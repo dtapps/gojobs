@@ -31,7 +31,7 @@ func NewClient(config *ClientConfig) *Client {
 	// 建立连接 获取client
 	c.Conn, err = grpc.Dial(c.Address, grpc.WithInsecure())
 	if err != nil {
-		panic("[客户端]{连接失败} " + err.Error())
+		panic("[客户端]{连接失败}" + err.Error())
 	}
 
 	return c

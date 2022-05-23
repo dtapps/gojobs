@@ -49,20 +49,19 @@ func NewServer(config *ServerConfig) *Server {
 }
 
 // StartUp 启动
-func (s *Server) StartUp() error {
+func (s *Server) StartUp() {
 
 	// 监听本地端口
 	lis, err := net.Listen("tcp", s.Address)
 	if err != nil {
-		return errors.New("[服务中转]{创建监听失败} " + err.Error())
+		panic(errors.New("[服务中转]{创建监听失败}" + err.Error()))
 	}
-	log.Println("[服务中转]{监听] ", lis.Addr())
+	log.Println("[服务中转]{监听}", lis.Addr())
 
 	// 启动grpc
 	err = s.Conn.Serve(lis)
 	if err != nil {
-		return errors.New("[服务中转]{创建服务失败} " + err.Error())
+		panic(errors.New("[服务中转]{创建服务失败}" + err.Error()))
 	}
 
-	return nil
 }
