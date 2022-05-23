@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -46,6 +47,22 @@ func NewServer(config *ServerConfig) *Server {
 	pb.RegisterPubSubServer(s.Conn, pb.NewPubSubServerService())
 
 	return s
+}
+
+// StartCron 启动定时任务
+func (s *Server) StartCron() {
+	cron := s.Pub.SubscribeTopic(func(v interface{}) bool {
+		if key, ok := v.(string); ok {
+			if strings.HasPrefix(key, prefix) {
+				return true
+			}
+		}
+		return false
+	})
+
+	go func() {
+		log.Println("cron：topic:", <-cron)
+	}()
 }
 
 // StartUp 启动

@@ -1,13 +1,16 @@
 package gojobs
 
 import (
+	"context"
 	"go.dtapp.net/gojobs/pb"
+	"go.dtapp.net/gouuid"
 	"google.golang.org/grpc"
 )
 
 // WorkerConfig 工作配置
 type WorkerConfig struct {
-	Address string // 服务端口 127.0.0.1:8888
+	Address  string // 服务端口 127.0.0.1:8888
+	ClientIp string // 自己的ip地址
 }
 
 // Worker 工作
@@ -23,10 +26,14 @@ func NewWorker(config *WorkerConfig) *Worker {
 	if config.Address == "" {
 		panic("[工作线]请填写服务端口")
 	}
+	if config.ClientIp == "" {
+		panic("[定时任务]请填写ip地址")
+	}
 
 	w := &Worker{}
 
 	w.Address = config.Address
+	w.ClientIp = config.ClientIp
 
 	var err error
 
@@ -40,4 +47,29 @@ func NewWorker(config *WorkerConfig) *Worker {
 	w.Pub = pb.NewPubSubClient(w.Conn)
 
 	return w
+}
+
+// SubscribeCron 订阅服务
+func (w *Worker) SubscribeCron() {
+	_, err := w.Pub.Subscribe(context.Background(), &pb.SubscribeRequest{
+		Id:    gouuid.GetUuId(),
+		Value: prefix,
+		Ip:    w.ClientIp,
+	})
+	if err != nil {
+		panic("[工作线]{订阅服务失败}" + err.Error())
+	}
+}
+
+// StartCron 启动任务
+func (w *Worker) StartCron() pb.PubSub_SubscribeClient {
+	stream, err := w.Pub.Subscribe(context.Background(), &pb.SubscribeRequest{
+		Id:    gouuid.GetUuId(),
+		Value: prefixSprintf(w.ClientIp),
+		Ip:    w.ClientIp,
+	})
+	if err != nil {
+		panic("[工作线]{启动任务失败}" + err.Error())
+	}
+	return stream
 }
