@@ -19,7 +19,8 @@ service PubSub {
 message PublishRequest {
   string id = 1;
   string value = 2;
-  string ip = 3;
+  string method = 3;
+  string ip = 4;
 }
 
 // 响应消息
@@ -33,12 +34,13 @@ message PublishResponse {
 message SubscribeRequest {
   string id = 1;
   string value = 2;
-  string ip = 3;
+  string method = 3;
+  string ip = 4;
 }
 
 // 响应消息
 message SubscribeResponse {
   string id = 1;
   string value = 2;
-  string ip = 3;
+  string method = 3;
 }

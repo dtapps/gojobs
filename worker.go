@@ -50,8 +50,8 @@ func NewWorker(config *WorkerConfig) *Worker {
 }
 
 // SubscribeCron 订阅服务
-func (w *Worker) SubscribeCron() {
-	_, err := w.Pub.Subscribe(context.Background(), &pb.SubscribeRequest{
+func (w *Worker) SubscribeCron() pb.PubSub_SubscribeClient {
+	stream, err := w.Pub.Subscribe(context.Background(), &pb.SubscribeRequest{
 		Id:    gouuid.GetUuId(),
 		Value: prefix,
 		Ip:    w.ClientIp,
@@ -59,6 +59,7 @@ func (w *Worker) SubscribeCron() {
 	if err != nil {
 		panic("[工作线]{订阅服务失败}" + err.Error())
 	}
+	return stream
 }
 
 // StartCron 启动任务

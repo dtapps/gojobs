@@ -41,12 +41,9 @@ func (p *PubSubServerService) Subscribe(req *SubscribeRequest, stream PubSub_Sub
 	// func(v interface{}) 定义函数过滤的规则
 	// SubscribeTopic 返回一个chan interface{}
 
-	log.Printf("[服务中转]{订阅}编号：%s 类型：%s ip地址：%s\n", req.GetId(), req.GetValue(), req.GetIp())
-
 	ch := p.pub.SubscribeTopic(func(v interface{}) bool {
 
 		log.Printf("[服务中转]{订阅}主题：%v\n", v)
-		log.Printf("[服务中转]{订阅}主题：%+v\n", v)
 
 		// 接收数据是string，并且key是以arg为前缀的
 		if key, ok := v.(string); ok {
@@ -57,6 +54,7 @@ func (p *PubSubServerService) Subscribe(req *SubscribeRequest, stream PubSub_Sub
 		return false
 	})
 
+	log.Printf("[服务中转]{订阅}编号：%s 类型：%s 方法：%s ip地址：%s\n", req.GetId(), req.GetValue(), req.GetMethod(), req.GetIp())
 	log.Println("[服务中转]{订阅}工作线：", ch)
 	log.Println("[服务中转]{订阅}当前工作线数量：", p.pub.Len())
 
@@ -65,8 +63,9 @@ func (p *PubSubServerService) Subscribe(req *SubscribeRequest, stream PubSub_Sub
 		log.Println("[服务中转]{订阅}for ch：", ch)
 		log.Println("[服务中转]{订阅}for v：", v)
 		err := stream.Send(&SubscribeResponse{
-			Value: v.(string),
-			Ip:    "",
+			Id:     req.GetId(),
+			Value:  req.GetValue(),
+			Method: req.GetMethod(),
 		})
 		if err != nil {
 			log.Println("[服务中转]{订阅}任务分配失败 ", err.Error())

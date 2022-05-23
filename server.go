@@ -65,7 +65,7 @@ func (s *Server) StartCron() {
 	}()
 }
 
-// StartUp 启动
+// StartUp 启动服务
 func (s *Server) StartUp() {
 
 	// 监听本地端口

@@ -29,8 +29,10 @@ func testServer(wg *sync.WaitGroup) {
 		Address:        "0.0.0.0:8888",
 	})
 
+	// 启动定时任务
 	server.StartCron()
 
+	// 启动服务
 	server.StartUp()
 
 	<-make(chan bool)
@@ -52,10 +54,10 @@ func testCron(wg *sync.WaitGroup) {
 	_, _ = c.AddFunc("*/15 * * * * *", func() {
 
 		server.Send(&pb.PublishRequest{
-			Id: gouuid.GetUuId(),
-			//Value: prefix + "wechat.send" + " 我是定时任务",
-			Value: prefixSprintf("127.0.0.1") + "wechat.send" + " 我是定时任务",
-			Ip:    "127.0.0.1",
+			Id:     gouuid.GetUuId(),
+			Value:  prefix,
+			Method: "wechat.1.send",
+			Ip:     "127.0.0.1",
 		})
 
 	})
@@ -64,10 +66,10 @@ func testCron(wg *sync.WaitGroup) {
 	_, _ = c.AddFunc("*/30 * * * * *", func() {
 
 		server.Send(&pb.PublishRequest{
-			Id: gouuid.GetUuId(),
-			//Value: prefix + "wechat.send" + " 我是定时任务",
-			Value: prefixSprintf("14.155.157.19") + "wechat.send" + " 我是定时任务",
-			Ip:    "14.155.157.19",
+			Id:     gouuid.GetUuId(),
+			Value:  prefix,
+			Method: "wechat.2.send",
+			Ip:     "14.155.157.19",
 		})
 
 	})
@@ -91,10 +93,10 @@ func testWorker1(wg *sync.WaitGroup) {
 	defer server.Conn.Close()
 
 	// 订阅服务
-	server.SubscribeCron()
+	stream := server.SubscribeCron()
 
 	// 启动任务，会想过滤器函数，订阅者应该收到的信息为 cron:任务名称
-	stream := server.StartCron()
+	//stream := server.StartCron()
 
 	// 阻塞遍历流，输出结果
 	for {
@@ -107,7 +109,7 @@ func testWorker1(wg *sync.WaitGroup) {
 			log.Println("[跑业务1]异常:", err.Error())
 			break
 		}
-		log.Println("[跑业务1]收到:", reply)
+		log.Printf("[跑业务1]{收到}编号：%s 方法：%s\n", reply.GetId(), reply.GetMethod())
 	}
 
 	wg.Done()
@@ -122,10 +124,10 @@ func testWorker2(wg *sync.WaitGroup) {
 	defer server.Conn.Close()
 
 	// 订阅服务
-	server.SubscribeCron()
+	stream := server.SubscribeCron()
 
 	// 启动任务，会想过滤器函数，订阅者应该收到的信息为 cron:任务名称
-	stream := server.StartCron()
+	//stream := server.StartCron()
 
 	// 阻塞遍历流，输出结果
 	for {
@@ -138,7 +140,7 @@ func testWorker2(wg *sync.WaitGroup) {
 			log.Println("[跑业务2]异常:", err.Error())
 			break
 		}
-		log.Println("[跑业务2]收到:", reply)
+		log.Printf("[跑业务2]{收到}编号：%s 方法：%s\n", reply.GetId(), reply.GetMethod())
 	}
 
 	wg.Done()
