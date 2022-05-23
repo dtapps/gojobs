@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PubSubClient interface {
 	// [发布] 消息
-	Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishRequest, error)
+	Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error)
 	// [订阅] 消息
 	Subscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (PubSub_SubscribeClient, error)
 }
@@ -36,8 +36,8 @@ func NewPubSubClient(cc grpc.ClientConnInterface) PubSubClient {
 	return &pubSubClient{cc}
 }
 
-func (c *pubSubClient) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishRequest, error) {
-	out := new(PublishRequest)
+func (c *pubSubClient) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error) {
+	out := new(PublishResponse)
 	err := c.cc.Invoke(ctx, "/pb.PubSub/Publish", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func (x *pubSubSubscribeClient) Recv() (*SubscribeResponse, error) {
 // for forward compatibility
 type PubSubServer interface {
 	// [发布] 消息
-	Publish(context.Context, *PublishRequest) (*PublishRequest, error)
+	Publish(context.Context, *PublishRequest) (*PublishResponse, error)
 	// [订阅] 消息
 	Subscribe(*SubscribeRequest, PubSub_SubscribeServer) error
 	mustEmbedUnimplementedPubSubServer()
@@ -92,7 +92,7 @@ type PubSubServer interface {
 type UnimplementedPubSubServer struct {
 }
 
-func (UnimplementedPubSubServer) Publish(context.Context, *PublishRequest) (*PublishRequest, error) {
+func (UnimplementedPubSubServer) Publish(context.Context, *PublishRequest) (*PublishResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Publish not implemented")
 }
 func (UnimplementedPubSubServer) Subscribe(*SubscribeRequest, PubSub_SubscribeServer) error {
