@@ -1,8 +1,10 @@
 package gojobs
 
 import (
+	"context"
 	"go.dtapp.net/gojobs/pb"
 	"google.golang.org/grpc"
+	"log"
 )
 
 // CronConfig 定时任务配置
@@ -40,4 +42,14 @@ func NewCron(config *CronConfig) *Cron {
 	c.Pub = pb.NewPubSubClient(c.Conn)
 
 	return c
+}
+
+// Send 发送
+func (c *Cron) Send(in *pb.String) (*pb.String, error) {
+	stream, err := c.Pub.Publish(context.Background(), in)
+	if err != nil {
+		log.Printf("[定时任务]发送失败：%v\n", err)
+	}
+	log.Println("[定时任务]发送成功", stream)
+	return stream, err
 }
