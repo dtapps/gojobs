@@ -12,10 +12,15 @@ import (
 )
 
 func TestJobs(t *testing.T) {
-	testServer()
+	wg := sync.WaitGroup{}
+	wg.Add(3)
+	go testServer(&wg)
+	go testCron(&wg)
+	go testWorker(&wg)
+	wg.Wait()
 }
 
-func testServer() {
+func testServer(wg *sync.WaitGroup) {
 
 	server := NewServer(&ServerConfig{
 		PublishTimeout: time.Millisecond * 100,
@@ -45,14 +50,7 @@ func testServer() {
 
 	<-make(chan bool)
 
-}
-
-func TestClient(t *testing.T) {
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-	go testCron(&wg)
-	go testWorker(&wg)
-	wg.Wait()
+	wg.Done()
 }
 
 func testCron(wg *sync.WaitGroup) {
