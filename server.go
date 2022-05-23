@@ -28,7 +28,7 @@ type Server struct {
 func NewServer(config *ServerConfig) *Server {
 
 	if config.Address == "" {
-		panic("请填写服务端口")
+		panic("[服务中转]请填写服务端口")
 	}
 
 	s := &Server{}
@@ -54,14 +54,14 @@ func (s *Server) StartUp() error {
 	// 监听本地端口
 	lis, err := net.Listen("tcp", s.Address)
 	if err != nil {
-		return errors.New("创建监听失败:" + err.Error())
+		return errors.New("[服务中转]{创建监听失败} " + err.Error())
 	}
-	log.Printf("正在监听的地址：%v", lis.Addr())
+	log.Println("[服务中转]{监听] ", lis.Addr())
 
 	// 启动grpc
 	err = s.Conn.Serve(lis)
 	if err != nil {
-		return errors.New("创建服务失败:" + err.Error())
+		return errors.New("[服务中转]{创建服务失败} " + err.Error())
 	}
 
 	return nil

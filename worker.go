@@ -21,7 +21,7 @@ type Worker struct {
 func NewWorker(config *WorkerConfig) *Worker {
 
 	if config.Address == "" {
-		panic("请填写服务端口")
+		panic("[工作线]请填写服务端口")
 	}
 
 	w := &Worker{}
@@ -33,7 +33,7 @@ func NewWorker(config *WorkerConfig) *Worker {
 	// 建立连接 获取client
 	w.Conn, err = grpc.Dial(w.Address, grpc.WithInsecure())
 	if err != nil {
-		panic("连接失败: " + err.Error())
+		panic("[工作线]{连接失败} " + err.Error())
 	}
 
 	// 新建一个客户端
