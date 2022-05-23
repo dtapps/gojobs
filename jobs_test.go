@@ -2,7 +2,9 @@ package gojobs
 
 import (
 	"context"
+	"github.com/robfig/cron/v3"
 	"go.dtapp.net/gojobs/pb"
+	"go.dtapp.net/gouuid"
 	"io"
 	"log"
 	"strings"
@@ -13,10 +15,11 @@ import (
 
 func TestJobs(t *testing.T) {
 	wg := sync.WaitGroup{}
-	wg.Add(3)
+	wg.Add(4)
 	go testServer(&wg)
 	go testCron(&wg)
-	go testWorker(&wg)
+	go testWorker1(&wg)
+	go testWorker2(&wg)
 	wg.Wait()
 }
 
@@ -29,9 +32,8 @@ func testServer(wg *sync.WaitGroup) {
 	})
 
 	cronServer := server.Pub.SubscribeTopic(func(v interface{}) bool {
-		log.Println("SubscribeTopic:", v)
 		if key, ok := v.(string); ok {
-			if strings.HasPrefix(key, "cron:") {
+			if strings.HasPrefix(key, prefix) {
 				return true
 			}
 		}
@@ -60,23 +62,42 @@ func testCron(wg *sync.WaitGroup) {
 	})
 	defer server.Conn.Close()
 
-	t1 := time.NewTimer(time.Second * 10)
-	for {
-		select {
-		case <-t1.C:
+	// 创建一个cron实例 精确到秒
+	c := cron.New(cron.WithSeconds())
 
-			server.Send(&pb.PublishRequest{
-				Value: "cron:" + "wechat.send",
-			})
+	// 每隔15秒执行一次
+	_, _ = c.AddFunc("*/15 * * * * *", func() {
 
-			t1.Reset(time.Second * 10)
-		}
-	}
+		server.Send(&pb.PublishRequest{
+			Id:    gouuid.GetUuId(),
+			Value: prefix + "wechat.send" + " 我是定时任务",
+			Ip:    "127.0.0.1",
+		})
+
+	})
+
+	// 每隔30秒执行一次
+	_, _ = c.AddFunc("*/30 * * * * *", func() {
+
+		server.Send(&pb.PublishRequest{
+			Id:    gouuid.GetUuId(),
+			Value: prefix + "wechat.send" + " 我是定时任务",
+			Ip:    "14.155.157.19",
+		})
+
+	})
+
+	// 启动任务
+	c.Start()
+
+	// 关闭任务
+	defer c.Stop()
+	select {}
 
 	wg.Done()
 }
 
-func testWorker(wg *sync.WaitGroup) {
+func testWorker1(wg *sync.WaitGroup) {
 
 	server := NewCron(&CronConfig{
 		Address: "localhost:8888",
@@ -86,25 +107,61 @@ func testWorker(wg *sync.WaitGroup) {
 	// 订阅服务，传入参数是 cron:
 	// 会想过滤器函数，订阅者应该收到的信息为 cron:任务名称
 	stream, err := server.Pub.Subscribe(context.Background(), &pb.SubscribeRequest{
-		Value: "cron:",
+		Id:    gouuid.GetUuId(),
+		Value: prefix,
 		Ip:    "127.0.0.1",
 	})
 	if err != nil {
-		log.Printf("[跑业务]发送失败:%v\n", err)
+		log.Printf("[跑业务1]发送失败:%v\n", err)
 	}
 
 	// 阻塞遍历流，输出结果
 	for {
 		reply, err := stream.Recv()
 		if io.EOF == err {
-			log.Println("[跑业务]已关闭:", err.Error())
+			log.Println("[跑业务1]已关闭:", err.Error())
 			break
 		}
 		if nil != err {
-			log.Println("[跑业务]异常:", err.Error())
+			log.Println("[跑业务1]异常:", err.Error())
 			break
 		}
-		log.Println("[跑业务]:", reply)
+		log.Println("[跑业务1]:", reply)
+	}
+
+	wg.Done()
+}
+
+func testWorker2(wg *sync.WaitGroup) {
+
+	server := NewCron(&CronConfig{
+		Address: "localhost:8888",
+	})
+	defer server.Conn.Close()
+
+	// 订阅服务，传入参数是 cron:
+	// 会想过滤器函数，订阅者应该收到的信息为 cron:任务名称
+	stream, err := server.Pub.Subscribe(context.Background(), &pb.SubscribeRequest{
+		Id:    gouuid.GetUuId(),
+		Value: prefix,
+		Ip:    "14.155.157.19",
+	})
+	if err != nil {
+		log.Printf("[跑业务2]发送失败:%v\n", err)
+	}
+
+	// 阻塞遍历流，输出结果
+	for {
+		reply, err := stream.Recv()
+		if io.EOF == err {
+			log.Println("[跑业务2]已关闭:", err.Error())
+			break
+		}
+		if nil != err {
+			log.Println("[跑业务2]异常:", err.Error())
+			break
+		}
+		log.Println("[跑业务2]:", reply)
 	}
 
 	wg.Done()

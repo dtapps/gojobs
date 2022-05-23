@@ -3,6 +3,9 @@ module go.dtapp.net/gojobs
 go 1.18
 
 require (
+	github.com/robfig/cron/v3 v3.0.1
+	go.dtapp.net/goip v1.0.16
+	go.dtapp.net/gouuid v1.0.0
 	google.golang.org/grpc v1.46.2
 	google.golang.org/protobuf v1.28.0
 )
@@ -12,7 +15,6 @@ require (
 	github.com/saracen/go7z v0.0.0-20191010121135-9c09b6bd7fda // indirect
 	github.com/saracen/solidblock v0.0.0-20190426153529-45df20abab6f // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
-	go.dtapp.net/goip v1.0.16 // indirect
 	go.dtapp.net/gorequest v1.0.18 // indirect
 	go.dtapp.net/gostring v1.0.3 // indirect
 	go.dtapp.net/gotime v1.0.2 // indirect

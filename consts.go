@@ -11,8 +11,10 @@ func configIp() {
 	ip = goip.GetOutsideIp()
 }
 
-const prefix = "cron_%s:"
+const prefix = "cron:"
 
-func prefixSprintf() string {
-	return fmt.Sprintf(prefix, ip)
+const prefixIp = "cron_%s:"
+
+func prefixSprintf(str string) string {
+	return fmt.Sprintf(prefixIp, str)
 }
