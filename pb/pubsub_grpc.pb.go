@@ -23,9 +23,9 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PubSubClient interface {
 	// [发布] 消息
-	Publish(ctx context.Context, in *String, opts ...grpc.CallOption) (*String, error)
+	Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishRequest, error)
 	// [订阅] 消息
-	Subscribe(ctx context.Context, in *String, opts ...grpc.CallOption) (PubSub_SubscribeClient, error)
+	Subscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (PubSub_SubscribeClient, error)
 }
 
 type pubSubClient struct {
@@ -36,8 +36,8 @@ func NewPubSubClient(cc grpc.ClientConnInterface) PubSubClient {
 	return &pubSubClient{cc}
 }
 
-func (c *pubSubClient) Publish(ctx context.Context, in *String, opts ...grpc.CallOption) (*String, error) {
-	out := new(String)
+func (c *pubSubClient) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishRequest, error) {
+	out := new(PublishRequest)
 	err := c.cc.Invoke(ctx, "/pb.PubSub/Publish", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (c *pubSubClient) Publish(ctx context.Context, in *String, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *pubSubClient) Subscribe(ctx context.Context, in *String, opts ...grpc.CallOption) (PubSub_SubscribeClient, error) {
+func (c *pubSubClient) Subscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (PubSub_SubscribeClient, error) {
 	stream, err := c.cc.NewStream(ctx, &PubSub_ServiceDesc.Streams[0], "/pb.PubSub/Subscribe", opts...)
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func (c *pubSubClient) Subscribe(ctx context.Context, in *String, opts ...grpc.C
 }
 
 type PubSub_SubscribeClient interface {
-	Recv() (*String, error)
+	Recv() (*SubscribeResponse, error)
 	grpc.ClientStream
 }
 
@@ -69,8 +69,8 @@ type pubSubSubscribeClient struct {
 	grpc.ClientStream
 }
 
-func (x *pubSubSubscribeClient) Recv() (*String, error) {
-	m := new(String)
+func (x *pubSubSubscribeClient) Recv() (*SubscribeResponse, error) {
+	m := new(SubscribeResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -82,9 +82,9 @@ func (x *pubSubSubscribeClient) Recv() (*String, error) {
 // for forward compatibility
 type PubSubServer interface {
 	// [发布] 消息
-	Publish(context.Context, *String) (*String, error)
+	Publish(context.Context, *PublishRequest) (*PublishRequest, error)
 	// [订阅] 消息
-	Subscribe(*String, PubSub_SubscribeServer) error
+	Subscribe(*SubscribeRequest, PubSub_SubscribeServer) error
 	mustEmbedUnimplementedPubSubServer()
 }
 
@@ -92,10 +92,10 @@ type PubSubServer interface {
 type UnimplementedPubSubServer struct {
 }
 
-func (UnimplementedPubSubServer) Publish(context.Context, *String) (*String, error) {
+func (UnimplementedPubSubServer) Publish(context.Context, *PublishRequest) (*PublishRequest, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Publish not implemented")
 }
-func (UnimplementedPubSubServer) Subscribe(*String, PubSub_SubscribeServer) error {
+func (UnimplementedPubSubServer) Subscribe(*SubscribeRequest, PubSub_SubscribeServer) error {
 	return status.Errorf(codes.Unimplemented, "method Subscribe not implemented")
 }
 func (UnimplementedPubSubServer) mustEmbedUnimplementedPubSubServer() {}
@@ -112,7 +112,7 @@ func RegisterPubSubServer(s grpc.ServiceRegistrar, srv PubSubServer) {
 }
 
 func _PubSub_Publish_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(String)
+	in := new(PublishRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -124,13 +124,13 @@ func _PubSub_Publish_Handler(srv interface{}, ctx context.Context, dec func(inte
 		FullMethod: "/pb.PubSub/Publish",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PubSubServer).Publish(ctx, req.(*String))
+		return srv.(PubSubServer).Publish(ctx, req.(*PublishRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _PubSub_Subscribe_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(String)
+	m := new(SubscribeRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
@@ -138,7 +138,7 @@ func _PubSub_Subscribe_Handler(srv interface{}, stream grpc.ServerStream) error 
 }
 
 type PubSub_SubscribeServer interface {
-	Send(*String) error
+	Send(*SubscribeResponse) error
 	grpc.ServerStream
 }
 
@@ -146,7 +146,7 @@ type pubSubSubscribeServer struct {
 	grpc.ServerStream
 }
 
-func (x *pubSubSubscribeServer) Send(m *String) error {
+func (x *pubSubSubscribeServer) Send(m *SubscribeResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 

@@ -45,7 +45,7 @@ func NewCron(config *CronConfig) *Cron {
 }
 
 // Send 发送
-func (c *Cron) Send(in *pb.String) (*pb.String, error) {
+func (c *Cron) Send(in *pb.PublishRequest) (*pb.PublishRequest, error) {
 	stream, err := c.Pub.Publish(context.Background(), in)
 	if err != nil {
 		log.Printf("[定时任务]发送失败：%v\n", err)

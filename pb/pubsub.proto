@@ -10,12 +10,24 @@ option go_package = "../pb";
 // 定义服务
 service PubSub {
   // [发布] 消息
-  rpc Publish (String) returns (String);
+  rpc Publish (PublishRequest) returns (PublishRequest);
   // [订阅] 消息
-  rpc Subscribe (String) returns (stream String);
+  rpc Subscribe (SubscribeRequest) returns (stream SubscribeResponse);
 }
 
 // 消息
-message String {
+message PublishRequest {
   string value = 1;
+}
+
+// 请求消息
+message SubscribeRequest {
+  string value = 1;
+  string ip = 2;
+}
+
+// 响应消息
+message SubscribeResponse {
+  string value = 1;
+  string ip = 2;
 }
