@@ -1,4 +1,4 @@
-package goip
+package gojobs
 
 import (
 	"go.dtapp.net/gojobs/pb"

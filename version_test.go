@@ -1,4 +1,4 @@
-package goip
+package gojobs
 
 import "testing"
 

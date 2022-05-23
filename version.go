@@ -1,3 +1,3 @@
-package goip
+package gojobs
 
-const Version = "1.0.0"
+const Version = "1.0.1"

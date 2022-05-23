@@ -12,7 +12,7 @@
 
 #### 安装使用
 
-```go
+```shell
 go get -v -u go.dtapp.net/gojobs
 ```
 
