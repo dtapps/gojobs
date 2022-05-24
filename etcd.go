@@ -3,8 +3,11 @@ package gojobs
 import (
 	"context"
 	"errors"
+	"fmt"
+	"go.dtapp.net/goip"
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	"go.etcd.io/etcd/client/v3"
+	"log"
 	"strings"
 	"time"
 )
@@ -99,6 +102,63 @@ func (e Etcd) ListWorkers() (workerArr []string, err error) {
 		workerArr = append(workerArr, workerIP)
 	}
 	return
+}
+
+// RegisterWorker 注册worker
+func (e Etcd) RegisterWorker() {
+	var (
+		regKey         string
+		leaseGrantResp *clientv3.LeaseGrantResponse
+		err            error
+		keepAliveChan  <-chan *clientv3.LeaseKeepAliveResponse
+		keepAliveResp  *clientv3.LeaseKeepAliveResponse
+		cancelCtx      context.Context
+		cancelFunc     context.CancelFunc
+	)
+
+	localIP := goip.GetOutsideIp()
+
+	for {
+		// 注册路径
+		regKey = JobWorkerDir + localIP
+
+		cancelFunc = nil
+
+		// 创建租约
+		if leaseGrantResp, err = e.lease.Grant(context.TODO(), 10); err != nil {
+			goto RETRY
+		}
+
+		// 自动续租
+		if keepAliveChan, err = e.lease.KeepAlive(context.TODO(), leaseGrantResp.ID); err != nil {
+			goto RETRY
+		}
+
+		cancelCtx, cancelFunc = context.WithCancel(context.TODO())
+
+		// 注册到etcd
+		if _, err = e.kv.Put(cancelCtx, regKey, "", clientv3.WithLease(leaseGrantResp.ID)); err != nil {
+			log.Println(fmt.Sprintf(" %s 服务注册失败:%s", regKey, err))
+			goto RETRY
+		}
+
+		// 处理续租应答
+		for {
+			select {
+			case keepAliveResp = <-keepAliveChan:
+				if keepAliveResp == nil { // 续租失败
+					log.Println("续租失败")
+					goto RETRY
+				}
+			}
+		}
+
+	RETRY:
+		time.Sleep(1 * time.Second)
+		if cancelFunc != nil {
+			cancelFunc()
+		}
+	}
 }
 
 const (
