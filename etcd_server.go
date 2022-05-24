@@ -18,6 +18,7 @@ func NewEtcdServer(config *EtcdConfig) (*Etcd, error) {
 
 	e.Endpoints = config.Endpoints
 	e.DialTimeout = config.DialTimeout
+	e.LocalIP = config.LocalIP
 
 	e.Client, err = clientv3.New(clientv3.Config{
 		Endpoints:   e.Endpoints,

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go.dtapp.net/goip"
 	"go.etcd.io/etcd/client/v3"
 	"log"
 	"time"
@@ -19,6 +20,10 @@ func NewEtcdWorker(config *EtcdConfig) (*Etcd, error) {
 
 	e.Endpoints = config.Endpoints
 	e.DialTimeout = config.DialTimeout
+	if config.LocalIP == "" {
+		config.LocalIP = goip.GetOutsideIp()
+	}
+	e.LocalIP = config.LocalIP
 
 	e.Client, err = clientv3.New(clientv3.Config{
 		Endpoints:   e.Endpoints,
