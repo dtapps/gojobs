@@ -25,12 +25,15 @@ func (e Etcd) Close() {
 
 // NewEtcd 创建etcd
 func NewEtcd(config *EtcdConfig) *Etcd {
+
 	e := &Etcd{}
+	e.Endpoints = config.Endpoints
+	e.DialTimeout = config.DialTimeout
 
 	var err error
 	e.c, err = clientv3.New(clientv3.Config{
-		Endpoints:   config.Endpoints,
-		DialTimeout: config.DialTimeout,
+		Endpoints:   e.Endpoints,
+		DialTimeout: e.DialTimeout,
 	})
 	if err != nil {
 		panic("连接失败：" + err.Error())
