@@ -43,8 +43,8 @@ func NewEtcd(config *EtcdConfig) *Etcd {
 }
 
 // Watch 监听
-func (e Etcd) Watch(ctx context.Context, key string) clientv3.WatchChan {
-	return e.c.Watch(ctx, key) // type WatchChan <-chan WatchResponse
+func (e Etcd) Watch(ctx context.Context, key string, opts ...clientv3.OpOption) clientv3.WatchChan {
+	return e.c.Watch(ctx, key, opts...)
 }
 
 // Create 创建
