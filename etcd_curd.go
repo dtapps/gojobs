@@ -7,25 +7,25 @@ import (
 
 // Watch 监听
 func (e Etcd) Watch(ctx context.Context, key string, opts ...clientv3.OpOption) clientv3.WatchChan {
-	return e.client.Watch(ctx, key, opts...)
+	return e.Client.Watch(ctx, key, opts...)
 }
 
 // Create 创建
 func (e Etcd) Create(ctx context.Context, key, val string, opts ...clientv3.OpOption) (*clientv3.PutResponse, error) {
-	return e.client.Put(ctx, key, val, opts...)
+	return e.Client.Put(ctx, key, val, opts...)
 }
 
 // Get 获取
 func (e Etcd) Get(ctx context.Context, key string, opts ...clientv3.OpOption) (*clientv3.GetResponse, error) {
-	return e.client.Get(ctx, key, opts...)
+	return e.Client.Get(ctx, key, opts...)
 }
 
 // Update 更新
 func (e Etcd) Update(ctx context.Context, key, val string, opts ...clientv3.OpOption) (*clientv3.PutResponse, error) {
-	return e.client.Put(ctx, key, val, opts...)
+	return e.Client.Put(ctx, key, val, opts...)
 }
 
 // Delete 删除
 func (e Etcd) Delete(ctx context.Context, key string, opts ...clientv3.OpOption) (*clientv3.DeleteResponse, error) {
-	return e.client.Delete(ctx, key, opts...)
+	return e.Client.Delete(ctx, key, opts...)
 }

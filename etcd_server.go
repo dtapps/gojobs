@@ -9,12 +9,17 @@ import (
 )
 
 // NewEtcdServer 创建 etcd server
-func NewEtcdServer(config *EtcdConfig) (e *Etcd, err error) {
+func NewEtcdServer(config *EtcdConfig) (*Etcd, error) {
+
+	var (
+		e   = &Etcd{}
+		err error
+	)
 
 	e.Endpoints = config.Endpoints
 	e.DialTimeout = config.DialTimeout
 
-	e.client, err = clientv3.New(clientv3.Config{
+	e.Client, err = clientv3.New(clientv3.Config{
 		Endpoints:   e.Endpoints,
 		DialTimeout: e.DialTimeout,
 	})
@@ -23,8 +28,8 @@ func NewEtcdServer(config *EtcdConfig) (e *Etcd, err error) {
 	}
 
 	// 得到KV和Lease的API子集
-	e.kv = clientv3.NewKV(e.client)
-	e.lease = clientv3.NewLease(e.client)
+	e.Kv = clientv3.NewKV(e.Client)
+	e.Lease = clientv3.NewLease(e.Client)
 
 	return e, nil
 }
@@ -41,7 +46,7 @@ func (e Etcd) ListWorkers() (workerArr []string, err error) {
 	workerArr = make([]string, 0)
 
 	// 获取目录下所有Kv
-	if getResp, err = e.kv.Get(context.TODO(), JobWorkerDir, clientv3.WithPrefix()); err != nil {
+	if getResp, err = e.Kv.Get(context.TODO(), JobWorkerDir, clientv3.WithPrefix()); err != nil {
 		return
 	}
 

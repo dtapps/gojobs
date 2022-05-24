@@ -4,24 +4,23 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go.dtapp.net/goip"
 	"go.etcd.io/etcd/client/v3"
 	"log"
 	"time"
 )
 
-const (
-	// JobWorkerDir 服务注册目录
-	JobWorkerDir = "/cron/workers/"
-)
-
 // NewEtcdWorker 创建 etcd Worker
-func NewEtcdWorker(config *EtcdConfig) (e *Etcd, err error) {
+func NewEtcdWorker(config *EtcdConfig) (*Etcd, error) {
+
+	var (
+		e   = &Etcd{}
+		err error
+	)
 
 	e.Endpoints = config.Endpoints
 	e.DialTimeout = config.DialTimeout
 
-	e.client, err = clientv3.New(clientv3.Config{
+	e.Client, err = clientv3.New(clientv3.Config{
 		Endpoints:   e.Endpoints,
 		DialTimeout: e.DialTimeout,
 	})
@@ -30,9 +29,10 @@ func NewEtcdWorker(config *EtcdConfig) (e *Etcd, err error) {
 	}
 
 	// 得到KV和Lease的API子集
-	e.kv = clientv3.NewKV(e.client)
-	e.lease = clientv3.NewLease(e.client)
+	e.Kv = clientv3.NewKV(e.Client)
+	e.Lease = clientv3.NewLease(e.Client)
 
+	// 注册
 	go e.RegisterWorker()
 
 	return e, nil
@@ -50,32 +50,30 @@ func (e Etcd) RegisterWorker() {
 		cancelFunc     context.CancelFunc
 	)
 
-	localIP := goip.GetOutsideIp()
-
 	for {
 		// 注册路径
-		regKey = JobWorkerDir + localIP
+		regKey = JobWorkerDir + e.LocalIP
 
 		cancelFunc = nil
 
 		// 创建租约
-		leaseGrantResp, err = e.lease.Grant(context.TODO(), 10)
+		leaseGrantResp, err = e.Lease.Grant(context.TODO(), 10)
+		log.Println("创建租约")
 		if err != nil {
-			log.Println("创建租约")
 			goto RETRY
 		}
 
 		// 自动续租
-		keepAliveChan, err = e.lease.KeepAlive(context.TODO(), leaseGrantResp.ID)
+		keepAliveChan, err = e.Lease.KeepAlive(context.TODO(), leaseGrantResp.ID)
+		log.Println("自动续租")
 		if err != nil {
-			log.Println("自动续租")
 			goto RETRY
 		}
 
 		cancelCtx, cancelFunc = context.WithCancel(context.TODO())
 
 		// 注册到etcd
-		_, err = e.kv.Put(cancelCtx, regKey, "", clientv3.WithLease(leaseGrantResp.ID))
+		_, err = e.Kv.Put(cancelCtx, regKey, "", clientv3.WithLease(leaseGrantResp.ID))
 		if err != nil {
 			log.Println(fmt.Sprintf(" %s 服务注册失败:%s", regKey, err))
 			goto RETRY
