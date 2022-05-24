@@ -28,11 +28,13 @@ func NewEtcdWorker(config *EtcdConfig) (*Etcd, error) {
 		return nil, errors.New("连接失败：" + err.Error())
 	}
 
-	// 得到KV和Lease的API子集
+	// 获得kv API子集
 	e.Kv = clientv3.NewKV(e.Client)
+
+	// 创建一个lease（租约）对象
 	e.Lease = clientv3.NewLease(e.Client)
 
-	// 注册
+	// 注册服务
 	go e.RegisterWorker()
 
 	return e, nil
@@ -56,17 +58,17 @@ func (e Etcd) RegisterWorker() {
 
 		cancelFunc = nil
 
-		// 创建租约
+		// 申请一个10秒的租约
 		leaseGrantResp, err = e.Lease.Grant(context.TODO(), 10)
-		log.Println("创建租约")
 		if err != nil {
+			log.Println("申请一个10秒的租约失败", err)
 			goto RETRY
 		}
 
-		// 自动续租
+		// 自动永久续租
 		keepAliveChan, err = e.Lease.KeepAlive(context.TODO(), leaseGrantResp.ID)
-		log.Println("自动续租")
 		if err != nil {
+			log.Println("自动永久续租失败", err)
 			goto RETRY
 		}
 
@@ -79,13 +81,15 @@ func (e Etcd) RegisterWorker() {
 			goto RETRY
 		}
 
-		// 处理续租应答
+		// 处理续约应答的协程
 		for {
 			select {
 			case keepAliveResp = <-keepAliveChan:
-				if keepAliveResp == nil { // 续租失败
+				if keepAliveResp == nil {
 					log.Println("续租失败")
 					goto RETRY
+				} else {
+					log.Println("收到自动续租应答:", leaseGrantResp.ID)
 				}
 			}
 		}

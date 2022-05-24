@@ -16,8 +16,9 @@ type EtcdConfig struct {
 type Etcd struct {
 	EtcdConfig                  // 配置
 	Client     *clientv3.Client // 驱动
-	Kv         clientv3.KV      // Kv api
-	Lease      clientv3.Lease   // Lease api
+	Kv         clientv3.KV      // kv API子集
+	Lease      clientv3.Lease   // lease（租约）对象
+	leaseId    clientv3.LeaseID // 租约编号
 }
 
 // Close 关闭

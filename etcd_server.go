@@ -27,8 +27,10 @@ func NewEtcdServer(config *EtcdConfig) (*Etcd, error) {
 		return nil, errors.New("连接失败：" + err.Error())
 	}
 
-	// 得到KV和Lease的API子集
+	// kv API子集
 	e.Kv = clientv3.NewKV(e.Client)
+
+	// 创建一个lease（租约）对象
 	e.Lease = clientv3.NewLease(e.Client)
 
 	return e, nil
