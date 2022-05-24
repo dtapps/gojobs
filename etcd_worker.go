@@ -60,6 +60,7 @@ func (e Etcd) RegisterWorker() {
 	for {
 		// 注册路径
 		regKey = JobWorkerDir + e.LocalIP
+		log.Println("租约：", regKey)
 
 		cancelFunc = nil
 
