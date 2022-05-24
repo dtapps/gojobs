@@ -40,5 +40,5 @@ func (e Etcd) GetWatchKey() string {
 
 // IssueWatchKey 下发的key
 func (e Etcd) IssueWatchKey(ip string) string {
-	return JobSaveDir + ip + "/"
+	return JobSaveDir + ip
 }

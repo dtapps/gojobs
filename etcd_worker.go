@@ -100,6 +100,7 @@ func (e Etcd) RegisterWorker() {
 		}
 
 	RETRY:
+		log.Println("异常 RETRY ", regKey)
 		time.Sleep(1 * time.Second)
 		if cancelFunc != nil {
 			cancelFunc()
