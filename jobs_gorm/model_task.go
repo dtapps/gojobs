@@ -1,6 +1,9 @@
-package jobs_gorm_model
+package jobs_gorm
 
-import "gorm.io/gorm"
+import (
+	"go.dtapp.net/gojobs"
+	"gorm.io/gorm"
+)
 
 // Task 任务
 type Task struct {
@@ -27,4 +30,48 @@ type Task struct {
 
 func (m *Task) TableName() string {
 	return "task"
+}
+
+// TaskTake 查询任务
+func (jobsGorm *JobsGorm) TaskTake(tx *gorm.DB, customId string) (result Task) {
+	tx.Where("custom_id = ?", customId).Where("status = ?", gojobs.TASK_IN).Take(&result)
+	return result
+}
+
+// TaskCustomIdTake 查询任务
+func (jobsGorm *JobsGorm) TaskCustomIdTake(tx *gorm.DB, Type, customId string) (result Task) {
+	tx.Where("type = ?", Type).Where("custom_id = ?", customId).Take(&result)
+	return result
+}
+
+// TaskCustomIdTakeStatus 查询任务
+func (jobsGorm *JobsGorm) TaskCustomIdTakeStatus(tx *gorm.DB, Type, customId, status string) (result Task) {
+	tx.Where("type = ?", Type).Where("custom_id = ?", customId).Where("status = ?", status).Take(&result)
+	return result
+}
+
+// TaskFind 查询任务
+func (jobsGorm *JobsGorm) TaskFind(tx *gorm.DB, frequency int64) (results []Task) {
+	tx.Table("task").Select("task.*").Where("task.frequency = ?", frequency).Where("task.status = ?", gojobs.TASK_IN).Where("task_ip.ips = ?", jobsGorm.OutsideIp).Order("task.id asc").Joins("left join task_ip on task_ip.task_type = task.type").Find(&results)
+	return jobsGorm.taskFindCheck(results)
+}
+
+// TaskFindAll 查询任务
+func (jobsGorm *JobsGorm) TaskFindAll(tx *gorm.DB, frequency int64) (results []Task) {
+	tx.Where("frequency = ?", frequency).Where("status = ?", gojobs.TASK_IN).Order("id asc").Find(&results)
+	return results
+}
+
+// 检查任务
+func (jobsGorm *JobsGorm) taskFindCheck(lists []Task) (results []Task) {
+	for _, v := range lists {
+		if v.SpecifyIp == "" {
+			results = append(results, v)
+		} else {
+			if jobsGorm.OutsideIp == v.SpecifyIp {
+				results = append(results, v)
+			}
+		}
+	}
+	return results
 }

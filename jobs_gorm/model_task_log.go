@@ -1,4 +1,4 @@
-package jobs_gorm_model
+package jobs_gorm
 
 // TaskLog 任务日志模型
 type TaskLog struct {
@@ -6,7 +6,7 @@ type TaskLog struct {
 	TaskId     uint   `json:"task_id"`                     // 任务编号
 	StatusCode int    `json:"status_code"`                 // 状态码
 	Desc       string `json:"desc"`                        // 结果
-	Version    int    `json:"version"`                     // 版本
+	Version    string `json:"version"`                     // 版本
 	CreatedAt  string `gorm:"type:text" json:"created_at"` // 创建时间
 }
 
