@@ -9,9 +9,9 @@ import (
 )
 
 type ConfigJobsGorm struct {
-	MainService int         // 主要服务
-	Db          *gorm.DB    // 数据库
-	Redis       goredis.App // 缓存数据库服务
+	MainService int             // 主要服务
+	Db          *gorm.DB        // 数据库
+	Redis       *goredis.Client // 缓存数据库服务
 }
 
 func NewJobsGorm(config *ConfigJobsGorm) *jobs_gorm.JobsGorm {
