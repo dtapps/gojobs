@@ -19,11 +19,22 @@ func NewEtcdServer(config *EtcdConfig) (*Etcd, error) {
 	e.Endpoints = config.Endpoints
 	e.DialTimeout = config.DialTimeout
 	e.LocalIP = config.LocalIP
+	e.Username = config.Username
+	e.Password = config.Password
+	e.CustomDirectory = config.CustomDirectory
 
-	e.Client, err = clientv3.New(clientv3.Config{
+	v3Config := clientv3.Config{
 		Endpoints:   e.Endpoints,
 		DialTimeout: e.DialTimeout,
-	})
+	}
+
+	// 判断有没有配置用户信息
+	if e.Username != "" {
+		v3Config.Username = e.Username
+		v3Config.Password = e.Password
+	}
+
+	e.Client, err = clientv3.New(v3Config)
 	if err != nil {
 		return nil, errors.New("连接失败：" + err.Error())
 	}
@@ -49,20 +60,20 @@ func (e Etcd) ListWorkers() (workerArr []string, err error) {
 	workerArr = make([]string, 0)
 
 	// 获取目录下所有Kv
-	if getResp, err = e.Kv.Get(context.TODO(), JobWorkerDir, clientv3.WithPrefix()); err != nil {
+	if getResp, err = e.Kv.Get(context.TODO(), getJobWorkerDir(e), clientv3.WithPrefix()); err != nil {
 		return
 	}
 
 	// 解析每个节点的IP
 	for _, kv = range getResp.Kvs {
 		// kv.Key : /cron/workers/192.168.2.1
-		workerIP = ExtractWorkerIP(string(kv.Key))
+		workerIP = e.ExtractWorkerIP(string(kv.Key))
 		workerArr = append(workerArr, workerIP)
 	}
 	return
 }
 
 // ExtractWorkerIP 提取worker的IP
-func ExtractWorkerIP(regKey string) string {
-	return strings.TrimPrefix(regKey, JobWorkerDir)
+func (e Etcd) ExtractWorkerIP(regKey string) string {
+	return strings.TrimPrefix(regKey, getJobWorkerDir(e))
 }

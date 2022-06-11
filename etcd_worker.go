@@ -24,11 +24,22 @@ func NewEtcdWorker(config *EtcdConfig) (*Etcd, error) {
 		config.LocalIP = goip.GetOutsideIp()
 	}
 	e.LocalIP = config.LocalIP
+	e.Username = config.Username
+	e.Password = config.Password
+	e.CustomDirectory = config.CustomDirectory
 
-	e.Client, err = clientv3.New(clientv3.Config{
+	v3Config := clientv3.Config{
 		Endpoints:   e.Endpoints,
 		DialTimeout: e.DialTimeout,
-	})
+	}
+
+	// 判断有没有配置用户信息
+	if e.Username != "" {
+		v3Config.Username = e.Username
+		v3Config.Password = e.Password
+	}
+
+	e.Client, err = clientv3.New(v3Config)
 	if err != nil {
 		return nil, errors.New("连接失败：" + err.Error())
 	}
@@ -59,7 +70,7 @@ func (e Etcd) RegisterWorker() {
 
 	for {
 		// 注册路径
-		regKey = JobWorkerDir + e.LocalIP
+		regKey = getJobWorkerDir(e) + e.LocalIP
 		log.Println("租约：", regKey)
 
 		cancelFunc = nil
