@@ -68,7 +68,7 @@ func (jobsGorm *JobsGorm) CreateInCustomId(config *ConfigCreateInCustomId) error
 		UpdatedIp:      jobsGorm.outsideIp,
 	})
 	if createStatus.RowsAffected == 0 {
-		return errors.New(fmt.Sprintf("创建任务失败：%s", createStatus.Error))
+		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, createStatus.Error))
 	}
 	return nil
 }
@@ -88,7 +88,7 @@ type ConfigCreateInCustomIdOnly struct {
 func (jobsGorm *JobsGorm) CreateInCustomIdOnly(config *ConfigCreateInCustomIdOnly) error {
 	query := jobsGorm.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
 	if query.Id != 0 {
-		return errors.New("任务已存在")
+		return errors.New(fmt.Sprintf("%d:[%s@%s]任务已存在", query.Id, config.CustomId, config.Type))
 	}
 	createStatus := config.Tx.Create(&Task{
 		Status:         jobs_common.TASK_IN,
@@ -104,7 +104,7 @@ func (jobsGorm *JobsGorm) CreateInCustomIdOnly(config *ConfigCreateInCustomIdOnl
 		UpdatedIp:      jobsGorm.outsideIp,
 	})
 	if createStatus.RowsAffected == 0 {
-		return errors.New(fmt.Sprintf("创建任务失败：%s", createStatus.Error))
+		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, createStatus.Error))
 	}
 	return nil
 }
@@ -138,7 +138,7 @@ func (jobsGorm *JobsGorm) CreateInCustomIdMaxNumber(config *ConfigCreateInCustom
 		UpdatedIp:      jobsGorm.outsideIp,
 	})
 	if createStatus.RowsAffected == 0 {
-		return errors.New(fmt.Sprintf("创建任务失败：%s", createStatus.Error))
+		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, createStatus.Error))
 	}
 	return nil
 }
@@ -159,7 +159,7 @@ type ConfigCreateInCustomIdMaxNumberOnly struct {
 func (jobsGorm *JobsGorm) CreateInCustomIdMaxNumberOnly(config *ConfigCreateInCustomIdMaxNumberOnly) error {
 	query := jobsGorm.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
 	if query.Id != 0 {
-		return errors.New("任务已存在")
+		return errors.New(fmt.Sprintf("%d:[%s@%s]任务已存在", query.Id, config.CustomId, config.Type))
 	}
 	createStatus := config.Tx.Create(&Task{
 		Status:         jobs_common.TASK_IN,
@@ -176,7 +176,7 @@ func (jobsGorm *JobsGorm) CreateInCustomIdMaxNumberOnly(config *ConfigCreateInCu
 		UpdatedIp:      jobsGorm.outsideIp,
 	})
 	if createStatus.RowsAffected == 0 {
-		return errors.New(fmt.Sprintf("创建任务失败：%s", createStatus.Error))
+		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, createStatus.Error))
 	}
 	return nil
 }
