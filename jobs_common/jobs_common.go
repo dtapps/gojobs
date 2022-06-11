@@ -1,4 +1,4 @@
-package gojobs
+package jobs_common
 
 const (
 	TASK_IN      = "IN"      // 任务运行

@@ -13,7 +13,7 @@ func (jobsGorm *JobsGorm) Lock(info Task, id any) string {
 	if judgeCache != "" {
 		return judgeCache
 	}
-	jobsGorm.Redis.NewStringOperation().Set(cacheName, fmt.Sprintf("已在%v机器上锁成功", jobsGorm.OutsideIp), goredis.WithExpire(time.Millisecond*time.Duration(info.Frequency)*3))
+	jobsGorm.Redis.NewStringOperation().Set(cacheName, fmt.Sprintf("已在%v机器上锁成功", jobsGorm.outsideIp), goredis.WithExpire(time.Millisecond*time.Duration(info.Frequency)*3))
 	return ""
 }
 
@@ -30,6 +30,6 @@ func (jobsGorm *JobsGorm) LockForever(info Task, id any) string {
 	if judgeCache != "" {
 		return judgeCache
 	}
-	jobsGorm.Redis.NewStringOperation().Set(cacheName, fmt.Sprintf("已在%v机器永远上锁成功", jobsGorm.OutsideIp))
+	jobsGorm.Redis.NewStringOperation().Set(cacheName, fmt.Sprintf("已在%v机器永远上锁成功", jobsGorm.outsideIp))
 	return ""
 }

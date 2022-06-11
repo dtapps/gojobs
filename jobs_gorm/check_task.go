@@ -7,7 +7,7 @@ import (
 )
 
 func (jobsGorm *JobsGorm) Check(tx *gorm.DB, vs []Task) {
-	if jobsGorm.MainService > 0 && len(vs) > 0 {
+	if jobsGorm.mainService > 0 && len(vs) > 0 {
 		for _, v := range vs {
 			diffInSecondWithAbs := gotime.Current().DiffInSecondWithAbs(gotime.SetCurrentParse(v.UpdatedAt).Time)
 			if diffInSecondWithAbs >= v.Frequency*3 {

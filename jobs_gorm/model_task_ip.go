@@ -35,27 +35,27 @@ func (jobsGorm *JobsGorm) TaskIpUpdate(tx *gorm.DB, taskType, ips string) *gorm.
 
 // TaskIpInit 实例任务ip
 func (jobsGorm *JobsGorm) TaskIpInit(tx *gorm.DB, ips map[string]string) bool {
-	if jobsGorm.OutsideIp == "" || jobsGorm.OutsideIp == "0.0.0.0" {
+	if jobsGorm.outsideIp == "" || jobsGorm.outsideIp == "0.0.0.0" {
 		return false
 	}
-	tx.Where("ips = ?", jobsGorm.OutsideIp).Delete(&TaskIp{}) // 删除
+	tx.Where("ips = ?", jobsGorm.outsideIp).Delete(&TaskIp{}) // 删除
 	for k, v := range ips {
 		if v == "" {
-			jobsGorm.TaskIpUpdate(tx, k, jobsGorm.OutsideIp)
+			jobsGorm.TaskIpUpdate(tx, k, jobsGorm.outsideIp)
 		} else {
 			find := strings.Contains(v, ",")
 			if find == true {
 				// 包含
 				parts := strings.Split(v, ",")
 				for _, vv := range parts {
-					if vv == jobsGorm.OutsideIp {
-						jobsGorm.TaskIpUpdate(tx, k, jobsGorm.OutsideIp)
+					if vv == jobsGorm.outsideIp {
+						jobsGorm.TaskIpUpdate(tx, k, jobsGorm.outsideIp)
 					}
 				}
 			} else {
 				// 不包含
-				if v == jobsGorm.OutsideIp {
-					jobsGorm.TaskIpUpdate(tx, k, jobsGorm.OutsideIp)
+				if v == jobsGorm.outsideIp {
+					jobsGorm.TaskIpUpdate(tx, k, jobsGorm.outsideIp)
 				}
 			}
 		}
