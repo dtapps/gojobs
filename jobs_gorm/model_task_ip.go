@@ -8,18 +8,23 @@ import (
 
 // TaskIp 任务Ip
 type TaskIp struct {
-	Id       int64  `gorm:"primaryKey" json:"id"` // 记录编号
-	TaskType string `json:"task_type"`            // 任务编号
-	Ips      string `json:"ips"`                  // 任务IP
+	Id       int64  `gorm:"primaryKey;comment:记录编号" json:"id"` // 记录编号
+	TaskType string `gorm:"comment:任务编号" json:"task_type"`     // 任务编号
+	Ips      string `gorm:"comment:任务IP" json:"ips"`           // 任务IP
 }
 
 func (m *TaskIp) TableName() string {
 	return "task_ip"
 }
 
+func (jobsGorm *JobsGorm) taskIpTake(tx *gorm.DB, taskType, ips string) (result TaskIp) {
+	tx.Where("task_type = ?", taskType).Where("ips = ?", ips).Take(&result)
+	return result
+}
+
+// TaskIpUpdate 更新ip
 func (jobsGorm *JobsGorm) TaskIpUpdate(tx *gorm.DB, taskType, ips string) *gorm.DB {
-	var query TaskIp
-	tx.Where("task_type = ?", taskType).Where("ips = ?", ips).Take(&query)
+	query := jobsGorm.taskIpTake(tx, taskType, ips)
 	if query.Id != 0 {
 		return tx
 	}
