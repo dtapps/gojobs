@@ -41,7 +41,7 @@ require (
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
-	go.dtapp.net/gorequest v1.0.19 // indirect
+	go.dtapp.net/gorequest v1.0.20 // indirect
 	go.dtapp.net/gostring v1.0.3 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.4 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
