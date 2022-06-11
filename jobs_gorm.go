@@ -19,6 +19,6 @@ func NewJobsGorm(config *ConfigJobsGorm) *jobs_gorm.JobsGorm {
 	jobsGorm = jobs_gorm.NewGorm(jobs_gorm.JobsGorm{
 		Db:    config.Db,
 		Redis: config.Redis,
-	}, config.MainService)
+	}, config.MainService, Version)
 	return jobsGorm
 }

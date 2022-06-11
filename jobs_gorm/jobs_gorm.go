@@ -3,7 +3,6 @@ package jobs_gorm
 import (
 	"go.dtapp.net/goarray"
 	"go.dtapp.net/goip"
-	"go.dtapp.net/gojobs"
 	"go.dtapp.net/goredis"
 	"gorm.io/gorm"
 	"runtime"
@@ -23,8 +22,8 @@ type JobsGorm struct {
 	Redis       goredis.App // 缓存数据库服务
 }
 
-func NewGorm(jobsGorm JobsGorm, mainService int) *JobsGorm {
-	jobsGorm.runVersion = gojobs.Version
+func NewGorm(jobsGorm JobsGorm, mainService int, runVersion string) *JobsGorm {
+	jobsGorm.runVersion = runVersion
 	jobsGorm.os = runtime.GOOS
 	jobsGorm.arch = runtime.GOARCH
 	jobsGorm.maxProCs = runtime.GOMAXPROCS(0)
