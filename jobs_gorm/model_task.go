@@ -142,3 +142,17 @@ func (jobsGorm *JobsGorm) TaskFindAllTimeout(tx *gorm.DB, frequency int64) []Tas
 func (jobsGorm *JobsGorm) TaskFindAllWait(tx *gorm.DB, frequency int64) []Task {
 	return jobsGorm.taskFindAll(tx, frequency, jobs_common.TASK_WAIT)
 }
+
+// EditTask 任务修改
+func (jobsGorm *JobsGorm) EditTask(tx *gorm.DB, id uint) *gorm.DB {
+	return tx.Model(&Task{}).Where("id = ?", id)
+}
+
+// UpdateFrequency 更新任务频率
+func (jobsGorm *JobsGorm) UpdateFrequency(tx *gorm.DB, id uint, frequency int64) *gorm.DB {
+	return jobsGorm.EditTask(tx, id).
+		Select("frequency").
+		Updates(Task{
+			Frequency: frequency,
+		})
+}
