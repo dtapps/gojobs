@@ -8,7 +8,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	go.dtapp.net/goarray v1.0.0
 	go.dtapp.net/goip v1.0.17
-	go.dtapp.net/goredis v1.0.0
+	go.dtapp.net/goredis v1.0.1
 	go.dtapp.net/gotime v1.0.2
 	go.dtapp.net/gouuid v1.0.0
 	go.etcd.io/etcd/api/v3 v3.5.4
