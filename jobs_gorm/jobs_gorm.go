@@ -7,8 +7,10 @@ import (
 	"go.dtapp.net/goip"
 	"go.dtapp.net/gojobs/jobs_common"
 	"go.dtapp.net/goredis"
+	"go.dtapp.net/gotime"
 	"go.dtapp.net/gouuid"
 	"gorm.io/gorm"
+	"log"
 	"runtime"
 )
 
@@ -179,4 +181,106 @@ func (jobsGorm *JobsGorm) CreateInCustomIdMaxNumberOnly(config *ConfigCreateInCu
 		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, createStatus.Error))
 	}
 	return nil
+}
+
+// RunAddLog 任务执行日志
+func (jobsGorm *JobsGorm) RunAddLog(tx *gorm.DB, id uint, runId string) *gorm.DB {
+	return tx.Create(&TaskLogRun{
+		TaskId:     id,
+		RunId:      runId,
+		InsideIp:   jobsGorm.insideIp,
+		OutsideIp:  jobsGorm.outsideIp,
+		Os:         jobsGorm.os,
+		Arch:       jobsGorm.arch,
+		Gomaxprocs: jobsGorm.maxProCs,
+		GoVersion:  jobsGorm.version,
+		MacAddrs:   jobsGorm.macAddrS,
+		CreatedAt:  gotime.Current().Format(),
+	})
+}
+
+// Run 任务执行
+func (jobsGorm *JobsGorm) Run(tx *gorm.DB, info Task, status int, desc string) {
+	// 请求函数记录
+	statusCreate := tx.Create(&TaskLog{
+		TaskId:     info.Id,
+		StatusCode: status,
+		Desc:       desc,
+		Version:    jobsGorm.runVersion,
+		CreatedAt:  gotime.Current().Format(),
+	})
+	if statusCreate.RowsAffected == 0 {
+		log.Println("statusCreate", statusCreate.Error)
+	}
+	if status == 0 {
+		statusEdit := jobsGorm.EditTask(tx, info.Id).Select("run_id").Updates(Task{
+			RunId: gouuid.GetUuId(),
+		})
+		if statusEdit.RowsAffected == 0 {
+			log.Println("statusEdit", statusEdit.Error)
+		}
+		return
+	}
+	// 任务
+	if status == CodeSuccess {
+		// 执行成功
+		statusEdit := jobsGorm.EditTask(tx, info.Id).
+			Select("status_desc", "number", "run_id", "updated_ip", "updated_at", "result").
+			Updates(Task{
+				StatusDesc: "执行成功",
+				Number:     info.Number + 1,
+				RunId:      gouuid.GetUuId(),
+				UpdatedIp:  jobsGorm.outsideIp,
+				UpdatedAt:  gotime.Current().Format(),
+				Result:     desc,
+			})
+		if statusEdit.RowsAffected == 0 {
+			log.Println("statusEdit", statusEdit.Error)
+		}
+	}
+	if status == CodeEnd {
+		// 执行成功、提前结束
+		statusEdit := jobsGorm.EditTask(tx, info.Id).
+			Select("status", "status_desc", "number", "updated_ip", "updated_at", "result").
+			Updates(Task{
+				Status:     jobs_common.TASK_SUCCESS,
+				StatusDesc: "结束执行",
+				Number:     info.Number + 1,
+				UpdatedIp:  jobsGorm.outsideIp,
+				UpdatedAt:  gotime.Current().Format(),
+				Result:     desc,
+			})
+		if statusEdit.RowsAffected == 0 {
+			log.Println("statusEdit", statusEdit.Error)
+		}
+	}
+	if status == CodeError {
+		// 执行失败
+		statusEdit := jobsGorm.EditTask(tx, info.Id).
+			Select("status_desc", "number", "run_id", "updated_ip", "updated_at", "result").
+			Updates(Task{
+				StatusDesc: "执行失败",
+				Number:     info.Number + 1,
+				RunId:      gouuid.GetUuId(),
+				UpdatedIp:  jobsGorm.outsideIp,
+				UpdatedAt:  gotime.Current().Format(),
+				Result:     desc,
+			})
+		if statusEdit.RowsAffected == 0 {
+			log.Println("statusEdit", statusEdit.Error)
+		}
+	}
+	if info.MaxNumber != 0 {
+		if info.Number+1 >= info.MaxNumber {
+			// 关闭执行
+			statusEdit := jobsGorm.EditTask(tx, info.Id).
+				Select("status").
+				Updates(Task{
+					Status: jobs_common.TASK_TIMEOUT,
+				})
+			if statusEdit.RowsAffected == 0 {
+				log.Println("statusEdit", statusEdit.Error)
+			}
+		}
+	}
 }
