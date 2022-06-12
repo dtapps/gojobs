@@ -1,18 +1,16 @@
 package gojobs
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSpec(t *testing.T) {
-	t.Log(GetSpecSeconds(10))
-	t.Log(GetFrequencySeconds(10))
+	t.Log("每隔n秒执行一次：", GetSpecSeconds(10))
+	t.Log("每隔n秒执行一次：", GetFrequencySeconds(10))
 
-	t.Log(GetSpecMinutes(1))
-	t.Log(GetFrequencyMinutes(1))
-	t.Log(GetSpecMinutes(10))
-	t.Log(GetFrequencyMinutes(10))
-	t.Log(GetSpecMinutes(30))
-	t.Log(GetFrequencyMinutes(30))
+	t.Log("每隔n分钟执行一次：", GetSpecMinutes(10))
+	t.Log("每隔n分钟执行一次：", GetFrequencyMinutes(10))
 
-	t.Log(GetSpecHour(10))
-	t.Log(GetFrequencyHour(10))
+	t.Log("每天n点执行一次：", GetSpecHour(10))
+	t.Log("每天n点执行一次：", GetFrequencyHour(10))
 }

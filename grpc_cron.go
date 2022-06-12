@@ -12,21 +12,21 @@ type CronConfig struct {
 	Address string // 服务端口 127.0.0.1:8888
 }
 
-// Cron 定时任务
-type Cron struct {
+// GrpcCron 定时任务
+type GrpcCron struct {
 	CronConfig                  // 配置
 	Pub        pb.PubSubClient  // 订阅
 	Conn       *grpc.ClientConn // 链接信息
 }
 
-// NewCron 创建定时任务
-func NewCron(config *CronConfig) *Cron {
+// NewGrpcCron 创建定时任务
+func NewGrpcCron(config *CronConfig) *GrpcCron {
 
 	if config.Address == "" {
 		panic("[定时任务]请填写服务端口")
 	}
 
-	c := &Cron{}
+	c := &GrpcCron{}
 
 	c.Address = config.Address
 
@@ -45,7 +45,7 @@ func NewCron(config *CronConfig) *Cron {
 }
 
 // Send 发送
-func (c *Cron) Send(in *pb.PublishRequest) (*pb.PublishResponse, error) {
+func (c *GrpcCron) Send(in *pb.PublishRequest) (*pb.PublishResponse, error) {
 	log.Printf("[定时任务]{广播开始}编号：%s 类型：%s ip：%s\n", in.GetId(), in.GetValue(), in.GetIp())
 	stream, err := c.Pub.Publish(context.Background(), in)
 	if err != nil {
