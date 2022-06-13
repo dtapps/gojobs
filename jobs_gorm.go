@@ -68,6 +68,14 @@ func NewJobsGorm(config *ConfigJobsGorm) *JobsGorm {
 	return j
 }
 
+func (j *JobsGorm) GetDb() *gorm.DB {
+	return j.db
+}
+
+func (j *JobsGorm) GetRedis() *goredis.Client {
+	return j.redis
+}
+
 // Run 运行
 func (j *JobsGorm) Run(info jobs_gorm_model.Task, status int, desc string) {
 	// 请求函数记录
