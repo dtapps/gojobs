@@ -1,4 +1,4 @@
-package jobs_gorm
+package jobs_gorm_model
 
 // TaskLog 任务日志模型
 type TaskLog struct {

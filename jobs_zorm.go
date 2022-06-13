@@ -2,14 +2,20 @@ package gojobs
 
 import "gitee.com/chunanyong/zorm"
 
-type JobsZorm struct {
-	Db *zorm.DBDao
+// Zorm数据库驱动
+type jobsZorm struct {
+	db *zorm.DBDao
 }
 
-func NewJobsZorm(db *zorm.DBDao) *JobsZorm {
+// NewJobsZorm 初始化
+func NewJobsZorm(db *zorm.DBDao) *jobsZorm {
 	var (
-		jobsZorm = &JobsZorm{}
+		j = &jobsZorm{}
 	)
-	jobsZorm.Db = db
-	return jobsZorm
+	j.db = db
+	return j
+}
+
+func (j *jobsZorm) Run() {
+
 }

@@ -2,14 +2,20 @@ package gojobs
 
 import "xorm.io/xorm"
 
-type JobsXorm struct {
-	Db *xorm.Engine
+// Xorm数据库驱动
+type jobsXorm struct {
+	db *xorm.Engine
 }
 
-func newJobsXorm(db *xorm.Engine) *JobsXorm {
+// NewJobsXorm 初始化
+func NewJobsXorm(db *xorm.Engine) *jobsXorm {
 	var (
-		jobsXorm = &JobsXorm{}
+		j = &jobsXorm{}
 	)
-	jobsXorm.Db = db
-	return jobsXorm
+	j.db = db
+	return j
+}
+
+func (j *jobsXorm) Run() {
+
 }

@@ -1,70 +1,25 @@
 package gojobs
 
-import (
-	"fmt"
-	"net/http"
-)
-
 const (
-	CodeAbnormal = 0                              // 异常
-	CodeError    = http.StatusInternalServerError // 失败
-	CodeSuccess  = http.StatusOK                  // 成功
-	CodeEnd      = http.StatusCreated             // 结束
+	TASK_IN      = "IN"      // 任务运行
+	TASK_SUCCESS = "SUCCESS" // 任务完成
+	TASK_ERROR   = "ERROR"   // 任务异常
+	TASK_TIMEOUT = "TIMEOUT" // 任务超时
+	TASK_WAIT    = "WAIT"    // 任务等待
 )
 
-// 每隔n秒执行一次
-const specSeconds = "*/%d * * * * *"
-
-// GetSpecSeconds 每隔n秒执行一次
-var GetSpecSeconds = func(n int64) string {
-	if n < 0 && n > 59 {
-		return ""
-	}
-	return fmt.Sprintf(specSeconds, n)
-}
-
-// GetFrequencySeconds 每隔n秒执行一次
-var GetFrequencySeconds = func(n int64) int64 {
-	if n < 0 && n > 59 {
-		return -1
-	}
-	return n
-}
-
-// 每隔n分钟执行一次
-const specMinutes = "0 */%d * * * *"
-
-// GetSpecMinutes 每隔n分钟执行一次
-var GetSpecMinutes = func(n int64) string {
-	if n < 0 && n > 59 {
-		return ""
-	}
-	return fmt.Sprintf(specMinutes, n)
-}
-
-// GetFrequencyMinutes 每隔n分钟执行一次
-var GetFrequencyMinutes = func(n int64) int64 {
-	if n < 0 && n > 59 {
-		return -1
-	}
-	return n * 60
-}
-
-// 每天n点执行一次
-const specHour = "0 0 */%d * * *"
-
-// GetSpecHour 每天n点执行一次
-var GetSpecHour = func(n int64) string {
-	if n < 0 && n > 23 {
-		return ""
-	}
-	return fmt.Sprintf(specHour, n)
-}
-
-// GetFrequencyHour 每天n点执行一次
-var GetFrequencyHour = func(n int64) int64 {
-	if n < 0 && n > 23 {
-		return -1
-	}
-	return n * 60 * 60
+// Cron
+type jobs interface {
+	// Run 运行
+	Run()
+	// RunAddLog 任务执行日志
+	RunAddLog()
+	// CreateInCustomId 创建正在运行任务
+	CreateInCustomId()
+	// CreateInCustomIdOnly 创建正在运行唯一任务
+	CreateInCustomIdOnly()
+	// CreateInCustomIdMaxNumber 创建正在运行任务并限制数量
+	CreateInCustomIdMaxNumber()
+	// CreateInCustomIdMaxNumberOnly 创建正在运行唯一任务并限制数量
+	CreateInCustomIdMaxNumberOnly()
 }

@@ -1,4 +1,4 @@
-package jobs_gorm
+package gojobs
 
 import (
 	"fmt"
@@ -17,7 +17,7 @@ const specSeconds = "*/%d * * * * *"
 
 // GetSpecSeconds 每隔n秒执行一次
 var GetSpecSeconds = func(n int64) string {
-	if n < 0 && n > 59 {
+	if n < 0 || n > 59 {
 		return ""
 	}
 	return fmt.Sprintf(specSeconds, n)
@@ -25,7 +25,7 @@ var GetSpecSeconds = func(n int64) string {
 
 // GetFrequencySeconds 每隔n秒执行一次
 var GetFrequencySeconds = func(n int64) int64 {
-	if n < 0 && n > 59 {
+	if n < 0 || n > 59 {
 		return -1
 	}
 	return n
@@ -36,7 +36,7 @@ const specMinutes = "0 */%d * * * *"
 
 // GetSpecMinutes 每隔n分钟执行一次
 var GetSpecMinutes = func(n int64) string {
-	if n < 0 && n > 59 {
+	if n < 0 || n > 59 {
 		return ""
 	}
 	return fmt.Sprintf(specMinutes, n)
@@ -44,7 +44,7 @@ var GetSpecMinutes = func(n int64) string {
 
 // GetFrequencyMinutes 每隔n分钟执行一次
 var GetFrequencyMinutes = func(n int64) int64 {
-	if n < 0 && n > 59 {
+	if n < 0 || n > 59 {
 		return -1
 	}
 	return n * 60
@@ -55,7 +55,7 @@ const specHour = "0 0 */%d * * *"
 
 // GetSpecHour 每天n点执行一次
 var GetSpecHour = func(n int64) string {
-	if n < 0 && n > 23 {
+	if n < 0 || n > 23 {
 		return ""
 	}
 	return fmt.Sprintf(specHour, n)
@@ -63,7 +63,7 @@ var GetSpecHour = func(n int64) string {
 
 // GetFrequencyHour 每天n点执行一次
 var GetFrequencyHour = func(n int64) int64 {
-	if n < 0 && n > 23 {
+	if n < 0 || n > 23 {
 		return -1
 	}
 	return n * 60 * 60

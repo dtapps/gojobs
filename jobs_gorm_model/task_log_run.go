@@ -1,8 +1,4 @@
-package jobs_gorm
-
-import (
-	"gorm.io/gorm"
-)
+package jobs_gorm_model
 
 // TaskLogRun 任务执行日志模型
 type TaskLogRun struct {
@@ -21,10 +17,4 @@ type TaskLogRun struct {
 
 func (m *TaskLogRun) TableName() string {
 	return "task_log_run"
-}
-
-// TaskLogRunTake 查询任务执行日志
-func (jobsGorm *JobsGorm) TaskLogRunTake(tx *gorm.DB, taskId uint, runId string) (result TaskLogRun) {
-	tx.Select("id", "os", "arch", "outside_ip", "created_at").Where("task_id = ?", taskId).Where("run_id = ?", runId).Take(&result)
-	return result
 }
