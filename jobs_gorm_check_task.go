@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func (j *jobsGorm) Check(tx *gorm.DB, vs []jobs_gorm_model.Task) {
+func (j *JobsGorm) Check(tx *gorm.DB, vs []jobs_gorm_model.Task) {
 	if j.mainService > 0 && len(vs) > 0 {
 		for _, v := range vs {
 			diffInSecondWithAbs := gotime.Current().DiffInSecondWithAbs(gotime.SetCurrentParse(v.UpdatedAt).Time)

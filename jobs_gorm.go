@@ -21,8 +21,8 @@ type ConfigJobsGorm struct {
 	Redis       *goredis.Client // 缓存数据库服务
 }
 
-// Gorm数据库驱动
-type jobsGorm struct {
+// JobsGorm Gorm数据库驱动
+type JobsGorm struct {
 	runVersion  string          // 运行版本
 	os          string          // 系统类型
 	arch        string          // 系统架构
@@ -37,10 +37,10 @@ type jobsGorm struct {
 }
 
 // NewJobsGorm 初始化
-func NewJobsGorm(config *ConfigJobsGorm) *jobsGorm {
+func NewJobsGorm(config *ConfigJobsGorm) *JobsGorm {
 
 	var (
-		j = &jobsGorm{}
+		j = &JobsGorm{}
 	)
 
 	j.runVersion = Version
@@ -69,7 +69,7 @@ func NewJobsGorm(config *ConfigJobsGorm) *jobsGorm {
 }
 
 // Run 运行
-func (j *jobsGorm) Run(info jobs_gorm_model.Task, status int, desc string) {
+func (j *JobsGorm) Run(info jobs_gorm_model.Task, status int, desc string) {
 	// 请求函数记录
 	statusCreate := j.db.Create(&jobs_gorm_model.TaskLog{
 		TaskId:     info.Id,
@@ -155,7 +155,7 @@ func (j *jobsGorm) Run(info jobs_gorm_model.Task, status int, desc string) {
 }
 
 // RunAddLog 任务执行日志
-func (j *jobsGorm) RunAddLog(id uint, runId string) *gorm.DB {
+func (j *JobsGorm) RunAddLog(id uint, runId string) *gorm.DB {
 	return j.db.Create(&jobs_gorm_model.TaskLogRun{
 		TaskId:     id,
 		RunId:      runId,
@@ -182,7 +182,7 @@ type ConfigCreateInCustomId struct {
 }
 
 // CreateInCustomId 创建正在运行任务
-func (j *jobsGorm) CreateInCustomId(config *ConfigCreateInCustomId) error {
+func (j *JobsGorm) CreateInCustomId(config *ConfigCreateInCustomId) error {
 	createStatus := config.Tx.Create(&jobs_gorm_model.Task{
 		Status:         TASK_IN,
 		Params:         config.Params,
@@ -214,7 +214,7 @@ type ConfigCreateInCustomIdOnly struct {
 }
 
 // CreateInCustomIdOnly 创建正在运行唯一任务
-func (j *jobsGorm) CreateInCustomIdOnly(config *ConfigCreateInCustomIdOnly) error {
+func (j *JobsGorm) CreateInCustomIdOnly(config *ConfigCreateInCustomIdOnly) error {
 	query := j.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
 	if query.Id != 0 {
 		return errors.New(fmt.Sprintf("%d:[%s@%s]任务已存在", query.Id, config.CustomId, config.Type))
@@ -251,7 +251,7 @@ type ConfigCreateInCustomIdMaxNumber struct {
 }
 
 // CreateInCustomIdMaxNumber 创建正在运行任务并限制数量
-func (j *jobsGorm) CreateInCustomIdMaxNumber(config *ConfigCreateInCustomIdMaxNumber) error {
+func (j *JobsGorm) CreateInCustomIdMaxNumber(config *ConfigCreateInCustomIdMaxNumber) error {
 	createStatus := config.Tx.Create(&jobs_gorm_model.Task{
 		Status:         TASK_IN,
 		Params:         config.Params,
@@ -285,7 +285,7 @@ type ConfigCreateInCustomIdMaxNumberOnly struct {
 }
 
 // CreateInCustomIdMaxNumberOnly 创建正在运行唯一任务并限制数量
-func (j *jobsGorm) CreateInCustomIdMaxNumberOnly(config *ConfigCreateInCustomIdMaxNumberOnly) error {
+func (j *JobsGorm) CreateInCustomIdMaxNumberOnly(config *ConfigCreateInCustomIdMaxNumberOnly) error {
 	query := j.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
 	if query.Id != 0 {
 		return errors.New(fmt.Sprintf("%d:[%s@%s]任务已存在", query.Id, config.CustomId, config.Type))

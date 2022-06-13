@@ -8,7 +8,7 @@ import (
 )
 
 // Lock 上锁
-func (j *jobsGorm) Lock(info jobs_gorm_model.Task, id any) string {
+func (j *JobsGorm) Lock(info jobs_gorm_model.Task, id any) string {
 	cacheName := fmt.Sprintf("cron:%v:%v", info.Type, id)
 	judgeCache := j.redis.NewStringOperation().Get(cacheName).UnwrapOr("")
 	if judgeCache != "" {
@@ -19,13 +19,13 @@ func (j *jobsGorm) Lock(info jobs_gorm_model.Task, id any) string {
 }
 
 // Unlock Lock 解锁
-func (j *jobsGorm) Unlock(info jobs_gorm_model.Task, id any) {
+func (j *JobsGorm) Unlock(info jobs_gorm_model.Task, id any) {
 	cacheName := fmt.Sprintf("cron:%v:%v", info.Type, id)
 	j.redis.NewStringOperation().Del(cacheName)
 }
 
 // LockForever 永远上锁
-func (j *jobsGorm) LockForever(info jobs_gorm_model.Task, id any) string {
+func (j *JobsGorm) LockForever(info jobs_gorm_model.Task, id any) string {
 	cacheName := fmt.Sprintf("cron:%v:%v", info.Type, id)
 	judgeCache := j.redis.NewStringOperation().Get(cacheName).UnwrapOr("")
 	if judgeCache != "" {

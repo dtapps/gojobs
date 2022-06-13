@@ -8,123 +8,123 @@ import (
 )
 
 // TaskTake 查询单任务
-func (j *jobsGorm) TaskTake(tx *gorm.DB, customId string) (result jobs_gorm_model.Task) {
+func (j *JobsGorm) TaskTake(tx *gorm.DB, customId string) (result jobs_gorm_model.Task) {
 	tx.Where("custom_id = ?", customId).Take(&result)
 	return result
 }
 
 // 查询单任务
-func (j *jobsGorm) taskTake(tx *gorm.DB, customId, status string) (result jobs_gorm_model.Task) {
+func (j *JobsGorm) taskTake(tx *gorm.DB, customId, status string) (result jobs_gorm_model.Task) {
 	tx.Where("custom_id = ?", customId).Where("status = ?", status).Take(&result)
 	return result
 }
 
 // TaskTakeIn 查询单任务 - 任务运行
-func (j *jobsGorm) TaskTakeIn(tx *gorm.DB, customId string) jobs_gorm_model.Task {
+func (j *JobsGorm) TaskTakeIn(tx *gorm.DB, customId string) jobs_gorm_model.Task {
 	return j.taskTake(tx, customId, TASK_IN)
 }
 
 // TaskTakeSuccess 查询单任务 - 任务完成
-func (j *jobsGorm) TaskTakeSuccess(tx *gorm.DB, customId string) jobs_gorm_model.Task {
+func (j *JobsGorm) TaskTakeSuccess(tx *gorm.DB, customId string) jobs_gorm_model.Task {
 	return j.taskTake(tx, customId, TASK_SUCCESS)
 }
 
 // TaskTakeError 查询单任务 - 任务异常
-func (j *jobsGorm) TaskTakeError(tx *gorm.DB, customId string) jobs_gorm_model.Task {
+func (j *JobsGorm) TaskTakeError(tx *gorm.DB, customId string) jobs_gorm_model.Task {
 	return j.taskTake(tx, customId, TASK_ERROR)
 }
 
 // TaskTakeTimeout 查询单任务 - 任务超时
-func (j *jobsGorm) TaskTakeTimeout(tx *gorm.DB, customId string) jobs_gorm_model.Task {
+func (j *JobsGorm) TaskTakeTimeout(tx *gorm.DB, customId string) jobs_gorm_model.Task {
 	return j.taskTake(tx, customId, TASK_TIMEOUT)
 }
 
 // TaskTakeWait 查询单任务 - 任务等待
-func (j *jobsGorm) TaskTakeWait(tx *gorm.DB, customId string) jobs_gorm_model.Task {
+func (j *JobsGorm) TaskTakeWait(tx *gorm.DB, customId string) jobs_gorm_model.Task {
 	return j.taskTake(tx, customId, TASK_WAIT)
 }
 
 // TaskTypeTake 查询单任务
-func (j *jobsGorm) TaskTypeTake(tx *gorm.DB, customId, Type string) (result jobs_gorm_model.Task) {
+func (j *JobsGorm) TaskTypeTake(tx *gorm.DB, customId, Type string) (result jobs_gorm_model.Task) {
 	tx.Where("custom_id = ?", customId).Where("type = ?", Type).Take(&result)
 	return result
 }
 
 // 查询单任务
-func (j *jobsGorm) taskTypeTake(tx *gorm.DB, customId, Type, status string) (result jobs_gorm_model.Task) {
+func (j *JobsGorm) taskTypeTake(tx *gorm.DB, customId, Type, status string) (result jobs_gorm_model.Task) {
 	tx.Where("custom_id = ?", customId).Where("type = ?", Type).Where("status = ?", status).Take(&result)
 	return result
 }
 
 // TaskTypeTakeIn 查询单任务 - 任务运行
-func (j *jobsGorm) TaskTypeTakeIn(tx *gorm.DB, customId, Type string) jobs_gorm_model.Task {
+func (j *JobsGorm) TaskTypeTakeIn(tx *gorm.DB, customId, Type string) jobs_gorm_model.Task {
 	return j.taskTypeTake(tx, customId, Type, TASK_IN)
 }
 
 // TaskTypeTakeSuccess 查询单任务 - 任务完成
-func (j *jobsGorm) TaskTypeTakeSuccess(tx *gorm.DB, customId, Type string) jobs_gorm_model.Task {
+func (j *JobsGorm) TaskTypeTakeSuccess(tx *gorm.DB, customId, Type string) jobs_gorm_model.Task {
 	return j.taskTypeTake(tx, customId, Type, TASK_SUCCESS)
 }
 
 // TaskTypeTakeError 查询单任务 - 任务异常
-func (j *jobsGorm) TaskTypeTakeError(tx *gorm.DB, customId, Type string) jobs_gorm_model.Task {
+func (j *JobsGorm) TaskTypeTakeError(tx *gorm.DB, customId, Type string) jobs_gorm_model.Task {
 	return j.taskTypeTake(tx, customId, Type, TASK_ERROR)
 }
 
 // TaskTypeTakeTimeout 查询单任务 - 任务超时
-func (j *jobsGorm) TaskTypeTakeTimeout(tx *gorm.DB, customId, Type string) jobs_gorm_model.Task {
+func (j *JobsGorm) TaskTypeTakeTimeout(tx *gorm.DB, customId, Type string) jobs_gorm_model.Task {
 	return j.taskTypeTake(tx, customId, Type, TASK_TIMEOUT)
 }
 
 // TaskTypeTakeWait 查询单任务 - 任务等待
-func (j *jobsGorm) TaskTypeTakeWait(tx *gorm.DB, customId, Type string) jobs_gorm_model.Task {
+func (j *JobsGorm) TaskTypeTakeWait(tx *gorm.DB, customId, Type string) jobs_gorm_model.Task {
 	return j.taskTypeTake(tx, customId, Type, TASK_WAIT)
 }
 
 // TaskFindAll 查询多任务
-func (j *jobsGorm) TaskFindAll(tx *gorm.DB, frequency int64) (results []jobs_gorm_model.Task) {
+func (j *JobsGorm) TaskFindAll(tx *gorm.DB, frequency int64) (results []jobs_gorm_model.Task) {
 	tx.Where("frequency = ?", frequency).Order("id asc").Find(&results)
 	return results
 }
 
 // 查询多任务
-func (j *jobsGorm) taskFindAll(tx *gorm.DB, frequency int64, status string) (results []jobs_gorm_model.Task) {
+func (j *JobsGorm) taskFindAll(tx *gorm.DB, frequency int64, status string) (results []jobs_gorm_model.Task) {
 	tx.Where("frequency = ?", frequency).Where("status = ?", status).Order("id asc").Find(&results)
 	return results
 }
 
 // TaskFindAllIn 查询多任务 - 任务运行
-func (j *jobsGorm) TaskFindAllIn(tx *gorm.DB, frequency int64) []jobs_gorm_model.Task {
+func (j *JobsGorm) TaskFindAllIn(tx *gorm.DB, frequency int64) []jobs_gorm_model.Task {
 	return j.taskFindAll(tx, frequency, TASK_IN)
 }
 
 // TaskFindAllSuccess 查询多任务 - 任务完成
-func (j *jobsGorm) TaskFindAllSuccess(tx *gorm.DB, frequency int64) []jobs_gorm_model.Task {
+func (j *JobsGorm) TaskFindAllSuccess(tx *gorm.DB, frequency int64) []jobs_gorm_model.Task {
 	return j.taskFindAll(tx, frequency, TASK_SUCCESS)
 }
 
 // TaskFindAllError 查询多任务 - 任务异常
-func (j *jobsGorm) TaskFindAllError(tx *gorm.DB, frequency int64) []jobs_gorm_model.Task {
+func (j *JobsGorm) TaskFindAllError(tx *gorm.DB, frequency int64) []jobs_gorm_model.Task {
 	return j.taskFindAll(tx, frequency, TASK_ERROR)
 }
 
 // TaskFindAllTimeout 查询多任务 - 任务超时
-func (j *jobsGorm) TaskFindAllTimeout(tx *gorm.DB, frequency int64) []jobs_gorm_model.Task {
+func (j *JobsGorm) TaskFindAllTimeout(tx *gorm.DB, frequency int64) []jobs_gorm_model.Task {
 	return j.taskFindAll(tx, frequency, TASK_TIMEOUT)
 }
 
 // TaskFindAllWait 查询多任务 - 任务等待
-func (j *jobsGorm) TaskFindAllWait(tx *gorm.DB, frequency int64) []jobs_gorm_model.Task {
+func (j *JobsGorm) TaskFindAllWait(tx *gorm.DB, frequency int64) []jobs_gorm_model.Task {
 	return j.taskFindAll(tx, frequency, TASK_WAIT)
 }
 
 // EditTask 任务修改
-func (j *jobsGorm) EditTask(tx *gorm.DB, id uint) *gorm.DB {
+func (j *JobsGorm) EditTask(tx *gorm.DB, id uint) *gorm.DB {
 	return tx.Model(&jobs_gorm_model.Task{}).Where("id = ?", id)
 }
 
 // UpdateFrequency 更新任务频率
-func (j *jobsGorm) UpdateFrequency(tx *gorm.DB, id uint, frequency int64) *gorm.DB {
+func (j *JobsGorm) UpdateFrequency(tx *gorm.DB, id uint, frequency int64) *gorm.DB {
 	return j.EditTask(tx, id).
 		Select("frequency").
 		Updates(jobs_gorm_model.Task{
@@ -132,13 +132,13 @@ func (j *jobsGorm) UpdateFrequency(tx *gorm.DB, id uint, frequency int64) *gorm.
 		})
 }
 
-func (j *jobsGorm) taskIpTake(tx *gorm.DB, taskType, ips string) (result jobs_gorm_model.TaskIp) {
+func (j *JobsGorm) taskIpTake(tx *gorm.DB, taskType, ips string) (result jobs_gorm_model.TaskIp) {
 	tx.Where("task_type = ?", taskType).Where("ips = ?", ips).Take(&result)
 	return result
 }
 
 // TaskIpUpdate 更新ip
-func (j *jobsGorm) TaskIpUpdate(tx *gorm.DB, taskType, ips string) *gorm.DB {
+func (j *JobsGorm) TaskIpUpdate(tx *gorm.DB, taskType, ips string) *gorm.DB {
 	query := j.taskIpTake(tx, taskType, ips)
 	if query.Id != 0 {
 		return tx
@@ -154,7 +154,7 @@ func (j *jobsGorm) TaskIpUpdate(tx *gorm.DB, taskType, ips string) *gorm.DB {
 }
 
 // TaskIpInit 实例任务ip
-func (j *jobsGorm) TaskIpInit(tx *gorm.DB, ips map[string]string) bool {
+func (j *JobsGorm) TaskIpInit(tx *gorm.DB, ips map[string]string) bool {
 	if j.outsideIp == "" || j.outsideIp == "0.0.0.0" {
 		return false
 	}
@@ -184,7 +184,7 @@ func (j *jobsGorm) TaskIpInit(tx *gorm.DB, ips map[string]string) bool {
 }
 
 // TaskLogRunTake 查询任务执行日志
-func (j *jobsGorm) TaskLogRunTake(tx *gorm.DB, taskId uint, runId string) (result jobs_gorm_model.TaskLogRun) {
+func (j *JobsGorm) TaskLogRunTake(tx *gorm.DB, taskId uint, runId string) (result jobs_gorm_model.TaskLogRun) {
 	tx.Select("id", "os", "arch", "outside_ip", "created_at").Where("task_id = ?", taskId).Where("run_id = ?", runId).Take(&result)
 	return result
 }

@@ -7,7 +7,7 @@ import (
 )
 
 // RefreshIp 刷新Ip
-func (j *jobsGorm) RefreshIp(tx *gorm.DB) {
+func (j *JobsGorm) RefreshIp(tx *gorm.DB) {
 	xip := goip.GetOutsideIp()
 	if j.outsideIp == "" || j.outsideIp == "0.0.0.0" {
 		return
