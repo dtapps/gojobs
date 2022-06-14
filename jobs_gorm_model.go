@@ -8,6 +8,12 @@ import (
 	"strings"
 )
 
+// TaskTakeId 查询单任务
+func (j *JobsGorm) TaskTakeId(tx *gorm.DB, id uint) (result jobs_gorm_model.Task) {
+	tx.Where("id = ?", id).Take(&result)
+	return result
+}
+
 // TaskTake 查询单任务
 func (j *JobsGorm) TaskTake(tx *gorm.DB, customId string) (result jobs_gorm_model.Task) {
 	tx.Where("custom_id = ?", customId).Take(&result)
