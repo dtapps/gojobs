@@ -11,9 +11,9 @@ const (
 // Cron
 type jobs interface {
 	// Run 运行
-	Run()
+	Run(info interface{}, status int, desc string)
 	// RunAddLog 任务执行日志
-	RunAddLog()
+	RunAddLog(id uint, runId string)
 	// CreateInCustomId 创建正在运行任务
 	CreateInCustomId()
 	// CreateInCustomIdOnly 创建正在运行唯一任务
