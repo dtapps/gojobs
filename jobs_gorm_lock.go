@@ -2,8 +2,8 @@ package gojobs
 
 import (
 	"fmt"
+	"go.dtapp.net/dorm"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
-	"go.dtapp.net/goredis"
 	"time"
 )
 
@@ -14,7 +14,7 @@ func (j *JobsGorm) Lock(info jobs_gorm_model.Task, id any) string {
 	if judgeCache != "" {
 		return judgeCache
 	}
-	j.redis.NewStringOperation().Set(cacheName, fmt.Sprintf("已在%v机器上锁成功", j.outsideIp), goredis.WithExpire(time.Millisecond*time.Duration(info.Frequency)*3))
+	j.redis.NewStringOperation().Set(cacheName, fmt.Sprintf("已在%v机器上锁成功", j.outsideIp), dorm.WithExpire(time.Millisecond*time.Duration(info.Frequency)*3))
 	return ""
 }
 

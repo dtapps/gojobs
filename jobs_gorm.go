@@ -3,10 +3,10 @@ package gojobs
 import (
 	"errors"
 	"fmt"
+	"go.dtapp.net/dorm"
 	"go.dtapp.net/goarray"
 	"go.dtapp.net/goip"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
-	"go.dtapp.net/goredis"
 	"go.dtapp.net/gotime"
 	"go.dtapp.net/gouuid"
 	"gorm.io/gorm"
@@ -16,24 +16,24 @@ import (
 
 // ConfigJobsGorm 配置
 type ConfigJobsGorm struct {
-	MainService int             // 主要服务
-	Db          *gorm.DB        // 数据库
-	Redis       *goredis.Client // 缓存数据库服务
+	MainService int               // 主要服务
+	Db          *gorm.DB          // 数据库
+	Redis       *dorm.RedisClient // 缓存数据库服务
 }
 
 // JobsGorm Gorm数据库驱动
 type JobsGorm struct {
-	runVersion  string          // 运行版本
-	os          string          // 系统类型
-	arch        string          // 系统架构
-	maxProCs    int             // CPU核数
-	version     string          // GO版本
-	macAddrS    string          // Mac地址
-	insideIp    string          // 内网ip
-	outsideIp   string          // 外网ip
-	mainService int             // 主要服务
-	db          *gorm.DB        // 数据库
-	redis       *goredis.Client // 缓存数据库服务
+	runVersion  string            // 运行版本
+	os          string            // 系统类型
+	arch        string            // 系统架构
+	maxProCs    int               // CPU核数
+	version     string            // GO版本
+	macAddrS    string            // Mac地址
+	insideIp    string            // 内网ip
+	outsideIp   string            // 外网ip
+	mainService int               // 主要服务
+	db          *gorm.DB          // 数据库
+	redis       *dorm.RedisClient // 缓存数据库服务
 }
 
 // NewJobsGorm 初始化
@@ -72,7 +72,7 @@ func (j *JobsGorm) GetDb() *gorm.DB {
 	return j.db
 }
 
-func (j *JobsGorm) GetRedis() *goredis.Client {
+func (j *JobsGorm) GetRedis() *dorm.RedisClient {
 	return j.redis
 }
 
