@@ -2,7 +2,6 @@ package gojobs
 
 import (
 	"go.dtapp.net/gojobs/jobs_gorm_model"
-	"go.dtapp.net/gotime"
 	"gorm.io/gorm"
 	"log"
 	"strings"
@@ -133,10 +132,9 @@ func (j *JobsGorm) EditTask(tx *gorm.DB, id uint) *gorm.DB {
 // UpdateFrequency 更新任务频率
 func (j *JobsGorm) UpdateFrequency(tx *gorm.DB, id uint, frequency int64) *gorm.DB {
 	return j.EditTask(tx, id).
-		Select("frequency", "updated_at").
+		Select("frequency").
 		Updates(jobs_gorm_model.Task{
 			Frequency: frequency,
-			UpdatedAt: gotime.Current().Format(),
 		})
 }
 
@@ -163,27 +161,27 @@ func (j *JobsGorm) TaskIpUpdate(tx *gorm.DB, taskType, ips string) *gorm.DB {
 
 // TaskIpInit 实例任务ip
 func (j *JobsGorm) TaskIpInit(tx *gorm.DB, ips map[string]string) bool {
-	if j.outsideIp == "" || j.outsideIp == "0.0.0.0" {
+	if j.config.outsideIp == "" || j.config.outsideIp == "0.0.0.0" {
 		return false
 	}
-	tx.Where("ips = ?", j.outsideIp).Delete(&jobs_gorm_model.TaskIp{}) // 删除
+	tx.Where("ips = ?", j.config.outsideIp).Delete(&jobs_gorm_model.TaskIp{}) // 删除
 	for k, v := range ips {
 		if v == "" {
-			j.TaskIpUpdate(tx, k, j.outsideIp)
+			j.TaskIpUpdate(tx, k, j.config.outsideIp)
 		} else {
 			find := strings.Contains(v, ",")
 			if find == true {
 				// 包含
 				parts := strings.Split(v, ",")
 				for _, vv := range parts {
-					if vv == j.outsideIp {
-						j.TaskIpUpdate(tx, k, j.outsideIp)
+					if vv == j.config.outsideIp {
+						j.TaskIpUpdate(tx, k, j.config.outsideIp)
 					}
 				}
 			} else {
 				// 不包含
-				if v == j.outsideIp {
-					j.TaskIpUpdate(tx, k, j.outsideIp)
+				if v == j.config.outsideIp {
+					j.TaskIpUpdate(tx, k, j.config.outsideIp)
 				}
 			}
 		}

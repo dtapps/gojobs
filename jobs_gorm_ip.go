@@ -9,12 +9,12 @@ import (
 // RefreshIp 刷新Ip
 func (j *JobsGorm) RefreshIp(tx *gorm.DB) {
 	xip := goip.GetOutsideIp()
-	if j.outsideIp == "" || j.outsideIp == "0.0.0.0" {
+	if j.config.outsideIp == "" || j.config.outsideIp == "0.0.0.0" {
 		return
 	}
-	if j.outsideIp == xip {
+	if j.config.outsideIp == xip {
 		return
 	}
-	tx.Where("ips = ?", j.outsideIp).Delete(&jobs_gorm_model.TaskIp{}) // 删除
-	j.outsideIp = xip
+	tx.Where("ips = ?", j.config.outsideIp).Delete(&jobs_gorm_model.TaskIp{}) // 删除
+	j.config.outsideIp = xip
 }

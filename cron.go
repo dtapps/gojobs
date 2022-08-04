@@ -1,7 +1,7 @@
 package gojobs
 
 import (
-	"github.com/pkg/errors"
+	"errors"
 	"github.com/robfig/cron/v3"
 	"sync"
 )
@@ -54,7 +54,7 @@ func (c *Cron) AddJobByInterface(id string, spec string, cmd cron.Job) error {
 	defer c.mutex.Unlock()
 
 	if _, ok := c.ids[id]; ok {
-		return errors.Errorf("任务已存在")
+		return errors.New("任务已存在")
 	}
 	eid, err := c.inner.AddJob(spec, cmd)
 	if err != nil {
@@ -73,7 +73,7 @@ func (c *Cron) AddJobByFunc(id string, spec string, f func()) error {
 	defer c.mutex.Unlock()
 
 	if _, ok := c.ids[id]; ok {
-		return errors.Errorf("任务已存在")
+		return errors.New("任务已存在")
 	}
 	eid, err := c.inner.AddFunc(spec, f)
 	if err != nil {
