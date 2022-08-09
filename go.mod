@@ -1,9 +1,9 @@
 module go.dtapp.net/gojobs
 
-go 1.18
+go 1.19
 
 require (
-	gitee.com/chunanyong/zorm v1.5.8
+	gitee.com/chunanyong/zorm v1.5.9
 	github.com/beego/beego/v2 v2.0.5
 	github.com/dtapps/go-library v1.0.50
 	github.com/go-redis/redis/v8 v8.11.5
@@ -13,7 +13,7 @@ require (
 	go.dtapp.net/goip v1.0.23
 	go.dtapp.net/golock v1.0.0
 	go.dtapp.net/gostring v1.0.6
-	go.dtapp.net/gotime v1.0.4
+	go.dtapp.net/gotime v1.0.5
 	go.etcd.io/etcd/api/v3 v3.5.4
 	go.etcd.io/etcd/client/v3 v3.5.4
 	google.golang.org/grpc v1.48.0
@@ -48,10 +48,10 @@ require (
 	go.etcd.io/etcd/client/pkg/v3 v3.5.4 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	go.uber.org/zap v1.21.0 // indirect
-	golang.org/x/net v0.0.0-20220802222814-0bcc04d9c69b // indirect
-	golang.org/x/sys v0.0.0-20220803195053-6e608f9ce704 // indirect
+	go.uber.org/zap v1.22.0 // indirect
+	golang.org/x/net v0.0.0-20220809012201-f428fae20770 // indirect
+	golang.org/x/sys v0.0.0-20220808155132-1c4a2a72c664 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/genproto v0.0.0-20220803205849-8f55acc8769f // indirect
+	google.golang.org/genproto v0.0.0-20220808204814-fd01256a5276 // indirect
 	xorm.io/builder v0.3.12 // indirect
 )

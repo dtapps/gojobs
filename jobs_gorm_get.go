@@ -6,17 +6,22 @@ import (
 	"gorm.io/gorm"
 )
 
-// GetDb 数据库驱动
+// GetDb 获取数据库驱动
 func (j *JobsGorm) GetDb() *gorm.DB {
 	return j.service.gormClient
 }
 
-// GetRedis 缓存数据库驱动
+// GetRedis 获取缓存数据库驱动
 func (j *JobsGorm) GetRedis() *redis.Client {
 	return j.db.redisClient
 }
 
-// GetEtcd 分布式缓存驱动
+// GetEtcd 获取分布式缓存驱动
 func (j *JobsGorm) GetEtcd() *clientv3.Client {
 	return j.db.etcdClient
+}
+
+// GetCurrentIp 获取当前ip
+func (j *JobsGorm) GetCurrentIp() string {
+	return j.config.outsideIp
 }
