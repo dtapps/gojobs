@@ -116,6 +116,7 @@ type ConfigCreateInCustomId struct {
 	CustomId       string   // 自定义编号
 	CustomSequence int64    // 自定义顺序
 	Type           string   // 类型
+	TypeName       string   // 类型名称
 	SpecifyIp      string   // 指定外网IP
 	CurrentIp      string   // 当前ip
 }
@@ -134,6 +135,7 @@ func (j *JobsGorm) CreateInCustomId(config *ConfigCreateInCustomId) error {
 		CustomId:       config.CustomId,
 		CustomSequence: config.CustomSequence,
 		Type:           config.Type,
+		TypeName:       config.TypeName,
 		CreatedIp:      config.CurrentIp,
 		SpecifyIp:      config.SpecifyIp,
 		UpdatedIp:      config.CurrentIp,
@@ -152,6 +154,7 @@ type ConfigCreateInCustomIdOnly struct {
 	CustomId       string   // 自定义编号
 	CustomSequence int64    // 自定义顺序
 	Type           string   // 类型
+	TypeName       string   // 类型名称
 	SpecifyIp      string   // 指定外网IP
 	CurrentIp      string   // 当前ip
 }
@@ -174,6 +177,7 @@ func (j *JobsGorm) CreateInCustomIdOnly(config *ConfigCreateInCustomIdOnly) erro
 		CustomId:       config.CustomId,
 		CustomSequence: config.CustomSequence,
 		Type:           config.Type,
+		TypeName:       config.TypeName,
 		CreatedIp:      config.CurrentIp,
 		SpecifyIp:      config.SpecifyIp,
 		UpdatedIp:      config.CurrentIp,
@@ -193,6 +197,7 @@ type ConfigCreateInCustomIdMaxNumber struct {
 	CustomId       string   // 自定义编号
 	CustomSequence int64    // 自定义顺序
 	Type           string   // 类型
+	TypeName       string   // 类型名称
 	SpecifyIp      string   // 指定外网IP
 	CurrentIp      string   // 当前ip
 }
@@ -212,6 +217,7 @@ func (j *JobsGorm) CreateInCustomIdMaxNumber(config *ConfigCreateInCustomIdMaxNu
 		CustomId:       config.CustomId,
 		CustomSequence: config.CustomSequence,
 		Type:           config.Type,
+		TypeName:       config.TypeName,
 		CreatedIp:      config.CurrentIp,
 		SpecifyIp:      config.SpecifyIp,
 		UpdatedIp:      config.CurrentIp,
@@ -231,6 +237,7 @@ type ConfigCreateInCustomIdMaxNumberOnly struct {
 	CustomId       string   // 自定义编号
 	CustomSequence int64    // 自定义顺序
 	Type           string   // 类型
+	TypeName       string   // 类型名称
 	SpecifyIp      string   // 指定外网IP
 	CurrentIp      string   // 当前ip
 }
@@ -254,6 +261,7 @@ func (j *JobsGorm) CreateInCustomIdMaxNumberOnly(config *ConfigCreateInCustomIdM
 		CustomId:       config.CustomId,
 		CustomSequence: config.CustomSequence,
 		Type:           config.Type,
+		TypeName:       config.TypeName,
 		CreatedIp:      config.CurrentIp,
 		SpecifyIp:      config.SpecifyIp,
 		UpdatedIp:      config.CurrentIp,
