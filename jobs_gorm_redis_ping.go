@@ -15,4 +15,7 @@ func (j *JobsGorm) Ping(ctx context.Context) {
 			log.Println("JOBS心跳", j.config.cornKeyIp, j.config.outsideIp, result, err)
 		}
 	})
+	c.Start()
+	defer c.Stop()
+	select {}
 }
