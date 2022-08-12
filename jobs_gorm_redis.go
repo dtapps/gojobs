@@ -26,13 +26,13 @@ type SubscribeResult struct {
 // Subscribe 订阅
 func (j *JobsGorm) Subscribe(ctx context.Context) SubscribeResult {
 	return SubscribeResult{
-		Message: j.redisClient.Subscribe(ctx, j.config.cornKeyChannel),
+		Message: j.redisClient.Subscribe(ctx, j.config.cornKeyPrefix+"_"+j.config.cornKeyCustom),
 	}
 }
 
 // PSubscribe 订阅，支持通配符匹配(ch_user_*)
 func (j *JobsGorm) PSubscribe(ctx context.Context) SubscribeResult {
 	return SubscribeResult{
-		Message: j.redisClient.PSubscribe(ctx, j.config.cornKeyChannels),
+		Message: j.redisClient.PSubscribe(ctx, j.config.cornKeyPrefix+"_"+j.config.cornKeyCustom+"_*"),
 	}
 }

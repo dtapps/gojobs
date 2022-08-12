@@ -11,9 +11,9 @@ import (
 func (j *JobsGorm) Ping(ctx context.Context) {
 	c := cron.New(cron.WithSeconds())
 	_, _ = c.AddFunc(GetSeconds(2).Spec(), func() {
-		result, err := j.redisClient.Set(ctx, j.config.cornKeyIp, j.config.outsideIp, 3*time.Second).Result()
+		result, err := j.redisClient.Set(ctx, j.config.cornKeyPrefix+"_"+j.config.cornKeyCustom, j.config.outsideIp, 3*time.Second).Result()
 		if j.config.debug == true {
-			log.Println("JOBS心跳", j.config.cornKeyIp, j.config.outsideIp, result, err)
+			log.Println("JOBS心跳", j.config.cornKeyPrefix+"_"+j.config.cornKeyCustom, j.config.outsideIp, result, err)
 		}
 	})
 	c.Start()

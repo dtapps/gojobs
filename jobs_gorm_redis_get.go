@@ -42,18 +42,18 @@ func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (a
 		if appointIpStatus == true {
 			// 判断是否指定某ip执行
 			if gostring.Contains(currentIp, workers[0]) == true {
-				return j.config.cornPrefix + "_" + v.SpecifyIp, nil
+				return j.config.cornKeyPrefix + "_" + v.SpecifyIp, nil
 			}
 			return address, errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
 		}
-		return j.config.cornPrefix + "_" + workers[0], nil
+		return j.config.cornKeyPrefix + "_" + workers[0], nil
 	}
 
 	// 优先处理指定某ip执行
 	if appointIpStatus == true {
 		for wk, wv := range workers {
 			if gostring.Contains(currentIp, wv) == true {
-				return j.config.cornPrefix + "_" + workers[wk], nil
+				return j.config.cornKeyPrefix + "_" + workers[wk], nil
 			}
 		}
 		return address, errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
@@ -63,7 +63,7 @@ func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (a
 		if zxIp == "" {
 			return address, errors.New("获取执行的客户端异常")
 		}
-		address = j.config.cornPrefix + "_" + zxIp
+		address = j.config.cornKeyPrefix + "_" + zxIp
 		return address, err
 	}
 }
@@ -72,11 +72,11 @@ func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (a
 func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) ([]string, error) {
 
 	if j.config.debug == true {
-		log.Printf("获取在线的客户端：%s\n", j.config.cornPrefix+"_*")
+		log.Printf("获取在线的客户端：%s\n", j.config.cornKeyPrefix+"_*")
 	}
 
 	// 扫描
-	values, err := j.redisClient.Keys(ctx, j.config.cornPrefix+"_*").Result()
+	values, err := j.redisClient.Keys(ctx, j.config.cornKeyPrefix+"_*").Result()
 	if err != nil {
 		if err == errors.New("ERR wrong number of arguments for 'mget' command") {
 			return []string{}, nil
