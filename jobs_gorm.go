@@ -8,6 +8,7 @@ import (
 	"go.dtapp.net/goip"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/golock"
+	"log"
 	"runtime"
 )
 
@@ -112,6 +113,10 @@ func NewJobsGorm(config *JobsGormConfig) (*JobsGorm, error) {
 	}
 	if c.config.cornKeyChannels == "" {
 		return nil, errors.New(fmt.Sprintf("没有配置 cornKeyChannels：%s", c.config.cornKeyChannels))
+	}
+
+	if c.config.debug == true {
+		log.Printf("配置：%+v\n", c.config)
 	}
 
 	return c, nil

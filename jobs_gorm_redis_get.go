@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -63,6 +64,12 @@ func (j *JobsGorm) GetIssueAddress(ctx context.Context, v *jobs_gorm_model.Task)
 
 // GetSubscribeClientList 获取在线的客户端
 func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) ([]string, error) {
+
+	if j.config.debug == true {
+		log.Printf("获取在线的客户端：%s\n", j.config.cornPrefix+"_*")
+	}
+
+	// 扫描
 	values, err := j.redisClient.Keys(ctx, j.config.cornPrefix+"_*").Result()
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("获取失败：%s", err.Error()))
