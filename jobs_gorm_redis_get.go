@@ -9,11 +9,6 @@ import (
 	"time"
 )
 
-type GetSubscribeClientListResult struct {
-	err    error
-	Client []string
-}
-
 // GetIssueAddress 获取下发地址
 func (j *JobsGorm) GetIssueAddress(ctx context.Context, v *jobs_gorm_model.Task) (address string, err error) {
 	var (
@@ -27,29 +22,29 @@ func (j *JobsGorm) GetIssueAddress(ctx context.Context, v *jobs_gorm_model.Task)
 		appointIpStatus = true
 	}
 
-	workers := j.GetSubscribeClientList(ctx)
-	if workers.err != nil {
+	workers, err := j.GetSubscribeClientList(ctx)
+	if err != nil {
 		return address, errors.New(fmt.Sprintf("获取在线客户端列表失败：%s", err.Error()))
 	}
-	if len(workers.Client) <= 0 {
+	if len(workers) <= 0 {
 		return address, errors.New("没有客户端在线")
 	}
 
 	// 只有一个客户端在线
-	if len(workers.Client) == 1 {
+	if len(workers) == 1 {
 		if appointIpStatus == true {
 			// 判断是否指定某ip执行
-			if currentIp == workers.Client[0] {
+			if currentIp == workers[0] {
 				return j.config.cornPrefix + "_" + v.SpecifyIp, nil
 			}
 			return address, errors.New("执行的客户端不在线")
 		}
-		return j.config.cornPrefix + "_" + workers.Client[0], nil
+		return j.config.cornPrefix + "_" + workers[0], nil
 	}
 
 	// 优先处理指定某ip执行
 	if appointIpStatus == true {
-		for _, wv := range workers.Client {
+		for _, wv := range workers {
 			if currentIp == wv {
 				return j.config.cornPrefix + "_" + wv, nil
 			}
@@ -57,7 +52,7 @@ func (j *JobsGorm) GetIssueAddress(ctx context.Context, v *jobs_gorm_model.Task)
 		return address, errors.New("执行的客户端不在线")
 	} else {
 		// 随机返回一个
-		zxIp := workers.Client[j.random(0, len(workers.Client))]
+		zxIp := workers[j.random(0, len(workers))]
 		if zxIp == "" {
 			return address, errors.New("获取执行的客户端异常")
 		}
@@ -67,22 +62,18 @@ func (j *JobsGorm) GetIssueAddress(ctx context.Context, v *jobs_gorm_model.Task)
 }
 
 // GetSubscribeClientList 获取在线的客户端
-func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) GetSubscribeClientListResult {
+func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) ([]string, error) {
 	values, err := j.redisClient.Keys(ctx, j.config.cornPrefix+"_*").Result()
 	if err != nil {
-		return GetSubscribeClientListResult{
-			err: err,
-		}
+		return nil, errors.New(fmt.Sprintf("获取失败：%s", err.Error()))
 	}
 
-	list := make([]string, 0, len(values))
+	client := make([]string, 0, len(values))
 	for _, val := range values {
-		list = append(list, val.(string))
+		client = append(client, val.(string))
 	}
 
-	return GetSubscribeClientListResult{
-		Client: list,
-	}
+	return client, nil
 }
 
 // 随机返回一个

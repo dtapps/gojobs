@@ -77,6 +77,7 @@ func NewJobsGorm(config *JobsGormConfig) (*JobsGorm, error) {
 	c.config.cornPrefix = config.CornPrefix
 	c.config.debug = config.Debug
 
+	// 锁
 	c.lockClient = golock.NewLockRedis(c.redisClient)
 
 	// 配置信息
@@ -102,6 +103,16 @@ func NewJobsGorm(config *JobsGormConfig) (*JobsGorm, error) {
 	c.config.cornKeyIp = c.getCornKeyIp()
 	c.config.cornKeyChannel = c.getCornKeyChannel()
 	c.config.cornKeyChannels = c.getCornKeyChannels()
+
+	if c.config.cornKeyIp == "" {
+		return nil, errors.New(fmt.Sprintf("没有配置 cornKeyIp：%s", c.config.cornKeyIp))
+	}
+	if c.config.cornKeyChannel == "" {
+		return nil, errors.New(fmt.Sprintf("没有配置 cornKeyChannel：%s", c.config.cornKeyChannel))
+	}
+	if c.config.cornKeyChannels == "" {
+		return nil, errors.New(fmt.Sprintf("没有配置 cornKeyChannels：%s", c.config.cornKeyChannels))
+	}
 
 	return c, nil
 }
