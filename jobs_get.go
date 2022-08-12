@@ -5,9 +5,9 @@ func (j *JobsGorm) getCornKeyIp() string {
 }
 
 func (j *JobsGorm) getCornKeyChannel() string {
-	return j.config.cornKeyIp + "_ch"
+	return j.config.cornKeyIp
 }
 
 func (j *JobsGorm) getCornKeyChannels() string {
-	return j.config.cornKeyIp + "_ch_*"
+	return j.config.cornKeyIp + "_*"
 }

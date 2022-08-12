@@ -41,8 +41,8 @@ type JobsGorm struct {
 		lockSeparator   string // 锁分隔符
 		cornPrefix      string // 任务key前缀
 		cornKeyIp       string // 任务key
-		cornKeyChannel  string // 任务频道key(任务key+_ch)
-		cornKeyChannels string // 任务频道key通配符匹配(任务key+_ch_*)
+		cornKeyChannel  string // 任务频道key(任务key+ip)
+		cornKeyChannels string // 任务频道key通配符匹配(任务key+ip+_*)
 	}
 }
 
@@ -116,7 +116,7 @@ func NewJobsGorm(config *JobsGormConfig) (*JobsGorm, error) {
 	}
 
 	if c.config.debug == true {
-		log.Printf("配置：%+v\n", c.config)
+		log.Printf("JOBS配置：%+v\n", c.config)
 	}
 
 	return c, nil

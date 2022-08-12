@@ -6,7 +6,7 @@ require (
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
-	go.dtapp.net/dorm v1.0.15
+	go.dtapp.net/dorm v1.0.16
 	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.24
 	go.dtapp.net/golock v1.0.2
