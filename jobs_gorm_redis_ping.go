@@ -4,13 +4,14 @@ import (
 	"context"
 	"github.com/robfig/cron/v3"
 	"log"
+	"time"
 )
 
 // Ping 心跳
 func (j *JobsGorm) Ping(ctx context.Context) {
 	c := cron.New(cron.WithSeconds())
 	_, _ = c.AddFunc(GetSeconds(2).Spec(), func() {
-		result, err := j.redisClient.Set(ctx, j.config.cornKeyIp, j.config.outsideIp, 3).Result()
+		result, err := j.redisClient.Set(ctx, j.config.cornKeyIp, j.config.outsideIp, 3*time.Second).Result()
 		if j.config.debug == true {
 			log.Println("JOBS心跳", j.config.cornKeyIp, j.config.outsideIp, result, err)
 		}

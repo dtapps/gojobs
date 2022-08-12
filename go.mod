@@ -9,7 +9,7 @@ require (
 	go.dtapp.net/dorm v1.0.16
 	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.24
-	go.dtapp.net/golock v1.0.2
+	go.dtapp.net/golock v1.0.3
 	go.dtapp.net/gostring v1.0.6
 	go.dtapp.net/gotime v1.0.5
 	google.golang.org/grpc v1.48.0

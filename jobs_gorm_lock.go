@@ -3,11 +3,12 @@ package gojobs
 import (
 	"fmt"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
+	"time"
 )
 
 // Lock 上锁
 func (j *JobsGorm) Lock(info jobs_gorm_model.Task, id any) (string, error) {
-	return j.lockClient.Lock(fmt.Sprintf("%s%s%v%s%v", j.config.lockPrefix, j.config.lockSeparator, info.Type, j.config.lockSeparator, id), fmt.Sprintf("已在%s@%s机器上锁成功", j.config.insideIp, j.config.outsideIp), info.Frequency*3)
+	return j.lockClient.Lock(fmt.Sprintf("%s%s%v%s%v", j.config.lockPrefix, j.config.lockSeparator, info.Type, j.config.lockSeparator, id), fmt.Sprintf("已在%s@%s机器上锁成功", j.config.insideIp, j.config.outsideIp), time.Duration(info.Frequency)*3*time.Second)
 }
 
 // Unlock Lock 解锁
