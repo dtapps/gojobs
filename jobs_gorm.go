@@ -1,6 +1,7 @@
 package gojobs
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"go.dtapp.net/dorm"
@@ -90,8 +91,8 @@ func NewJobsGorm(config *JobsGormConfig) (*JobsGorm, error) {
 	c.config.arch = runtime.GOARCH
 	c.config.maxProCs = runtime.GOMAXPROCS(0)
 	c.config.version = runtime.Version()
-	c.config.macAddrS = goarray.TurnString(goip.GetMacAddr())
-	c.config.insideIp = goip.GetInsideIp()
+	c.config.macAddrS = goarray.TurnString(goip.GetMacAddr(context.Background()))
+	c.config.insideIp = goip.GetInsideIp(context.Background())
 
 	// 创建模型
 	err := c.gormClient.Db.AutoMigrate(
