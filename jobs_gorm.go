@@ -8,7 +8,6 @@ import (
 	"go.dtapp.net/goarray"
 	"go.dtapp.net/goip"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
-	"go.dtapp.net/golock"
 	"log"
 	"runtime"
 )
@@ -26,9 +25,9 @@ type JobsGormConfig struct {
 
 // JobsGorm Gorm数据库驱动
 type JobsGorm struct {
-	gormClient  *dorm.GormClient  // 数据库驱动
-	redisClient *dorm.RedisClient // 缓存驱动
-	lockClient  *golock.LockRedis // 锁驱动
+	gormClient  *dorm.GormClient      // 数据库驱动
+	redisClient *dorm.RedisClient     // 缓存驱动
+	lockClient  *dorm.RedisClientLock // 锁驱动
 	config      struct {
 		debug            bool   // 调试
 		runVersion       string // 运行版本
@@ -65,12 +64,6 @@ func NewJobsGorm(config *JobsGormConfig) (*JobsGorm, error) {
 	if config.CurrentIp == "" {
 		return nil, errors.New("需要配置当前的IP")
 	}
-	if config.GormClient == nil {
-		return nil, errors.New("需要配置数据库驱动")
-	}
-	if config.RedisClient == nil {
-		return nil, errors.New("需要配置缓存数据库驱动")
-	}
 
 	c := &JobsGorm{}
 	c.gormClient = config.GormClient
@@ -82,8 +75,15 @@ func NewJobsGorm(config *JobsGormConfig) (*JobsGorm, error) {
 	c.config.cornKeyCustom = config.CornKeyCustom
 	c.config.debug = config.Debug
 
+	if c.gormClient.Db == nil {
+		return nil, errors.New("需要配置数据库驱动")
+	}
+	if c.redisClient.Db == nil {
+		return nil, errors.New("需要配置缓存数据库驱动")
+	}
+
 	// 锁
-	c.lockClient = golock.NewLockRedis(c.redisClient)
+	c.lockClient = c.redisClient.NewLock()
 
 	// 配置信息
 	c.config.runVersion = Version

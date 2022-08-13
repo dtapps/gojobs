@@ -6,10 +6,9 @@ require (
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
-	go.dtapp.net/dorm v1.0.17
+	go.dtapp.net/dorm v1.0.21
 	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.25
-	go.dtapp.net/golock v1.0.3
 	go.dtapp.net/gostring v1.0.6
 	go.dtapp.net/gotime v1.0.5
 	google.golang.org/grpc v1.48.0
@@ -73,7 +72,7 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.dtapp.net/gorandom v1.0.1 // indirect
 	go.dtapp.net/gorequest v1.0.26 // indirect
-	go.dtapp.net/gotrace_id v1.0.0 // indirect
+	go.dtapp.net/gotrace_id v1.0.2 // indirect
 	go.mongodb.org/mongo-driver v1.10.1 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
