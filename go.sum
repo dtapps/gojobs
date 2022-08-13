@@ -536,8 +536,8 @@ github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a/go.mod h1:ul22v+Nro/
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 github.com/ziutek/mymysql v1.5.4/go.mod h1:LMSpPZ6DbqWFxNCHW77HeMg9I646SAhApZ/wKdgO/C0=
-go.dtapp.net/dorm v1.0.25 h1:nYvBaB4pvwbc+kk83XZ0F/tdDltKH99WNKJpg8m6BPU=
-go.dtapp.net/dorm v1.0.25/go.mod h1:bHG7BmgeLaAlc56myYF63lwZAIuMeWRAqHBb/L84dLM=
+go.dtapp.net/dorm v1.0.26 h1:UkNuEVwlwB/chWr4LV1qKdt2tpcoDvPmR3KbGGeMWts=
+go.dtapp.net/dorm v1.0.26/go.mod h1:bHG7BmgeLaAlc56myYF63lwZAIuMeWRAqHBb/L84dLM=
 go.dtapp.net/goarray v1.0.1 h1:cHNHaJ2MFcuJPA1WKU2PM1EUZShS1vQqEH7n6YXsQVU=
 go.dtapp.net/goarray v1.0.1/go.mod h1:/MPhlFCAhQyeNV1M0v1PAOOX33Sg705fVjUgMO12IBQ=
 go.dtapp.net/goip v1.0.25 h1:GSgQkR7dc28TX8E1mF3wAy+EEGZ++tgqc8Q85OKZPEY=
