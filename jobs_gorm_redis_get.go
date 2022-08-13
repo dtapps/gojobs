@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go.dtapp.net/dorm"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gostring"
 	"math/rand"
@@ -70,7 +69,7 @@ func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) ([]string, error)
 	// 扫描
 	values, err := j.redisClient.Keys(ctx, j.config.cornKeyPrefix+"_*").Result()
 	if err != nil {
-		if err == dorm.RedisKeysNotFound {
+		if err == errors.New("ERR wrong number of arguments for 'mget' command") {
 			return []string{}, nil
 		}
 		return nil, errors.New(fmt.Sprintf("获取失败：%s", err.Error()))
