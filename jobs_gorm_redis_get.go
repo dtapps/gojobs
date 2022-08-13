@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go.dtapp.net/dorm"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gostring"
-	"log"
 	"math/rand"
 	"time"
 )
@@ -63,14 +63,14 @@ func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (a
 // GetSubscribeClientList 获取在线的客户端
 func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) ([]string, error) {
 
-	if j.config.debug == true {
-		log.Printf("获取在线的客户端：%s\n", j.config.cornKeyPrefix+"_*")
+	if j.config.logDebug == true {
+		j.logClient.Logger.Sugar().Infof("[jobs.GetSubscribeClientList] %s", j.config.cornKeyPrefix+"_*")
 	}
 
 	// 扫描
 	values, err := j.redisClient.Keys(ctx, j.config.cornKeyPrefix+"_*").Result()
 	if err != nil {
-		if err == errors.New("ERR wrong number of arguments for 'mget' command") {
+		if err == dorm.RedisKeysNotFound {
 			return []string{}, nil
 		}
 		return nil, errors.New(fmt.Sprintf("获取失败：%s", err.Error()))

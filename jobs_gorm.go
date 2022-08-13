@@ -8,28 +8,30 @@ import (
 	"go.dtapp.net/goarray"
 	"go.dtapp.net/goip"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
-	"log"
+	"go.dtapp.net/golog"
 	"runtime"
 )
 
 type JobsGormConfig struct {
 	GormClient       *dorm.GormClient  // 数据库驱动
 	RedisClient      *dorm.RedisClient // 缓存数据库驱动
+	LogClient        *golog.GoLog      // 日志驱动
+	LogDebug         bool              // 日志开关
 	CurrentIp        string            // 当前ip
 	LockKeyPrefix    string            // 锁Key前缀 xxx_lock
 	LockKeySeparator string            // 锁Key分隔符 :
 	CornKeyPrefix    string            // 任务Key前缀 xxx_cron
 	CornKeyCustom    string            // 任务Key自定义 xxx_cron_自定义  xxx_cron_自定义_*
-	Debug            bool              // 调试
 }
 
 // JobsGorm Gorm数据库驱动
 type JobsGorm struct {
-	gormClient  *dorm.GormClient      // 数据库驱动
-	redisClient *dorm.RedisClient     // 缓存驱动
-	lockClient  *dorm.RedisClientLock // 锁驱动
+	gormClient  *dorm.GormClient      // 数据库服务
+	redisClient *dorm.RedisClient     // 缓存服务
+	lockClient  *dorm.RedisClientLock // 锁服务
+	logClient   *golog.GoLog          // 日志服务
 	config      struct {
-		debug            bool   // 调试
+		logDebug         bool   // 日志开关
 		runVersion       string // 运行版本
 		os               string // 系统类型
 		arch             string // 系统架构
@@ -65,25 +67,25 @@ func NewJobsGorm(config *JobsGormConfig) (*JobsGorm, error) {
 		return nil, errors.New("需要配置当前的IP")
 	}
 
+	if config.GormClient.Db == nil {
+		return nil, errors.New("需要配置数据库驱动")
+	}
+	if config.RedisClient.Db == nil {
+		return nil, errors.New("需要配置缓存数据库驱动")
+	}
+
 	c := &JobsGorm{}
 	c.gormClient = config.GormClient
 	c.redisClient = config.RedisClient
+	c.lockClient = c.redisClient.NewLock()
+	c.logClient = config.LogClient
+
 	c.config.outsideIp = config.CurrentIp
 	c.config.lockKeyPrefix = config.LockKeyPrefix
 	c.config.lockKeySeparator = config.LockKeySeparator
 	c.config.cornKeyPrefix = config.CornKeyPrefix
 	c.config.cornKeyCustom = config.CornKeyCustom
-	c.config.debug = config.Debug
-
-	if c.gormClient.Db == nil {
-		return nil, errors.New("需要配置数据库驱动")
-	}
-	if c.redisClient.Db == nil {
-		return nil, errors.New("需要配置缓存数据库驱动")
-	}
-
-	// 锁
-	c.lockClient = c.redisClient.NewLock()
+	c.config.logDebug = config.LogDebug
 
 	// 配置信息
 	c.config.runVersion = Version
@@ -105,8 +107,8 @@ func NewJobsGorm(config *JobsGormConfig) (*JobsGorm, error) {
 		return nil, errors.New(fmt.Sprintf("创建任务模型失败：%v\n", err))
 	}
 
-	if c.config.debug == true {
-		log.Printf("JOBS配置：%+v\n", c.config)
+	if c.config.logDebug == true {
+		c.logClient.Logger.Sugar().Infof("[jobs.NewJobsGorm]%+v", c.config)
 	}
 
 	return c, nil
