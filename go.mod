@@ -6,7 +6,7 @@ require (
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
-	go.dtapp.net/dorm v1.0.26
+	go.dtapp.net/dorm v1.0.27
 	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.25
 	go.dtapp.net/golog v1.0.29
@@ -93,8 +93,8 @@ require (
 	google.golang.org/genproto v0.0.0-20220812140447-cec7f5303424 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/datatypes v1.0.7 // indirect
-	gorm.io/driver/mysql v1.3.5 // indirect
-	gorm.io/driver/postgres v1.3.8 // indirect
+	gorm.io/driver/mysql v1.3.6 // indirect
+	gorm.io/driver/postgres v1.3.9 // indirect
 	mellium.im/sasl v0.2.1 // indirect
 	modernc.org/ccgo/v3 v3.16.8 // indirect
 	xorm.io/builder v0.3.12 // indirect

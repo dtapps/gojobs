@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go.dtapp.net/dorm"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gostring"
 	"math/rand"
@@ -17,7 +16,7 @@ import (
 // ---
 // address 下发地址
 // err 错误信息
-func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (address string, err error) {
+func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (string, error) {
 	var (
 		currentIp       = ""    // 当前Ip
 		appointIpStatus = false // 指定Ip状态
@@ -34,29 +33,28 @@ func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (a
 		if appointIpStatus == true {
 			// 判断是否指定某ip执行
 			if gostring.Contains(workers[0], currentIp) == true {
-				return j.config.cornKeyPrefix + "_" + v.SpecifyIp, nil
+				return workers[0], nil
 			}
-			return address, errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
+			return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
 		}
-		return j.config.cornKeyPrefix + "_" + workers[0], nil
+		return workers[0], nil
 	}
 
 	// 优先处理指定某ip执行
 	if appointIpStatus == true {
 		for wk, wv := range workers {
 			if gostring.Contains(wv, currentIp) == true {
-				return j.config.cornKeyPrefix + "_" + workers[wk], nil
+				return workers[wk], nil
 			}
 		}
-		return address, errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
+		return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
 	} else {
 		// 随机返回一个
-		zxIp := workers[j.random(0, len(workers))]
-		if zxIp == "" {
+		address := workers[j.random(0, len(workers))]
+		if address == "" {
 			return address, errors.New("获取执行的客户端异常")
 		}
-		address = j.config.cornKeyPrefix + "_" + zxIp
-		return address, err
+		return address, nil
 	}
 }
 
@@ -68,18 +66,7 @@ func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) ([]string, error)
 	}
 
 	// 扫描
-	values, err := j.redisClient.Keys(ctx, j.config.cornKeyPrefix+"_*").Result()
-	if err != nil {
-		if errors.Is(err, dorm.RedisKeysNotFound) {
-			return []string{}, nil
-		}
-		return nil, errors.New(fmt.Sprintf("获取失败：%s", err.Error()))
-	}
-
-	client := make([]string, 0, len(values))
-	for _, val := range values {
-		client = append(client, val.(string))
-	}
+	client := j.redisClient.Keys(ctx, j.config.cornKeyPrefix+"_*")
 
 	return client, nil
 }
