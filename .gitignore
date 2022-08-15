@@ -6,7 +6,5 @@
 *.log
 gomod.sh
 grpc_build.sh
-etcd_server_test.go
-etcd_worker_test.go
-grpc_server_test.go
+*_test.go
 /vendor/

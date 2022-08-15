@@ -9,7 +9,7 @@ require (
 	go.dtapp.net/dorm v1.0.26
 	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.25
-	go.dtapp.net/golog v1.0.27
+	go.dtapp.net/golog v1.0.29
 	go.dtapp.net/gostring v1.0.6
 	go.dtapp.net/gotime v1.0.5
 	google.golang.org/grpc v1.48.0
@@ -46,6 +46,7 @@ require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lib/pq v1.10.6 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -54,6 +55,7 @@ require (
 	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/rs/zerolog v1.27.0 // indirect
 	github.com/saracen/go7z v0.0.0-20191010121135-9c09b6bd7fda // indirect
 	github.com/saracen/solidblock v0.0.0-20190426153529-45df20abab6f // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
@@ -74,8 +76,8 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.dtapp.net/gojson v1.0.1 // indirect
 	go.dtapp.net/gorandom v1.0.1 // indirect
-	go.dtapp.net/gorequest v1.0.26 // indirect
-	go.dtapp.net/gotrace_id v1.0.2 // indirect
+	go.dtapp.net/gorequest v1.0.27 // indirect
+	go.dtapp.net/gotrace_id v1.0.5 // indirect
 	go.dtapp.net/gourl v1.0.0 // indirect
 	go.dtapp.net/goxml v1.0.1 // indirect
 	go.mongodb.org/mongo-driver v1.10.1 // indirect

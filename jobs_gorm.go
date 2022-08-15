@@ -15,7 +15,7 @@ import (
 type JobsGormConfig struct {
 	GormClient       *dorm.GormClient  // 数据库驱动
 	RedisClient      *dorm.RedisClient // 缓存数据库驱动
-	LogClient        *golog.GoLog      // 日志驱动
+	LogClient        *golog.ZapLog     // 日志驱动
 	LogDebug         bool              // 日志开关
 	CurrentIp        string            // 当前ip
 	LockKeyPrefix    string            // 锁Key前缀 xxx_lock
@@ -29,7 +29,7 @@ type JobsGorm struct {
 	gormClient  *dorm.GormClient      // 数据库服务
 	redisClient *dorm.RedisClient     // 缓存服务
 	lockClient  *dorm.RedisClientLock // 锁服务
-	logClient   *golog.GoLog          // 日志服务
+	logClient   *golog.ZapLog         // 日志服务
 	config      struct {
 		logDebug         bool   // 日志开关
 		runVersion       string // 运行版本
@@ -108,7 +108,7 @@ func NewJobsGorm(config *JobsGormConfig) (*JobsGorm, error) {
 	}
 
 	if c.config.logDebug == true {
-		c.logClient.Logger.Sugar().Infof("[jobs.NewJobsGorm]%+v", c.config)
+		c.logClient.Infof(context.Background(), "[jobs.NewJobsGorm]%+v", c.config)
 	}
 
 	return c, nil

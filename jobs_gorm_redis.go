@@ -12,7 +12,7 @@ import (
 func (j *JobsGorm) Publish(ctx context.Context, channel string, message interface{}) error {
 	publish, err := j.redisClient.Publish(ctx, channel, message).Result()
 	if j.config.logDebug == true {
-		j.logClient.Logger.Sugar().Infof("[jobs.Publish] %s %s %v %s", channel, message, publish, err)
+		j.logClient.Infof(ctx, "[jobs.Publish] %s %s %v %s", channel, message, publish, err)
 	}
 	return err
 }

@@ -64,7 +64,7 @@ func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (a
 func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) ([]string, error) {
 
 	if j.config.logDebug == true {
-		j.logClient.Logger.Sugar().Infof("[jobs.GetSubscribeClientList] %s", j.config.cornKeyPrefix+"_*")
+		j.logClient.Infof(ctx, "[jobs.GetSubscribeClientList] %s", j.config.cornKeyPrefix+"_*")
 	}
 
 	// 扫描

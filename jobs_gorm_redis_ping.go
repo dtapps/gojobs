@@ -12,7 +12,7 @@ func (j *JobsGorm) Ping(ctx context.Context) {
 	_, _ = c.AddFunc(GetSeconds(2).Spec(), func() {
 		result, err := j.redisClient.Set(ctx, j.config.cornKeyPrefix+"_"+j.config.cornKeyCustom, j.config.cornKeyCustom, 3*time.Second).Result()
 		if j.config.logDebug == true {
-			j.logClient.Logger.Sugar().Infof("[jobs.Ping] %s %s %v %s", j.config.cornKeyPrefix+"_"+j.config.cornKeyCustom, j.config.cornKeyCustom, result, err)
+			j.logClient.Infof(ctx, "[jobs.Ping] %s %s %v %s", j.config.cornKeyPrefix+"_"+j.config.cornKeyCustom, j.config.cornKeyCustom, result, err)
 		}
 	})
 	c.Start()
