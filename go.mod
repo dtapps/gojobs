@@ -6,16 +6,16 @@ require (
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
-	go.dtapp.net/dorm v1.0.27
+	go.dtapp.net/dorm v1.0.28
 	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.25
-	go.dtapp.net/golog v1.0.29
+	go.dtapp.net/golog v1.0.30
 	go.dtapp.net/gostring v1.0.6
 	go.dtapp.net/gotime v1.0.5
+	go.dtapp.net/gotrace_id v1.0.6
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
 	gorm.io/gorm v1.23.8
-	xorm.io/xorm v1.3.1
 )
 
 require (
@@ -77,7 +77,6 @@ require (
 	go.dtapp.net/gojson v1.0.1 // indirect
 	go.dtapp.net/gorandom v1.0.1 // indirect
 	go.dtapp.net/gorequest v1.0.27 // indirect
-	go.dtapp.net/gotrace_id v1.0.5 // indirect
 	go.dtapp.net/gourl v1.0.0 // indirect
 	go.dtapp.net/goxml v1.0.1 // indirect
 	go.mongodb.org/mongo-driver v1.10.1 // indirect
@@ -98,4 +97,5 @@ require (
 	mellium.im/sasl v0.3.0 // indirect
 	modernc.org/ccgo/v3 v3.16.8 // indirect
 	xorm.io/builder v0.3.12 // indirect
+	xorm.io/xorm v1.3.1 // indirect
 )

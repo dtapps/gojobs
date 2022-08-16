@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gostring"
+	"go.dtapp.net/gotrace_id"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -16,10 +18,11 @@ import (
 // ---
 // address 下发地址
 // err 错误信息
-func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (string, error) {
+func (j *JobsGorm) GetIssueAddress(ctx context.Context, workers []string, v *jobs_gorm_model.Task) (string, error) {
 	var (
 		currentIp       = ""    // 当前Ip
 		appointIpStatus = false // 指定Ip状态
+		traceId         = gotrace_id.GetTraceIdContext(ctx)
 	)
 
 	// 赋值ip
@@ -33,6 +36,7 @@ func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (s
 		if appointIpStatus == true {
 			// 判断是否指定某ip执行
 			if gostring.Contains(workers[0], currentIp) == true {
+				log.Println("[jobs.GetIssueAddress]只有一个客户端在线，指定某ip执行", traceId, workers[0], currentIp)
 				return workers[0], nil
 			}
 			return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
@@ -44,6 +48,7 @@ func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (s
 	if appointIpStatus == true {
 		for wk, wv := range workers {
 			if gostring.Contains(wv, currentIp) == true {
+				log.Println("[jobs.GetIssueAddress]优先处理指定某ip执行", traceId, workers[wk], currentIp)
 				return workers[wk], nil
 			}
 		}
@@ -54,6 +59,7 @@ func (j *JobsGorm) GetIssueAddress(workers []string, v *jobs_gorm_model.Task) (s
 		if address == "" {
 			return address, errors.New("获取执行的客户端异常")
 		}
+		log.Println("[jobs.GetIssueAddress]随机返回一个", traceId, address, currentIp)
 		return address, nil
 	}
 }
