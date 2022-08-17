@@ -19,3 +19,8 @@ func (j *JobsGorm) GetRedis() *redis.Client {
 func (j *JobsGorm) GetCurrentIp() string {
 	return j.config.outsideIp
 }
+
+// GetSubscribeAddress 获取订阅地址
+func (j *JobsGorm) GetSubscribeAddress() string {
+	return j.config.cornKeyPrefix + "_" + j.config.cornKeyCustom
+}
