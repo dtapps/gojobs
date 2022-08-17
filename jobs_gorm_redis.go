@@ -35,15 +35,3 @@ func (j *JobsGorm) PSubscribe(ctx context.Context) SubscribeResult {
 		Message: j.redisClient.PSubscribe(ctx, j.config.cornKeyPrefix+"_"+j.config.cornKeyCustom+"_*"),
 	}
 }
-
-// PubSubChannels 查询活跃的channel
-func (j *JobsGorm) PubSubChannels(ctx context.Context) []string {
-	result, _ := j.redisClient.PubSubChannels(ctx, j.config.cornKeyPrefix+"_"+j.config.cornKeyCustom+"_*").Result()
-	return result
-}
-
-// PubSubNumSub 查询指定的channel有多少个订阅者
-func (j *JobsGorm) PubSubNumSub(ctx context.Context) map[string]int64 {
-	result, _ := j.redisClient.PubSubNumSub(ctx, j.config.cornKeyPrefix+"_"+j.config.cornKeyCustom+"_*").Result()
-	return result
-}

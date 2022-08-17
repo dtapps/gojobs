@@ -65,16 +65,16 @@ func (j *JobsGorm) GetIssueAddress(ctx context.Context, workers []string, v *job
 }
 
 // GetSubscribeClientList 获取在线的客户端
-func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) ([]string, error) {
+func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) (client []string, err error) {
 
 	if j.config.logDebug == true {
 		j.logClient.Infof(ctx, "[jobs.GetSubscribeClientList] %s", j.config.cornKeyPrefix+"_*")
 	}
 
-	// 扫描
-	client := j.redisClient.Keys(ctx, j.config.cornKeyPrefix+"_*")
+	// 查询活跃的channel
+	client, err = j.redisClient.PubSubChannels(ctx, j.config.cornKeyPrefix+"_*").Result()
 
-	return client, nil
+	return client, err
 }
 
 // 随机返回一个
