@@ -68,7 +68,7 @@ func (j *JobsGorm) GetIssueAddress(ctx context.Context, workers []string, v *job
 func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) (client []string, err error) {
 
 	if j.config.logDebug == true {
-		j.logClient.Infof(ctx, "[jobs.GetSubscribeClientList] %s", j.config.cornKeyPrefix+"_*")
+		log.Printf("[jobs.GetSubscribeClientList] %s\n", j.config.cornKeyPrefix+"_*")
 	}
 
 	// 查询活跃的channel

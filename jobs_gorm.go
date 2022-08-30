@@ -9,6 +9,7 @@ import (
 	"go.dtapp.net/goip"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/golog"
+	"log"
 	"runtime"
 )
 
@@ -108,7 +109,7 @@ func NewJobsGorm(config *JobsGormConfig) (*JobsGorm, error) {
 	}
 
 	if c.config.logDebug == true {
-		c.logClient.Infof(context.Background(), "[jobs.NewJobsGorm]%+v", c.config)
+		log.Printf("[jobs.NewJobsGorm]%+v\n", c.config)
 	}
 
 	return c, nil
