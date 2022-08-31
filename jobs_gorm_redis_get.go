@@ -26,7 +26,7 @@ func (j *JobsGorm) GetIssueAddress(ctx context.Context, workers []string, v *job
 	)
 
 	// 赋值ip
-	if v.SpecifyIp != "" {
+	if v.SpecifyIp != "" && v.SpecifyIp != SpecifyIpNull {
 		currentIp = v.SpecifyIp
 		appointIpStatus = true
 	}
