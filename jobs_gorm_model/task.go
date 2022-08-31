@@ -24,6 +24,7 @@ type Task struct {
 	SpecifyIp      string         `gorm:"index;comment:指定外网IP" json:"specify_ip"`        // 指定外网IP
 	UpdatedIp      string         `gorm:"comment:更新外网IP" json:"updated_ip"`              // 更新外网IP
 	Result         string         `gorm:"comment:结果" json:"result"`                      // 结果
+	NextRunTime    time.Time      `gorm:"comment:下次运行时间" json:"next_run_time"`           // 下次运行时间
 	CreatedAt      time.Time      `gorm:"autoCreateTime;comment:创建时间" json:"created_at"` // 创建时间
 	UpdatedAt      time.Time      `gorm:"autoUpdateTime;comment:更新时间" json:"updated_at"` // 更新时间
 	DeletedAt      gorm.DeletedAt `gorm:"index;comment:删除时间" json:"deleted_at"`          // 删除时间

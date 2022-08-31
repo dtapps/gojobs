@@ -1,3 +1,3 @@
 package gojobs
 
-const Version = "1.0.66"
+const Version = "1.0.67"
