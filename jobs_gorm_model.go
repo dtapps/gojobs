@@ -124,6 +124,29 @@ func (j *JobsGorm) TaskFindAllWait(tx *gorm.DB, frequency int64) []jobs_gorm_mod
 	return j.taskFindAll(tx, frequency, TASK_WAIT)
 }
 
+// StartTask 任务启动
+func (j *JobsGorm) StartTask(tx *gorm.DB, id uint) error {
+	return j.EditTask(tx, id).
+		Select("status", "status_desc").
+		Updates(jobs_gorm_model.Task{
+			Status:     TASK_IN,
+			StatusDesc: "启动任务",
+		}).Error
+}
+
+// StartTaskCustom 任务启动自定义
+func (j *JobsGorm) StartTaskCustom(tx *gorm.DB, customId string, customSequence int64) error {
+	return tx.Model(&jobs_gorm_model.Task{}).
+		Where("custom_id = ?", customId).
+		Where("custom_sequence = ?", customSequence).
+		Where("status = ?", TASK_WAIT).
+		Select("status", "status_desc").
+		Updates(jobs_gorm_model.Task{
+			Status:     TASK_IN,
+			StatusDesc: "启动任务",
+		}).Error
+}
+
 // EditTask 任务修改
 func (j *JobsGorm) EditTask(tx *gorm.DB, id uint) *gorm.DB {
 	return tx.Model(&jobs_gorm_model.Task{}).Where("id = ?", id)
