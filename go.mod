@@ -9,7 +9,7 @@ require (
 	go.dtapp.net/dorm v1.0.30
 	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.28
-	go.dtapp.net/golog v1.0.44
+	go.dtapp.net/golog v1.0.51
 	go.dtapp.net/gostring v1.0.10
 	go.dtapp.net/gotime v1.0.5
 	go.dtapp.net/gotrace_id v1.0.6
@@ -77,7 +77,7 @@ require (
 	github.com/xdg-go/stringprep v1.0.3 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.dtapp.net/gorandom v1.0.1 // indirect
-	go.dtapp.net/gorequest v1.0.27 // indirect
+	go.dtapp.net/gorequest v1.0.28 // indirect
 	go.dtapp.net/gourl v1.0.0 // indirect
 	go.dtapp.net/goxml v1.0.1 // indirect
 	go.mongodb.org/mongo-driver v1.10.1 // indirect
