@@ -1,0 +1,24 @@
+package gojobs
+
+import (
+	"context"
+	"fmt"
+	"go.dtapp.net/gojobs/jobs_gorm_model"
+	"go.dtapp.net/gotime"
+	"time"
+)
+
+// Lock 上锁
+func (c *Client) Lock(ctx context.Context, info jobs_gorm_model.Task, id any) (string, error) {
+	return c.cache.redisLockClient.Lock(ctx, fmt.Sprintf("%s%s%v%s%v", c.cache.lockKeyPrefix, c.cache.lockKeySeparator, info.Type, c.cache.lockKeySeparator, id), fmt.Sprintf("已在%s@%s机器上锁成功，%v", c.config.insideIp, c.config.outsideIp, gotime.Current().Format()), time.Duration(info.Frequency)*3*time.Second)
+}
+
+// Unlock Lock 解锁
+func (c *Client) Unlock(ctx context.Context, info jobs_gorm_model.Task, id any) error {
+	return c.cache.redisLockClient.Unlock(ctx, fmt.Sprintf("%s%s%v%s%v", c.cache.lockKeyPrefix, c.cache.lockKeySeparator, info.Type, c.cache.lockKeySeparator, id))
+}
+
+// LockForever 永远上锁
+func (c *Client) LockForever(ctx context.Context, info jobs_gorm_model.Task, id any) (string, error) {
+	return c.cache.redisLockClient.LockForever(ctx, fmt.Sprintf("%s%s%v%s%v", c.cache.lockKeyPrefix, c.cache.lockKeySeparator, info.Type, c.cache.lockKeySeparator, id), fmt.Sprintf("已在%s@%s机器永远上锁成功，%v", c.config.insideIp, c.config.outsideIp, gotime.Current().Format()))
+}

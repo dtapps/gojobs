@@ -15,6 +15,6 @@ type TaskLogRun struct {
 	CreatedAt  string `xorm:"created" json:"created_at"` // 创建时间
 }
 
-func (m *TaskLogRun) TableName() string {
+func (TaskLogRun) TableName() string {
 	return "task_log_run"
 }

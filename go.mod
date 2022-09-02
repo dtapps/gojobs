@@ -9,12 +9,10 @@ require (
 	go.dtapp.net/dorm v1.0.30
 	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.28
-	go.dtapp.net/golog v1.0.51
 	go.dtapp.net/gostring v1.0.10
 	go.dtapp.net/gotime v1.0.5
 	go.dtapp.net/gotrace_id v1.0.6
-	google.golang.org/grpc v1.49.0
-	google.golang.org/protobuf v1.28.1
+	go.mongodb.org/mongo-driver v1.10.1
 	gorm.io/gorm v1.23.8
 )
 
@@ -31,7 +29,6 @@ require (
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
@@ -48,15 +45,12 @@ require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lib/pq v1.10.6 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/montanaflynn/stats v0.6.6 // indirect
-	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rs/zerolog v1.28.0 // indirect
 	github.com/saracen/go7z v0.0.0-20191010121135-9c09b6bd7fda // indirect
 	github.com/saracen/solidblock v0.0.0-20190426153529-45df20abab6f // indirect
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18 // indirect
@@ -78,25 +72,20 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.dtapp.net/gorandom v1.0.1 // indirect
 	go.dtapp.net/gorequest v1.0.28 // indirect
-	go.dtapp.net/gourl v1.0.0 // indirect
-	go.dtapp.net/goxml v1.0.1 // indirect
-	go.mongodb.org/mongo-driver v1.10.1 // indirect
-	go.uber.org/atomic v1.10.0 // indirect
-	go.uber.org/multierr v1.8.0 // indirect
-	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
 	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde // indirect
 	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/genproto v0.0.0-20220829175752-36a9c930ecbf // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/datatypes v1.0.7 // indirect
 	gorm.io/driver/mysql v1.3.6 // indirect
 	gorm.io/driver/postgres v1.3.9 // indirect
 	mellium.im/sasl v0.3.0 // indirect
 	modernc.org/ccgo/v3 v3.16.8 // indirect
+	modernc.org/libc v1.16.19 // indirect
+	modernc.org/sqlite v1.18.0 // indirect
 	xorm.io/builder v0.3.12 // indirect
 	xorm.io/xorm v1.3.1 // indirect
 )

@@ -12,6 +12,6 @@ type TaskLog struct {
 	CreatedAt  time.Time `gorm:"autoCreateTime;comment:创建时间" json:"created_at"` // 创建时间
 }
 
-func (m *TaskLog) TableName() string {
+func (TaskLog) TableName() string {
 	return "task_log"
 }

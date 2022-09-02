@@ -22,9 +22,9 @@ type ConfigCreateInCustomId struct {
 }
 
 // CreateInCustomId 创建正在运行任务
-func (j *JobsGorm) CreateInCustomId(config *ConfigCreateInCustomId) error {
+func (c *Client) CreateInCustomId(config *ConfigCreateInCustomId) error {
 	if config.CurrentIp == "" {
-		config.CurrentIp = j.config.outsideIp
+		config.CurrentIp = c.config.outsideIp
 	}
 	err := config.Tx.Create(&jobs_gorm_model.Task{
 		Status:         TASK_IN,
@@ -60,13 +60,13 @@ type ConfigCreateInCustomIdOnly struct {
 }
 
 // CreateInCustomIdOnly 创建正在运行唯一任务
-func (j *JobsGorm) CreateInCustomIdOnly(config *ConfigCreateInCustomIdOnly) error {
-	query := j.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
+func (c *Client) CreateInCustomIdOnly(config *ConfigCreateInCustomIdOnly) error {
+	query := c.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
 	if query.Id != 0 {
 		return errors.New(fmt.Sprintf("%d:[%s@%s]任务已存在", query.Id, config.CustomId, config.Type))
 	}
 	if config.CurrentIp == "" {
-		config.CurrentIp = j.config.outsideIp
+		config.CurrentIp = c.config.outsideIp
 	}
 	err := config.Tx.Create(&jobs_gorm_model.Task{
 		Status:         TASK_IN,
@@ -103,9 +103,9 @@ type ConfigCreateInCustomIdMaxNumber struct {
 }
 
 // CreateInCustomIdMaxNumber 创建正在运行任务并限制数量
-func (j *JobsGorm) CreateInCustomIdMaxNumber(config *ConfigCreateInCustomIdMaxNumber) error {
+func (c *Client) CreateInCustomIdMaxNumber(config *ConfigCreateInCustomIdMaxNumber) error {
 	if config.CurrentIp == "" {
-		config.CurrentIp = j.config.outsideIp
+		config.CurrentIp = c.config.outsideIp
 	}
 	err := config.Tx.Create(&jobs_gorm_model.Task{
 		Status:         TASK_IN,
@@ -143,13 +143,13 @@ type ConfigCreateInCustomIdMaxNumberOnly struct {
 }
 
 // CreateInCustomIdMaxNumberOnly 创建正在运行唯一任务并限制数量
-func (j *JobsGorm) CreateInCustomIdMaxNumberOnly(config *ConfigCreateInCustomIdMaxNumberOnly) error {
-	query := j.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
+func (c *Client) CreateInCustomIdMaxNumberOnly(config *ConfigCreateInCustomIdMaxNumberOnly) error {
+	query := c.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
 	if query.Id != 0 {
 		return errors.New(fmt.Sprintf("%d:[%s@%s]任务已存在", query.Id, config.CustomId, config.Type))
 	}
 	if config.CurrentIp == "" {
-		config.CurrentIp = j.config.outsideIp
+		config.CurrentIp = c.config.outsideIp
 	}
 	err := config.Tx.Create(&jobs_gorm_model.Task{
 		Status:         TASK_IN,

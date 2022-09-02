@@ -30,6 +30,6 @@ type Task struct {
 	DeletedAt      gorm.DeletedAt `gorm:"index;comment:删除时间" json:"deleted_at"`                             // 删除时间
 }
 
-func (m *Task) TableName() string {
+func (Task) TableName() string {
 	return "task"
 }

@@ -26,6 +26,6 @@ type Task struct {
 	DeletedAt      string    `xorm:"deleted" json:"deleted_at"` // 删除时间
 }
 
-func (m *Task) TableName() string {
+func (Task) TableName() string {
 	return "task"
 }

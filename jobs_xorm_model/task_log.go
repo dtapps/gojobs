@@ -10,6 +10,6 @@ type TaskLog struct {
 	CreatedAt  string `xorm:"created" json:"created_at"` // 创建时间
 }
 
-func (m *TaskLog) TableName() string {
+func (TaskLog) TableName() string {
 	return "task_log"
 }

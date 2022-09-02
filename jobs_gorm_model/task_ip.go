@@ -7,6 +7,6 @@ type TaskIp struct {
 	Ips      string `gorm:"comment:任务IP" json:"ips"`           // 任务IP
 }
 
-func (m *TaskIp) TableName() string {
+func (TaskIp) TableName() string {
 	return "task_ip"
 }

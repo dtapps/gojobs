@@ -17,6 +17,6 @@ type TaskLogRun struct {
 	CreatedAt  time.Time `gorm:"autoCreateTime;comment:创建时间" json:"created_at"` // 创建时间
 }
 
-func (m *TaskLogRun) TableName() string {
+func (TaskLogRun) TableName() string {
 	return "task_log_run"
 }

@@ -22,9 +22,9 @@ type ConfigCreateWaitCustomId struct {
 }
 
 // CreateWaitCustomId 创建正在运行任务
-func (j *JobsGorm) CreateWaitCustomId(config *ConfigCreateWaitCustomId) error {
+func (c *Client) CreateWaitCustomId(config *ConfigCreateWaitCustomId) error {
 	if config.CurrentIp == "" {
-		config.CurrentIp = j.config.outsideIp
+		config.CurrentIp = c.config.outsideIp
 	}
 	err := config.Tx.Create(&jobs_gorm_model.Task{
 		Status:         TASK_WAIT,

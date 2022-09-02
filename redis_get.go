@@ -18,7 +18,7 @@ import (
 // ---
 // address 下发地址
 // err 错误信息
-func (j *JobsGorm) GetIssueAddress(ctx context.Context, workers []string, v *jobs_gorm_model.Task) (string, error) {
+func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_gorm_model.Task) (string, error) {
 	var (
 		currentIp       = ""    // 当前Ip
 		appointIpStatus = false // 指定Ip状态
@@ -55,7 +55,7 @@ func (j *JobsGorm) GetIssueAddress(ctx context.Context, workers []string, v *job
 		return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
 	} else {
 		// 随机返回一个
-		address := workers[j.random(0, len(workers))]
+		address := workers[c.random(0, len(workers))]
 		if address == "" {
 			return address, errors.New("获取执行的客户端异常")
 		}
@@ -65,14 +65,14 @@ func (j *JobsGorm) GetIssueAddress(ctx context.Context, workers []string, v *job
 }
 
 // GetSubscribeClientList 获取在线的客户端
-func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) (client []string, err error) {
+func (c *Client) GetSubscribeClientList(ctx context.Context) (client []string, err error) {
 
-	if j.config.logDebug == true {
-		log.Printf("[jobs.GetSubscribeClientList] %s\n", j.config.cornKeyPrefix+"_*")
+	if c.config.debug == true {
+		log.Printf("[jobs.GetSubscribeClientList] %s\n", c.cache.cornKeyPrefix+"_*")
 	}
 
 	// 查询活跃的channel
-	client, err = j.redisClient.PubSubChannels(ctx, j.config.cornKeyPrefix+"_*").Result()
+	client, err = c.cache.redisClient.PubSubChannels(ctx, c.cache.cornKeyPrefix+"_*").Result()
 
 	return client, err
 }
@@ -80,7 +80,7 @@ func (j *JobsGorm) GetSubscribeClientList(ctx context.Context) (client []string,
 // 随机返回一个
 // min最小
 // max最大
-func (j *JobsGorm) random(min, max int) int {
+func (c *Client) random(min, max int) int {
 	if max-min <= 0 {
 		return 0
 	}
