@@ -7,27 +7,26 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
 )
 
 // 创建模型
 func (c *Client) autoMigrateTask() {
-	log.Println(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.Task{}))
+	c.zapLog.WithLogger().Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.Task{}))
 }
 
 // 创建模型
 func (c *Client) autoMigrateTaskIp() {
-	log.Println(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskIp{}))
+	c.zapLog.WithLogger().Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskIp{}))
 }
 
 // 创建模型
 func (c *Client) autoMigrateTaskLog() {
-	log.Println(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskLog{}))
+	c.zapLog.WithLogger().Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskLog{}))
 }
 
 // 创建模型
 func (c *Client) autoMigrateTaskLogRun() {
-	log.Println(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskLogRun{}))
+	c.zapLog.WithLogger().Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskLogRun{}))
 }
 
 // 创建时间序列集合
@@ -37,40 +36,40 @@ func (c *Client) mongoCreateCollectionTask(ctx context.Context) {
 		"listCollections", 1,
 	}}).Decode(&commandResult)
 	if commandErr != nil {
-		log.Println("检查时间序列集合：", commandErr)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("检查时间序列集合：%s", commandErr)
 	} else {
-		log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).CreateCollection(ctx, jobs_mongo_model.Task{}.TableName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("created_at"))))
+		c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).CreateCollection(ctx, jobs_mongo_model.Task{}.TableName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("created_at"))))
 	}
 }
 
 // 创建索引
 func (c *Client) mongoCreateIndexesTask(ctx context.Context) {
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"status", 1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"frequency", 1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"custom_id", 1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"type", 1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"created_ip", 1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"specify_ip", 1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"updated_ip", 1},
 	}}))
 }
 
 // 创建索引
 func (c *Client) mongoCreateIndexesTaskIp(ctx context.Context) {
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskIp{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskIp{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"task_type", 1},
 	}}))
 }
@@ -82,21 +81,21 @@ func (c *Client) mongoCreateCollectionTaskLog(ctx context.Context) {
 		"listCollections", 1,
 	}}).Decode(&commandResult)
 	if commandErr != nil {
-		log.Println("检查时间序列集合：", commandErr)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("检查时间序列集合：%s", commandErr)
 	} else {
-		log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).CreateCollection(ctx, jobs_mongo_model.TaskLog{}.TableName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("created_at"))))
+		c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).CreateCollection(ctx, jobs_mongo_model.TaskLog{}.TableName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("created_at"))))
 	}
 }
 
 // 创建索引
 func (c *Client) mongoCreateIndexesTaskLog(ctx context.Context) {
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"task_id", -1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"status_code", -1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"version", -1},
 	}}))
 }
@@ -108,33 +107,33 @@ func (c *Client) mongoCreateCollectionTaskLogRun(ctx context.Context) {
 		"listCollections", 1,
 	}}).Decode(&commandResult)
 	if commandErr != nil {
-		log.Println("检查时间序列集合：", commandErr)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("检查时间序列集合：%s", commandErr)
 	} else {
-		log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).CreateCollection(ctx, jobs_mongo_model.TaskLogRun{}.TableName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("created_at"))))
+		c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).CreateCollection(ctx, jobs_mongo_model.TaskLogRun{}.TableName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("created_at"))))
 	}
 }
 
 // 创建索引
 func (c *Client) mongoCreateIndexesTaskLogRun(ctx context.Context) {
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"task_id", -1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"run_id", -1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"outside_ip", -1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"inside_ip", -1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"os", -1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"arch", -1},
 	}}))
-	log.Println(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"go_version", -1},
 	}}))
 }

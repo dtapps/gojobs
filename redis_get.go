@@ -7,7 +7,6 @@ import (
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gostring"
 	"go.dtapp.net/gotrace_id"
-	"log"
 	"math/rand"
 	"time"
 )
@@ -36,7 +35,7 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_
 		if appointIpStatus == true {
 			// 判断是否指定某ip执行
 			if gostring.Contains(workers[0], currentIp) == true {
-				log.Println("[jobs.GetIssueAddress]只有一个客户端在线，指定某ip执行", traceId, workers[0], currentIp)
+				c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs.GetIssueAddress]只有一个客户端在线，指定某ip执行", traceId, workers[0], currentIp)
 				return workers[0], nil
 			}
 			return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
@@ -48,7 +47,7 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_
 	if appointIpStatus == true {
 		for wk, wv := range workers {
 			if gostring.Contains(wv, currentIp) == true {
-				log.Println("[jobs.GetIssueAddress]优先处理指定某ip执行", traceId, workers[wk], currentIp)
+				c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs.GetIssueAddress]优先处理指定某ip执行", traceId, workers[wk], currentIp)
 				return workers[wk], nil
 			}
 		}
@@ -59,7 +58,7 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_
 		if address == "" {
 			return address, errors.New("获取执行的客户端异常")
 		}
-		log.Println("[jobs.GetIssueAddress]随机返回一个", traceId, address, currentIp)
+		c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs.GetIssueAddress]随机返回一个", traceId, address, currentIp)
 		return address, nil
 	}
 }
@@ -68,7 +67,7 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_
 func (c *Client) GetSubscribeClientList(ctx context.Context) (client []string, err error) {
 
 	if c.config.debug == true {
-		log.Printf("[jobs.GetSubscribeClientList] %s\n", c.cache.cornKeyPrefix+"_*")
+		c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs.GetSubscribeClientList] %s\n", c.cache.cornKeyPrefix+"_*")
 	}
 
 	// 查询活跃的channel

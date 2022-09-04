@@ -3,6 +3,7 @@ package gojobs
 import (
 	"context"
 	"go.dtapp.net/dorm"
+	"go.dtapp.net/golog"
 )
 
 // client *dorm.GormClient
@@ -29,11 +30,13 @@ type ClientConfig struct {
 	RedisClientFun redisClientFun // 数据库驱动
 	RedisPrefixFun redisPrefixFun // 前缀
 	Debug          bool           // 日志开关
+	ZapLog         *golog.ZapLog  // 日志服务
 	CurrentIp      string         // 当前ip
 }
 
 // Client 实例
 type Client struct {
+	zapLog *golog.ZapLog // 日志服务
 	config struct {
 		debug      bool   // 日志开关
 		runVersion string // 运行版本
@@ -66,6 +69,8 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	var ctx = context.Background()
 
 	c := &Client{}
+
+	c.zapLog = config.ZapLog
 
 	c.config.debug = config.Debug
 

@@ -3,7 +3,6 @@ package gojobs
 import (
 	"context"
 	"github.com/go-redis/redis/v9"
-	"log"
 )
 
 // Publish 发布
@@ -13,7 +12,7 @@ import (
 func (c *Client) Publish(ctx context.Context, channel string, message interface{}) error {
 	publish, err := c.cache.redisClient.Publish(ctx, channel, message).Result()
 	if c.config.debug == true {
-		log.Printf("[jobs.Publish] %s %s %v %s\n", channel, message, publish, err)
+		c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs.Publish] %s %s %v %s\n", channel, message, publish, err)
 	}
 	return err
 }

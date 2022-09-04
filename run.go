@@ -6,7 +6,6 @@ import (
 	"go.dtapp.net/gostring"
 	"go.dtapp.net/gotime"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"log"
 )
 
 // Run 运行
@@ -19,7 +18,7 @@ func (c *Client) Run(info jobs_gorm_model.Task, status int, result string) {
 		Version:    c.config.runVersion,
 	}).Error
 	if err != nil {
-		log.Println("[gojobs.Run.Create]", err.Error())
+		c.zapLog.WithLogger().Sugar().Errorf("[gojobs.Run.Create]：%s", err.Error())
 	}
 	// 记录
 	if c.db.mongoClient != nil && c.db.mongoClient.Db != nil {
@@ -43,7 +42,7 @@ func (c *Client) Run(info jobs_gorm_model.Task, status int, result string) {
 				NextRunTime: gotime.Current().AfterSeconds(info.Frequency).Time,
 			}).Error
 		if err != nil {
-			log.Println("[gojobs.Run.0.EditTask]", err.Error())
+			c.zapLog.WithLogger().Sugar().Errorf("[gojobs.Run.0.EditTask]：%s", err.Error())
 		}
 		return
 	}
@@ -61,7 +60,7 @@ func (c *Client) Run(info jobs_gorm_model.Task, status int, result string) {
 				NextRunTime: gotime.Current().AfterSeconds(info.Frequency).Time,
 			}).Error
 		if err != nil {
-			log.Println("[gojobs.Run.CodeSuccess.EditTask]", err.Error())
+			c.zapLog.WithLogger().Sugar().Errorf("[gojobs.Run.CodeSuccess.EditTask]：%s", err.Error())
 		}
 	}
 	if status == CodeEnd {
@@ -77,7 +76,7 @@ func (c *Client) Run(info jobs_gorm_model.Task, status int, result string) {
 				NextRunTime: gotime.Current().Time,
 			}).Error
 		if err != nil {
-			log.Println("[gojobs.Run.CodeEnd.EditTask]", err.Error())
+			c.zapLog.WithLogger().Sugar().Errorf("[gojobs.Run.CodeEnd.EditTask]：%s", err.Error())
 		}
 	}
 	if status == CodeError {
@@ -93,7 +92,7 @@ func (c *Client) Run(info jobs_gorm_model.Task, status int, result string) {
 				NextRunTime: gotime.Current().AfterSeconds(info.Frequency).Time,
 			}).Error
 		if err != nil {
-			log.Println("[gojobs.Run.CodeError.EditTask]", err.Error())
+			c.zapLog.WithLogger().Sugar().Errorf("[gojobs.Run.CodeError.EditTask]：%s", err.Error())
 		}
 	}
 	if info.MaxNumber != 0 {
@@ -105,7 +104,7 @@ func (c *Client) Run(info jobs_gorm_model.Task, status int, result string) {
 					Status: TASK_TIMEOUT,
 				}).Error
 			if err != nil {
-				log.Println("[gojobs.Run.TASK_TIMEOUT.EditTask]", err.Error())
+				c.zapLog.WithLogger().Sugar().Errorf("[gojobs.Run.TASK_TIMEOUT.EditTask]：%s", err.Error())
 			}
 		}
 	}
