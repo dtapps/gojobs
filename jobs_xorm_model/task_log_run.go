@@ -11,6 +11,7 @@ type TaskLogRun struct {
 	Arch       string `json:"arch"`                      // 系统架构
 	Gomaxprocs int    `json:"gomaxprocs"`                // CPU核数
 	GoVersion  string `json:"go_version"`                // GO版本
+	SdkVersion string `json:"sdk_version"`               // SDK版本
 	MacAddrs   string `json:"mac_addrs"`                 // Mac地址
 	CreatedAt  string `xorm:"created" json:"created_at"` // 创建时间
 }

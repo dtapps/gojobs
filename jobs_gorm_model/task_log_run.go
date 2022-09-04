@@ -13,6 +13,7 @@ type TaskLogRun struct {
 	Arch       string    `gorm:"comment:系统架构" json:"arch"`                      // 系统架构
 	Gomaxprocs int       `gorm:"comment:CPU核数" json:"gomaxprocs"`               // CPU核数
 	GoVersion  string    `gorm:"comment:GO版本" json:"go_version"`                // GO版本
+	SdkVersion string    `gorm:"comment:SDK版本" json:"sdk_version"`              // SDK版本
 	MacAddrs   string    `gorm:"comment:Mac地址" json:"mac_addrs"`                // Mac地址
 	CreatedAt  time.Time `gorm:"autoCreateTime;comment:创建时间" json:"created_at"` // 创建时间
 }

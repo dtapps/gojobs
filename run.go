@@ -124,6 +124,7 @@ func (c *Client) RunAddLog(id uint, runId string) error {
 				Arch:       c.config.arch,
 				Gomaxprocs: c.config.maxProCs,
 				GoVersion:  c.config.version,
+				SdkVersion: c.config.runVersion,
 				MacAddrs:   c.config.macAddrS,
 				CreatedAt:  primitive.NewDateTimeFromTime(gotime.Current().Time),
 			})
@@ -138,6 +139,7 @@ func (c *Client) RunAddLog(id uint, runId string) error {
 		Arch:       c.config.arch,
 		Gomaxprocs: c.config.maxProCs,
 		GoVersion:  c.config.version,
+		SdkVersion: c.config.runVersion,
 		MacAddrs:   c.config.macAddrS,
 	}).Error
 }
