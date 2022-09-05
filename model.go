@@ -137,3 +137,31 @@ func (c *Client) mongoCreateIndexesTaskLogRun(ctx context.Context) {
 		{"go_version", -1},
 	}}))
 }
+
+// 创建时间序列集合
+func (c *Client) mongoCreateCollectionTaskIssueRecord(ctx context.Context) {
+	var commandResult bson.M
+	commandErr := c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).RunCommand(ctx, bson.D{{
+		"listCollections", 1,
+	}}).Decode(&commandResult)
+	if commandErr != nil {
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("检查时间序列集合：%s", commandErr)
+	} else {
+		c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).CreateCollection(ctx, jobs_mongo_model.TaskIssueRecord{}.TableName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("record_time"))))
+	}
+}
+
+// 创建时间序列集合
+func (c *Client) mongoCreateCollectionTaskReceiveRecord(ctx context.Context) {
+	if c.cache.cornKeyCustom != "" {
+		var commandResult bson.M
+		commandErr := c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).RunCommand(ctx, bson.D{{
+			"listCollections", 1,
+		}}).Decode(&commandResult)
+		if commandErr != nil {
+			c.zapLog.WithTraceId(ctx).Sugar().Errorf("检查时间序列集合：%s", commandErr)
+		} else {
+			c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).CreateCollection(ctx, jobs_mongo_model.TaskReceiveRecord{}.TableName()+c.cache.cornKeyCustom, options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("record_time"))))
+		}
+	}
+}

@@ -109,6 +109,8 @@ func NewClient(config *ClientConfig) (*Client, error) {
 		c.mongoCreateIndexesTaskLog(ctx)
 		c.mongoCreateCollectionTaskLogRun(ctx)
 		c.mongoCreateIndexesTaskLogRun(ctx)
+		c.mongoCreateCollectionTaskIssueRecord(ctx)
+		c.mongoCreateCollectionTaskReceiveRecord(ctx)
 	}
 
 	redisClient := config.RedisClientFun()

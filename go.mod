@@ -9,7 +9,7 @@ require (
 	go.dtapp.net/dorm v1.0.30
 	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.28
-	go.dtapp.net/golog v1.0.54
+	go.dtapp.net/golog v1.0.55
 	go.dtapp.net/gostring v1.0.10
 	go.dtapp.net/gotime v1.0.5
 	go.dtapp.net/gotrace_id v1.0.6
@@ -55,13 +55,14 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/saracen/go7z v0.0.0-20191010121135-9c09b6bd7fda // indirect
 	github.com/saracen/solidblock v0.0.0-20190426153529-45df20abab6f // indirect
+	github.com/segmentio/fasthash v1.0.3 // indirect
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
-	github.com/upper/db/v4 v4.5.4 // indirect
+	github.com/upper/db/v4 v4.6.0 // indirect
 	github.com/uptrace/bun v1.1.8 // indirect
 	github.com/uptrace/bun/dialect/mysqldialect v1.1.8 // indirect
 	github.com/uptrace/bun/dialect/pgdialect v1.1.8 // indirect
