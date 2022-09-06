@@ -47,7 +47,7 @@ func (c *Client) PublishLog(ctx context.Context, info jobs_gorm_model.Task, reco
 				SdkVersion: c.config.runVersion,
 			},
 			RecordAddress: recordAddress,
-			RecordTime:    dorm.BsonTime(gotime.Current().Time),
+			RecordTime:    primitive.NewDateTimeFromTime(gotime.Current().Time),
 		})
 	if err != nil {
 		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[gojobs.RunAddLog.jobs_mongo_model.TaskIssueRecord]：%s", err.Error())

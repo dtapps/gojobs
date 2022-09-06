@@ -79,9 +79,23 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	}
 	c.config.outsideIp = config.CurrentIp
 
+	// 缓存
+	redisClient := config.RedisClientFun()
+	if redisClient != nil && redisClient.Db != nil {
+		c.cache.redisClient = redisClient
+		c.cache.redisLockClient = c.cache.redisClient.NewLock()
+	}
+
+	// 缓存前缀
+	c.cache.lockKeyPrefix, c.cache.lockKeySeparator, c.cache.cornKeyPrefix, c.cache.cornKeyCustom = config.RedisPrefixFun()
+	if c.cache.lockKeyPrefix == "" || c.cache.lockKeySeparator == "" || c.cache.cornKeyPrefix == "" || c.cache.cornKeyCustom == "" {
+		return nil, redisPrefixFunNoConfig
+	}
+
 	// 配置信息
 	c.setConfig(ctx)
 
+	// 数据库
 	gormClient := config.GormClientFun()
 	if gormClient != nil && gormClient.Db != nil {
 		c.db.gormClient = gormClient
@@ -94,6 +108,7 @@ func NewClient(config *ClientConfig) (*Client, error) {
 		return nil, gormClientFunNoConfig
 	}
 
+	// 数据库
 	mongoClient, databaseName := config.MongoClientFun()
 	if mongoClient != nil && mongoClient.Db != nil {
 		c.db.mongoClient = mongoClient
@@ -111,17 +126,6 @@ func NewClient(config *ClientConfig) (*Client, error) {
 		c.mongoCreateIndexesTaskLogRun(ctx)
 		c.mongoCreateCollectionTaskIssueRecord(ctx)
 		c.mongoCreateCollectionTaskReceiveRecord(ctx)
-	}
-
-	redisClient := config.RedisClientFun()
-	if redisClient != nil && redisClient.Db != nil {
-		c.cache.redisClient = redisClient
-		c.cache.redisLockClient = c.cache.redisClient.NewLock()
-	}
-
-	c.cache.lockKeyPrefix, c.cache.lockKeySeparator, c.cache.cornKeyPrefix, c.cache.cornKeyCustom = config.RedisPrefixFun()
-	if c.cache.lockKeyPrefix == "" || c.cache.lockKeySeparator == "" || c.cache.cornKeyPrefix == "" || c.cache.cornKeyCustom == "" {
-		return nil, redisPrefixFunNoConfig
 	}
 
 	return c, nil

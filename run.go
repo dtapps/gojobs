@@ -50,7 +50,7 @@ func (c *Client) Run(ctx context.Context, info jobs_gorm_model.Task, status int,
 						GoVersion:  c.config.version,
 						SdkVersion: c.config.runVersion,
 					},
-					RecordTime: dorm.BsonTime(gotime.Current().Time),
+					RecordTime: primitive.NewDateTimeFromTime(gotime.Current().Time),
 				})
 			if err != nil {
 				c.zapLog.WithTraceId(ctx).Sugar().Errorf("[gojobs.Run.jobs_mongo_model.TaskReceiveRecord]：%s", err.Error())

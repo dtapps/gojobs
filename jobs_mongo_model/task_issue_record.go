@@ -44,7 +44,7 @@ type TaskIssueRecord struct {
 	TaskInfo      TaskIssueRecordTaskInfo   `json:"task_info,omitempty" bson:"task_info,omitempty"`           // 任务信息
 	SystemInfo    TaskIssueRecordSystemInfo `json:"system_info,omitempty" bson:"system_info,omitempty"`       // 系统信息
 	RecordAddress string                    `json:"record_address,omitempty" bson:"record_address,omitempty"` // 接收地址
-	RecordTime    dorm.BsonTime             `json:"record_time,omitempty" bson:"record_time,omitempty"`       // 记录时间
+	RecordTime    primitive.DateTime        `json:"record_time,omitempty" bson:"record_time,omitempty"`       // 记录时间
 }
 
 func (TaskIssueRecord) TableName() string {
