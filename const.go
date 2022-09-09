@@ -1,6 +1,6 @@
 package gojobs
 
 const (
-	Version       = "1.0.77"
+	Version       = "1.0.78"
 	SpecifyIpNull = "0.0.0.0"
 )

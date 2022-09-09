@@ -2,7 +2,6 @@ package gojobs
 
 import (
 	"context"
-	"go.dtapp.net/dorm"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gojobs/jobs_mongo_model"
 	"go.dtapp.net/gostring"
@@ -12,51 +11,6 @@ import (
 
 // Run 运行
 func (c *Client) Run(ctx context.Context, info jobs_gorm_model.Task, status int, result string) {
-	// 任务接收记录
-	go func() {
-		if c.cache.cornKeyCustom != "" {
-			_, err := c.db.mongoClient.Database(c.db.mongoDatabaseName).
-				Collection(jobs_mongo_model.TaskReceiveRecord{}.TableName() + c.cache.cornKeyCustom).
-				InsertOne(&jobs_mongo_model.TaskReceiveRecord{
-					Id: primitive.NewObjectID(),
-					TaskInfo: jobs_mongo_model.TaskIssueRecordTaskInfo{
-						Id:             info.Id,
-						Status:         info.Status,
-						Params:         info.Params,
-						ParamsType:     info.ParamsType,
-						StatusDesc:     info.StatusDesc,
-						Frequency:      info.Frequency,
-						Number:         info.Number,
-						MaxNumber:      info.MaxNumber,
-						RunId:          info.RunId,
-						CustomId:       info.CustomId,
-						CustomSequence: info.CustomSequence,
-						Type:           info.Type,
-						TypeName:       info.TypeName,
-						CreatedIp:      info.CreatedIp,
-						SpecifyIp:      info.SpecifyIp,
-						UpdatedIp:      info.UpdatedIp,
-						Result:         info.Result,
-						NextRunTime:    dorm.BsonTime(info.NextRunTime),
-						CreatedAt:      dorm.BsonTime(info.CreatedAt),
-						UpdatedAt:      dorm.BsonTime(info.UpdatedAt),
-					},
-					SystemInfo: jobs_mongo_model.TaskIssueRecordSystemInfo{
-						InsideIp:   c.config.insideIp,
-						OutsideIp:  c.config.outsideIp,
-						Os:         c.config.os,
-						Arch:       c.config.arch,
-						Gomaxprocs: c.config.maxProCs,
-						GoVersion:  c.config.version,
-						SdkVersion: c.config.runVersion,
-					},
-					RecordTime: primitive.NewDateTimeFromTime(gotime.Current().Time),
-				})
-			if err != nil {
-				c.zapLog.WithTraceId(ctx).Sugar().Errorf("[gojobs.Run.jobs_mongo_model.TaskReceiveRecord]：%s", err.Error())
-			}
-		}
-	}()
 	// 请求函数记录
 	err := c.db.gormClient.Db.Create(&jobs_gorm_model.TaskLog{
 		TaskId:     info.Id,
