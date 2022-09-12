@@ -67,13 +67,6 @@ func (c *Client) mongoCreateIndexesTask(ctx context.Context) {
 	}}))
 }
 
-// 创建索引
-func (c *Client) mongoCreateIndexesTaskIp(ctx context.Context) {
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskIp{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
-		{"task_type", 1},
-	}}))
-}
-
 // 创建时间序列集合
 func (c *Client) mongoCreateCollectionTaskLog(ctx context.Context) {
 	var commandResult bson.M
@@ -115,25 +108,25 @@ func (c *Client) mongoCreateCollectionTaskLogRun(ctx context.Context) {
 
 // 创建索引
 func (c *Client) mongoCreateIndexesTaskLogRun(ctx context.Context) {
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLogRun{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"task_id", -1},
 	}}))
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLogRun{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"run_id", -1},
 	}}))
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLogRun{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"outside_ip", -1},
 	}}))
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLogRun{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"inside_ip", -1},
 	}}))
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLogRun{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"os", -1},
 	}}))
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLogRun{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"arch", -1},
 	}}))
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLog{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.TaskLogRun{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
 		{"go_version", -1},
 	}}))
 }
