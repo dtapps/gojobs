@@ -119,11 +119,6 @@ func NewClient(config *ClientConfig) (*Client, error) {
 
 		c.mongoCreateCollectionTask(ctx)
 		c.mongoCreateIndexesTask(ctx)
-		c.mongoCreateCollectionTaskLog(ctx)
-		c.mongoCreateIndexesTaskLog(ctx)
-		c.mongoCreateCollectionTaskLogRun(ctx)
-		c.mongoCreateIndexesTaskLogRun(ctx)
-		c.mongoCreateCollectionTaskIssueRecord(ctx)
 	}
 
 	return c, nil
