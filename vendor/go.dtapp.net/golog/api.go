@@ -34,6 +34,11 @@ type ApiClient struct {
 		gorm  bool // 日志开关
 		mongo bool // 日志开关
 	}
+	config struct {
+		os       string // 系统类型
+		arch     string // 系统架构
+		maxProCs int    // CPU核数
+	}
 }
 
 // client 数据库服务
@@ -73,6 +78,10 @@ func NewApiClient(config *ApiClientConfig) (*ApiClient, error) {
 	if config.CurrentIp != "" && config.CurrentIp != "0.0.0.0" {
 		c.currentIp = config.CurrentIp
 	}
+
+	c.config.os = runtime.GOOS
+	c.config.arch = runtime.GOARCH
+	c.config.maxProCs = runtime.GOMAXPROCS(0)
 
 	gormClient, gormTableName := config.GormClientFun()
 	mongoClient, mongoDatabaseName, mongoCollectionName := config.MongoClientFun()

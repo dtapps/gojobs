@@ -159,6 +159,18 @@ func (c *GinClient) mongoCreateIndexes() {
 		}}))
 	c.zapLog.WithLogger().Sugar().Infof(c.mongoClient.Db.Database(c.mongoConfig.databaseName).Collection(c.mongoConfig.collectionName).Indexes().CreateOne(context.TODO(), mongo.IndexModel{
 		Keys: bson.D{
+			{"system_os", -1},
+		}}))
+	c.zapLog.WithLogger().Sugar().Infof(c.mongoClient.Db.Database(c.mongoConfig.databaseName).Collection(c.mongoConfig.collectionName).Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		Keys: bson.D{
+			{"system_arch", -1},
+		}}))
+	c.zapLog.WithLogger().Sugar().Infof(c.mongoClient.Db.Database(c.mongoConfig.databaseName).Collection(c.mongoConfig.collectionName).Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		Keys: bson.D{
+			{"system_cpu_quantity", 1},
+		}}))
+	c.zapLog.WithLogger().Sugar().Infof(c.mongoClient.Db.Database(c.mongoConfig.databaseName).Collection(c.mongoConfig.collectionName).Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		Keys: bson.D{
 			{"go_version", -1},
 		}}))
 	c.zapLog.WithLogger().Sugar().Infof(c.mongoClient.Db.Database(c.mongoConfig.databaseName).Collection(c.mongoConfig.collectionName).Indexes().CreateOne(context.TODO(), mongo.IndexModel{
@@ -195,6 +207,9 @@ type ginMongoLog struct {
 	CostTime          int64              `json:"cost_time,omitempty" bson:"cost_time,omitempty"`                     //【系统】花费时间
 	SystemHostName    string             `json:"system_host_name,omitempty" bson:"system_host_name,omitempty"`       //【系统】主机名
 	SystemInsideIp    string             `json:"system_inside_ip,omitempty" bson:"system_inside_ip,omitempty"`       //【系统】内网ip
+	SystemOs          string             `json:"system_os,omitempty" bson:"system_os,omitempty"`                     //【系统】系统类型
+	SystemArch        string             `json:"system_arch,omitempty" bson:"system_arch,omitempty"`                 //【系统】系统架构
+	SystemCpuQuantity int                `json:"system_cpu_quantity,omitempty" bson:"system_cpu_quantity,omitempty"` //【系统】CPU核数
 	GoVersion         string             `json:"go_version,omitempty" bson:"go_version,omitempty"`                   //【程序】Go版本
 	SdkVersion        string             `json:"sdk_version,omitempty" bson:"sdk_version,omitempty"`                 //【程序】Sdk版本
 }
@@ -207,6 +222,10 @@ func (c *GinClient) mongoRecord(mongoLog ginMongoLog) (err error) {
 	mongoLog.GoVersion = c.mongoConfig.goVersion
 
 	mongoLog.SdkVersion = Version
+
+	mongoLog.SystemOs = c.config.os
+	mongoLog.SystemArch = c.config.arch
+	mongoLog.SystemCpuQuantity = c.config.maxProCs
 
 	mongoLog.LogId = primitive.NewObjectID()
 

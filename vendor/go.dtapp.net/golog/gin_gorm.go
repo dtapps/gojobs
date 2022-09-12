@@ -110,6 +110,9 @@ type ginPostgresqlLog struct {
 	CostTime          int64     `gorm:"comment:【系统】花费时间" json:"cost_time,omitempty"`                    //【系统】花费时间
 	SystemHostName    string    `gorm:"index;comment:【系统】主机名" json:"system_host_name,omitempty"`        //【系统】主机名
 	SystemInsideIp    string    `gorm:"index;comment:【系统】内网ip" json:"system_inside_ip,omitempty"`       //【系统】内网ip
+	SystemOs          string    `gorm:"index;comment:【系统】系统类型" json:"system_os,omitempty"`              //【系统】系统类型
+	SystemArch        string    `gorm:"index;comment:【系统】系统架构" json:"system_arch,omitempty"`            //【系统】系统架构
+	SystemCpuQuantity int       `gorm:"index;comment:【系统】CPU核数" json:"system_cpu_quantity,omitempty"`   //【系统】CPU核数
 	GoVersion         string    `gorm:"index;comment:【程序】Go版本" json:"go_version,omitempty"`             //【程序】Go版本
 	SdkVersion        string    `gorm:"index;comment:【程序】Sdk版本" json:"sdk_version,omitempty"`           //【程序】Sdk版本
 }
@@ -122,6 +125,10 @@ func (c *GinClient) gormRecord(postgresqlLog ginPostgresqlLog) (err error) {
 	postgresqlLog.GoVersion = c.gormConfig.goVersion
 
 	postgresqlLog.SdkVersion = Version
+
+	postgresqlLog.SystemOs = c.config.os
+	postgresqlLog.SystemArch = c.config.arch
+	postgresqlLog.SystemCpuQuantity = c.config.maxProCs
 
 	err = c.gormClient.Db.Table(c.gormConfig.tableName).Create(&postgresqlLog).Error
 	if err != nil {
