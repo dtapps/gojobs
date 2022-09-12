@@ -3,6 +3,7 @@ package gojobs
 import (
 	"context"
 	"go.dtapp.net/dorm"
+	"go.dtapp.net/goip"
 	"go.dtapp.net/golog"
 )
 
@@ -38,15 +39,16 @@ type ClientConfig struct {
 type Client struct {
 	zapLog *golog.ZapLog // 日志服务
 	config struct {
-		debug      bool   // 日志开关
-		runVersion string // 运行版本
-		os         string // 系统类型
-		arch       string // 系统架构
-		maxProCs   int    // CPU核数
-		version    string // GO版本
-		macAddrS   string // Mac地址
-		insideIp   string // 内网ip
-		outsideIp  string // 外网ip
+		systemHostName    string // 主机名
+		systemInsideIp    string // 内网ip
+		systemOs          string // 系统类型
+		systemArch        string // 系统架构
+		systemCpuQuantity int    // cpu核数
+		goVersion         string // go版本
+		sdkVersion        string // sdk版本
+		systemMacAddrS    string // Mac地址
+		systemOutsideIp   string // 外网ip
+		debug             bool   // 日志开关
 	}
 	cache struct {
 		redisClient      *dorm.RedisClient     // 数据库
@@ -75,9 +77,11 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	c.config.debug = config.Debug
 
 	if config.CurrentIp == "" {
-		return nil, currentIpNoConfig
+		config.CurrentIp = goip.GetOutsideIp(ctx)
 	}
-	c.config.outsideIp = config.CurrentIp
+	if config.CurrentIp != "" && config.CurrentIp != "0.0.0.0" {
+		c.config.systemOutsideIp = config.CurrentIp
+	}
 
 	// 缓存
 	redisClient := config.RedisClientFun()
@@ -100,10 +104,10 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	if gormClient != nil && gormClient.Db != nil {
 		c.db.gormClient = gormClient
 
-		c.autoMigrateTask()
-		c.autoMigrateTaskIp()
-		c.autoMigrateTaskLog()
-		c.autoMigrateTaskLogRun()
+		c.autoMigrateTask(ctx)
+		c.autoMigrateTaskIp(ctx)
+		c.autoMigrateTaskLog(ctx)
+		c.autoMigrateTaskLogRun(ctx)
 	} else {
 		return nil, gormClientFunNoConfig
 	}

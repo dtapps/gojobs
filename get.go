@@ -23,7 +23,7 @@ func (c *Client) GetRedis() *redis.Client {
 
 // GetCurrentIp 获取当前ip
 func (c *Client) GetCurrentIp() string {
-	return c.config.outsideIp
+	return c.config.systemOutsideIp
 }
 
 // GetSubscribeAddress 获取订阅地址

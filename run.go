@@ -3,10 +3,8 @@ package gojobs
 import (
 	"context"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
-	"go.dtapp.net/gojobs/jobs_mongo_model"
 	"go.dtapp.net/gostring"
 	"go.dtapp.net/gotime"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Run 运行
@@ -16,28 +14,10 @@ func (c *Client) Run(ctx context.Context, info jobs_gorm_model.Task, status int,
 		TaskId:     info.Id,
 		StatusCode: status,
 		Desc:       result,
-		Version:    c.config.runVersion,
+		Version:    c.config.sdkVersion,
 	}).Error
 	if err != nil {
 		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[gojobs.Run.Create]：%s", err.Error())
-	}
-	// 记录
-	if c.db.mongoClient != nil && c.db.mongoClient.Db != nil {
-		go func() {
-			_, err = c.db.mongoClient.Database(c.db.mongoDatabaseName).
-				Collection(jobs_mongo_model.TaskLog{}.TableName()).
-				InsertOne(&jobs_mongo_model.TaskLog{
-					Id:         primitive.NewObjectID(),
-					TaskId:     info.Id,
-					StatusCode: status,
-					Desc:       result,
-					Version:    c.config.runVersion,
-					CreatedAt:  primitive.NewDateTimeFromTime(gotime.Current().Time),
-				})
-			if err != nil {
-				c.zapLog.WithTraceId(ctx).Sugar().Errorf("[gojobs.Run.jobs_mongo_model.TaskLog]：%s", err.Error())
-			}
-		}()
 	}
 	if status == 0 {
 		err = c.EditTask(c.db.gormClient.Db, info.Id).
@@ -61,7 +41,7 @@ func (c *Client) Run(ctx context.Context, info jobs_gorm_model.Task, status int,
 				StatusDesc:  "执行成功",
 				Number:      info.Number + 1,
 				RunId:       gostring.GetUuId(),
-				UpdatedIp:   c.config.outsideIp,
+				UpdatedIp:   c.config.systemOutsideIp,
 				Result:      result,
 				NextRunTime: gotime.Current().AfterSeconds(info.Frequency).Time,
 			}).Error
@@ -77,7 +57,7 @@ func (c *Client) Run(ctx context.Context, info jobs_gorm_model.Task, status int,
 				Status:      TASK_SUCCESS,
 				StatusDesc:  "结束执行",
 				Number:      info.Number + 1,
-				UpdatedIp:   c.config.outsideIp,
+				UpdatedIp:   c.config.systemOutsideIp,
 				Result:      result,
 				NextRunTime: gotime.Current().Time,
 			}).Error
@@ -93,7 +73,7 @@ func (c *Client) Run(ctx context.Context, info jobs_gorm_model.Task, status int,
 				StatusDesc:  "执行失败",
 				Number:      info.Number + 1,
 				RunId:       gostring.GetUuId(),
-				UpdatedIp:   c.config.outsideIp,
+				UpdatedIp:   c.config.systemOutsideIp,
 				Result:      result,
 				NextRunTime: gotime.Current().AfterSeconds(info.Frequency).Time,
 			}).Error
@@ -118,39 +98,16 @@ func (c *Client) Run(ctx context.Context, info jobs_gorm_model.Task, status int,
 
 // RunAddLog 任务执行日志
 func (c *Client) RunAddLog(ctx context.Context, id uint, runId string) error {
-	if c.db.mongoClient != nil && c.db.mongoClient.Db != nil {
-		go func() {
-			_, err := c.db.mongoClient.Database(c.db.mongoDatabaseName).
-				Collection(jobs_mongo_model.TaskLogRun{}.TableName()).
-				InsertOne(&jobs_mongo_model.TaskLogRun{
-					Id:         primitive.NewObjectID(),
-					TaskId:     id,
-					RunId:      runId,
-					InsideIp:   c.config.insideIp,
-					OutsideIp:  c.config.outsideIp,
-					Os:         c.config.os,
-					Arch:       c.config.arch,
-					Gomaxprocs: c.config.maxProCs,
-					GoVersion:  c.config.version,
-					SdkVersion: c.config.runVersion,
-					MacAddrs:   c.config.macAddrS,
-					CreatedAt:  primitive.NewDateTimeFromTime(gotime.Current().Time),
-				})
-			if err != nil {
-				c.zapLog.WithTraceId(ctx).Sugar().Errorf("[gojobs.RunAddLog.jobs_mongo_model.TaskLogRun]：%s", err.Error())
-			}
-		}()
-	}
 	return c.db.gormClient.Db.Create(&jobs_gorm_model.TaskLogRun{
 		TaskId:     id,
 		RunId:      runId,
-		InsideIp:   c.config.insideIp,
-		OutsideIp:  c.config.outsideIp,
-		Os:         c.config.os,
-		Arch:       c.config.arch,
-		Gomaxprocs: c.config.maxProCs,
-		GoVersion:  c.config.version,
-		SdkVersion: c.config.runVersion,
-		MacAddrs:   c.config.macAddrS,
+		InsideIp:   c.config.systemInsideIp,
+		OutsideIp:  c.config.systemOutsideIp,
+		Os:         c.config.systemOs,
+		Arch:       c.config.systemArch,
+		Gomaxprocs: c.config.systemCpuQuantity,
+		GoVersion:  c.config.goVersion,
+		SdkVersion: c.config.sdkVersion,
+		MacAddrs:   c.config.systemMacAddrS,
 	}).Error
 }

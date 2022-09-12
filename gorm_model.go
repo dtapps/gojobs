@@ -184,27 +184,27 @@ func (c *Client) TaskIpUpdate(tx *gorm.DB, taskType, ips string) *gorm.DB {
 
 // TaskIpInit 实例任务ip
 func (c *Client) TaskIpInit(tx *gorm.DB, ips map[string]string) bool {
-	if c.config.outsideIp == "" || c.config.outsideIp == "0.0.0.0" {
+	if c.config.systemOutsideIp == "" || c.config.systemOutsideIp == "0.0.0.0" {
 		return false
 	}
-	tx.Where("ips = ?", c.config.outsideIp).Delete(&jobs_gorm_model.TaskIp{}) // 删除
+	tx.Where("ips = ?", c.config.systemOutsideIp).Delete(&jobs_gorm_model.TaskIp{}) // 删除
 	for k, v := range ips {
 		if v == "" {
-			c.TaskIpUpdate(tx, k, c.config.outsideIp)
+			c.TaskIpUpdate(tx, k, c.config.systemOutsideIp)
 		} else {
 			find := strings.Contains(v, ",")
 			if find == true {
 				// 包含
 				parts := strings.Split(v, ",")
 				for _, vv := range parts {
-					if vv == c.config.outsideIp {
-						c.TaskIpUpdate(tx, k, c.config.outsideIp)
+					if vv == c.config.systemOutsideIp {
+						c.TaskIpUpdate(tx, k, c.config.systemOutsideIp)
 					}
 				}
 			} else {
 				// 不包含
-				if v == c.config.outsideIp {
-					c.TaskIpUpdate(tx, k, c.config.outsideIp)
+				if v == c.config.systemOutsideIp {
+					c.TaskIpUpdate(tx, k, c.config.systemOutsideIp)
 				}
 			}
 		}

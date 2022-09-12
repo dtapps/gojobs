@@ -10,23 +10,23 @@ import (
 )
 
 // 创建模型
-func (c *Client) autoMigrateTask() {
-	c.zapLog.WithLogger().Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.Task{}))
+func (c *Client) autoMigrateTask(ctx context.Context) {
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.Task{}))
 }
 
 // 创建模型
-func (c *Client) autoMigrateTaskIp() {
-	c.zapLog.WithLogger().Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskIp{}))
+func (c *Client) autoMigrateTaskIp(ctx context.Context) {
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskIp{}))
 }
 
 // 创建模型
-func (c *Client) autoMigrateTaskLog() {
-	c.zapLog.WithLogger().Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskLog{}))
+func (c *Client) autoMigrateTaskLog(ctx context.Context) {
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskLog{}))
 }
 
 // 创建模型
-func (c *Client) autoMigrateTaskLogRun() {
-	c.zapLog.WithLogger().Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskLogRun{}))
+func (c *Client) autoMigrateTaskLogRun(ctx context.Context) {
+	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskLogRun{}))
 }
 
 // 创建时间序列集合
@@ -38,7 +38,7 @@ func (c *Client) mongoCreateCollectionTask(ctx context.Context) {
 	if commandErr != nil {
 		c.zapLog.WithTraceId(ctx).Sugar().Errorf("检查时间序列集合：%s", commandErr)
 	} else {
-		c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).CreateCollection(ctx, jobs_mongo_model.Task{}.TableName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("current_time"))))
+		c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).CreateCollection(ctx, jobs_mongo_model.Task{}.TableName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("create_time"))))
 	}
 }
 
