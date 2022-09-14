@@ -123,7 +123,7 @@ type ConfigCreateInCustomIdOnly struct {
 func (c *Client) CreateInCustomIdOnly(ctx context.Context, config *ConfigCreateInCustomIdOnly) error {
 	query := c.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
 	if query.Id != 0 {
-		return errors.New(fmt.Sprintf("%d:[%s@%s]任务已存在", query.Id, config.CustomId, config.Type))
+		return TaskIsExist
 	}
 	if config.CurrentIp == "" {
 		config.CurrentIp = c.config.systemOutsideIp
@@ -319,7 +319,7 @@ type ConfigCreateInCustomIdMaxNumberOnly struct {
 func (c *Client) CreateInCustomIdMaxNumberOnly(ctx context.Context, config *ConfigCreateInCustomIdMaxNumberOnly) error {
 	query := c.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
 	if query.Id != 0 {
-		return errors.New(fmt.Sprintf("%d:[%s@%s]任务已存在", query.Id, config.CustomId, config.Type))
+		return TaskIsExist
 	}
 	if config.CurrentIp == "" {
 		config.CurrentIp = c.config.systemOutsideIp

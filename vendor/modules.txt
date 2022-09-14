@@ -266,7 +266,7 @@ go.dtapp.net/golog
 # go.dtapp.net/gorandom v1.0.1
 ## explicit; go 1.18
 go.dtapp.net/gorandom
-# go.dtapp.net/gorequest v1.0.30
+# go.dtapp.net/gorequest v1.0.31
 ## explicit; go 1.19
 go.dtapp.net/gorequest
 # go.dtapp.net/gostring v1.0.10
