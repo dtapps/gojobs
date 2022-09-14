@@ -1,7 +1,7 @@
 package gorequest
 
 const (
-	userAgentFormat = "%s/GO/%s/%s"
+	userAgentFormat = "%s/%s/%s/%s"
 )
 
 // 定义请求类型
@@ -11,4 +11,4 @@ var (
 	httpParamsModeForm = "FORM"
 )
 
-const Version = "1.0.28"
+const Version = "1.0.30"

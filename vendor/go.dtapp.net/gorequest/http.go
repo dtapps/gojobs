@@ -12,6 +12,7 @@ import (
 	"go.dtapp.net/gotrace_id"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"runtime"
@@ -194,7 +195,7 @@ func request(app *App, ctx context.Context) (httpResponse Response, err error) {
 	}
 
 	// SDK版本
-	httpResponse.RequestHeader.Set("Sdk-User-Agent", fmt.Sprintf(userAgentFormat, runtime.GOOS, runtime.Version(), Version))
+	httpResponse.RequestHeader.Set("Sdk-User-Agent", fmt.Sprintf(userAgentFormat, runtime.GOOS, runtime.GOARCH, runtime.Version(), Version))
 
 	// 请求类型
 	switch app.httpContentType {
@@ -297,8 +298,8 @@ func request(app *App, ctx context.Context) (httpResponse Response, err error) {
 	httpResponse.ResponseContentLength = resp.ContentLength
 
 	if app.debug == true {
-		fmt.Printf("gorequest：%+v\n", httpResponse)
-		fmt.Printf("gorequest.body：%s\n", httpResponse.ResponseBody)
+		log.Printf("gorequest：%+v\n", httpResponse)
+		log.Printf("gorequest.body：%s\n", httpResponse.ResponseBody)
 	}
 
 	return httpResponse, err
