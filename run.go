@@ -3,12 +3,19 @@ package gojobs
 import (
 	"context"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
-	"go.dtapp.net/gostring"
 	"go.dtapp.net/gotime"
+	"go.dtapp.net/gotrace_id"
 )
 
 // Run 运行
 func (c *Client) Run(ctx context.Context, info jobs_gorm_model.Task, status int, result string) {
+
+	runId := gotrace_id.GetTraceIdContext(ctx)
+	if runId == "" {
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[gojobs.Run]：%s", "上下文没有跟踪编号")
+		return
+	}
+
 	// 请求函数记录
 	err := c.db.gormClient.Db.Create(&jobs_gorm_model.TaskLog{
 		TaskId:     info.Id,
@@ -23,7 +30,7 @@ func (c *Client) Run(ctx context.Context, info jobs_gorm_model.Task, status int,
 		err = c.EditTask(c.db.gormClient.Db, info.Id).
 			Select("run_id", "result", "next_run_time").
 			Updates(jobs_gorm_model.Task{
-				RunId:       gostring.GetUuId(),
+				RunId:       runId,
 				Result:      result,
 				NextRunTime: gotime.Current().AfterSeconds(info.Frequency).Time,
 			}).Error
@@ -40,7 +47,7 @@ func (c *Client) Run(ctx context.Context, info jobs_gorm_model.Task, status int,
 			Updates(jobs_gorm_model.Task{
 				StatusDesc:  "执行成功",
 				Number:      info.Number + 1,
-				RunId:       gostring.GetUuId(),
+				RunId:       runId,
 				UpdatedIp:   c.config.systemOutsideIp,
 				Result:      result,
 				NextRunTime: gotime.Current().AfterSeconds(info.Frequency).Time,
@@ -72,7 +79,7 @@ func (c *Client) Run(ctx context.Context, info jobs_gorm_model.Task, status int,
 			Updates(jobs_gorm_model.Task{
 				StatusDesc:  "执行失败",
 				Number:      info.Number + 1,
-				RunId:       gostring.GetUuId(),
+				RunId:       runId,
 				UpdatedIp:   c.config.systemOutsideIp,
 				Result:      result,
 				NextRunTime: gotime.Current().AfterSeconds(info.Frequency).Time,
