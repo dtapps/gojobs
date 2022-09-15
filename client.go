@@ -5,6 +5,7 @@ import (
 	"go.dtapp.net/dorm"
 	"go.dtapp.net/goip"
 	"go.dtapp.net/golog"
+	"log"
 )
 
 // client *dorm.GormClient
@@ -122,6 +123,12 @@ func NewClient(config *ClientConfig) (*Client, error) {
 
 		c.mongoCreateCollectionTask(ctx)
 		c.mongoCreateIndexesTask(ctx)
+	} else {
+		return nil, mongoClientFunNoConfig
+	}
+
+	if c.config.debug {
+		log.Printf("[gojobs]:%+v\n", c)
 	}
 
 	return c, nil
