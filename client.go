@@ -88,6 +88,8 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	if redisClient != nil && redisClient.Db != nil {
 		c.cache.redisClient = redisClient
 		c.cache.redisLockClient = c.cache.redisClient.NewLock()
+	} else {
+		return nil, redisPrefixFunNoConfig
 	}
 
 	// 缓存前缀
@@ -105,9 +107,6 @@ func NewClient(config *ClientConfig) (*Client, error) {
 		c.db.gormClient = gormClient
 
 		c.autoMigrateTask(ctx)
-		c.autoMigrateTaskIp(ctx)
-		c.autoMigrateTaskLog(ctx)
-		c.autoMigrateTaskLogRun(ctx)
 	} else {
 		return nil, gormClientFunNoConfig
 	}

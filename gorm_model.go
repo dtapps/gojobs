@@ -3,8 +3,6 @@ package gojobs
 import (
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"gorm.io/gorm"
-	"log"
-	"strings"
 )
 
 // TaskTakeId 查询单任务
@@ -159,61 +157,4 @@ func (c *Client) UpdateFrequency(tx *gorm.DB, id uint, frequency int64) *gorm.DB
 		Updates(jobs_gorm_model.Task{
 			Frequency: frequency,
 		})
-}
-
-func (c *Client) taskIpTake(tx *gorm.DB, taskType, ips string) (result jobs_gorm_model.TaskIp) {
-	tx.Where("task_type = ?", taskType).Where("ips = ?", ips).Take(&result)
-	return result
-}
-
-// TaskIpUpdate 更新ip
-func (c *Client) TaskIpUpdate(tx *gorm.DB, taskType, ips string) *gorm.DB {
-	query := c.taskIpTake(tx, taskType, ips)
-	if query.Id != 0 {
-		return tx
-	}
-	updateStatus := tx.Create(&jobs_gorm_model.TaskIp{
-		TaskType: taskType,
-		Ips:      ips,
-	})
-	if updateStatus.RowsAffected == 0 {
-		log.Println("任务更新失败：", updateStatus.Error)
-	}
-	return updateStatus
-}
-
-// TaskIpInit 实例任务ip
-func (c *Client) TaskIpInit(tx *gorm.DB, ips map[string]string) bool {
-	if c.config.systemOutsideIp == "" || c.config.systemOutsideIp == "0.0.0.0" {
-		return false
-	}
-	tx.Where("ips = ?", c.config.systemOutsideIp).Delete(&jobs_gorm_model.TaskIp{}) // 删除
-	for k, v := range ips {
-		if v == "" {
-			c.TaskIpUpdate(tx, k, c.config.systemOutsideIp)
-		} else {
-			find := strings.Contains(v, ",")
-			if find == true {
-				// 包含
-				parts := strings.Split(v, ",")
-				for _, vv := range parts {
-					if vv == c.config.systemOutsideIp {
-						c.TaskIpUpdate(tx, k, c.config.systemOutsideIp)
-					}
-				}
-			} else {
-				// 不包含
-				if v == c.config.systemOutsideIp {
-					c.TaskIpUpdate(tx, k, c.config.systemOutsideIp)
-				}
-			}
-		}
-	}
-	return true
-}
-
-// TaskLogRunTake 查询任务执行日志
-func (c *Client) TaskLogRunTake(tx *gorm.DB, taskId uint, runId string) (result jobs_gorm_model.TaskLogRun) {
-	tx.Select("id", "os", "arch", "outside_ip", "created_at").Where("task_id = ?", taskId).Where("run_id = ?", runId).Take(&result)
-	return result
 }

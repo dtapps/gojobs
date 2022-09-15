@@ -14,21 +14,6 @@ func (c *Client) autoMigrateTask(ctx context.Context) {
 	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.Task{}))
 }
 
-// 创建模型
-func (c *Client) autoMigrateTaskIp(ctx context.Context) {
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskIp{}))
-}
-
-// 创建模型
-func (c *Client) autoMigrateTaskLog(ctx context.Context) {
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskLog{}))
-}
-
-// 创建模型
-func (c *Client) autoMigrateTaskLogRun(ctx context.Context) {
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskLogRun{}))
-}
-
 // 创建时间序列集合
 func (c *Client) mongoCreateCollectionTask(ctx context.Context) {
 	var commandResult bson.M
