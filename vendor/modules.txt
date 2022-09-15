@@ -248,19 +248,19 @@ github.com/xdg-go/stringprep
 # github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a
 ## explicit; go 1.12
 github.com/youmark/pkcs8
-# go.dtapp.net/dorm v1.0.32
+# go.dtapp.net/dorm v1.0.33
 ## explicit; go 1.19
 go.dtapp.net/dorm
 # go.dtapp.net/goarray v1.0.1
 ## explicit; go 1.18
 go.dtapp.net/goarray
-# go.dtapp.net/goip v1.0.29
+# go.dtapp.net/goip v1.0.30
 ## explicit; go 1.19
 go.dtapp.net/goip
 go.dtapp.net/goip/ip2region
 go.dtapp.net/goip/v4
 go.dtapp.net/goip/v6
-# go.dtapp.net/golog v1.0.72
+# go.dtapp.net/golog v1.0.73
 ## explicit; go 1.19
 go.dtapp.net/golog
 # go.dtapp.net/gorandom v1.0.1

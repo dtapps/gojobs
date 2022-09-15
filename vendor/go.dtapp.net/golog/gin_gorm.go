@@ -248,8 +248,13 @@ func (c *GinClient) gormRecordXml(ginCtx *gin.Context, traceId string, requestTi
 }
 
 // GormQuery 查询
-func (c *GinClient) GormQuery() *gorm.DB {
+func (c *GinClient) GormQuery(ctx context.Context) *gorm.DB {
 	return c.gormClient.Db.Table(c.gormConfig.tableName)
+}
+
+// GormDelete 删除
+func (c *GinClient) GormDelete(ctx context.Context, hour int64) error {
+	return c.gormClient.Db.Table(c.gormConfig.tableName).Where("request_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&ginPostgresqlLog{}).Error
 }
 
 // GormMiddleware 中间件

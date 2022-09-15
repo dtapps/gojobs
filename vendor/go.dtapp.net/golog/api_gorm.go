@@ -6,6 +6,7 @@ import (
 	"go.dtapp.net/dorm"
 	"go.dtapp.net/goip"
 	"go.dtapp.net/gorequest"
+	"go.dtapp.net/gotime"
 	"go.dtapp.net/gotrace_id"
 	"go.dtapp.net/gourl"
 	"gorm.io/gorm"
@@ -135,8 +136,13 @@ func (c *ApiClient) gormRecord(ctx context.Context, postgresqlLog apiPostgresqlL
 }
 
 // GormQuery 查询
-func (c *ApiClient) GormQuery() *gorm.DB {
+func (c *ApiClient) GormQuery(ctx context.Context) *gorm.DB {
 	return c.gormClient.Db.Table(c.gormConfig.tableName)
+}
+
+// GormDelete 删除
+func (c *ApiClient) GormDelete(ctx context.Context, hour int64) error {
+	return c.gormClient.Db.Table(c.gormConfig.tableName).Where("request_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&apiPostgresqlLog{}).Error
 }
 
 // GormMiddleware 中间件

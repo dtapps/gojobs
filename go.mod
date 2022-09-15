@@ -6,10 +6,10 @@ require (
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
-	go.dtapp.net/dorm v1.0.32
+	go.dtapp.net/dorm v1.0.33
 	go.dtapp.net/goarray v1.0.1
-	go.dtapp.net/goip v1.0.29
-	go.dtapp.net/golog v1.0.72
+	go.dtapp.net/goip v1.0.30
+	go.dtapp.net/golog v1.0.73
 	go.dtapp.net/gostring v1.0.10
 	go.dtapp.net/gotime v1.0.5
 	go.dtapp.net/gotrace_id v1.0.6

@@ -81,7 +81,7 @@ func NewGormPostgresClient(config *ConfigGormClient) (*GormClient, error) {
 
 	// 设置了连接可复用的最大时间
 	if c.config.ConnSetConnMaxLifetime == 0 {
-		sqlDB.SetConnMaxLifetime(time.Second * 600)
+		sqlDB.SetConnMaxLifetime(time.Hour)
 	} else {
 		sqlDB.SetConnMaxLifetime(time.Duration(c.config.ConnSetConnMaxLifetime))
 	}

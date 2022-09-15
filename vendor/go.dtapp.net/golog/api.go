@@ -135,10 +135,10 @@ func NewApiClient(config *ApiClientConfig) (*ApiClient, error) {
 		c.log.mongo = true
 
 		// 创建时间序列集合
-		c.mongoCreateCollection()
+		c.mongoCreateCollection(ctx)
 
 		// 创建索引
-		c.mongoCreateIndexes()
+		c.mongoCreateIndexes(ctx)
 
 	}
 
