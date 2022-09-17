@@ -1,20 +1,21 @@
 package jobs_mongo_model
 
 import (
+	"go.dtapp.net/dorm"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type TaskRunInfo struct {
-	SystemHostName    string `json:"system_host_name,omitempty" bson:"system_host_name,omitempty"`       //【系统】主机名
-	SystemInsideIp    string `json:"system_inside_ip,omitempty" bson:"system_inside_ip,omitempty"`       //【系统】内网ip
-	SystemOs          string `json:"system_os,omitempty" bson:"system_os,omitempty"`                     //【系统】系统类型
-	SystemArch        string `json:"system_arch,omitempty" bson:"system_arch,omitempty"`                 //【系统】系统架构
-	SystemCpuQuantity int    `json:"system_cpu_quantity,omitempty" bson:"system_cpu_quantity,omitempty"` //【系统】CPU核数
-	GoVersion         string `json:"go_version,omitempty" bson:"go_version,omitempty"`                   //【程序】Go版本
-	SdkVersion        string `json:"sdk_version,omitempty" bson:"sdk_version,omitempty"`                 //【程序】Sdk版本
-	RunTime           string `json:"run_time,omitempty" bson:"run_time,omitempty"`                       //【系统】运行时间
-	RunIp             string `json:"run_ip,omitempty" bson:"run_ip,omitempty"`                           //【系统】外网ip
-	RunResult         string `json:"run_result,omitempty" bson:"run_result,omitempty"`                   //【系统】结果
+	SystemHostName    string        `json:"system_host_name,omitempty" bson:"system_host_name,omitempty"`       //【系统】主机名
+	SystemInsideIp    string        `json:"system_inside_ip,omitempty" bson:"system_inside_ip,omitempty"`       //【系统】内网ip
+	SystemOs          string        `json:"system_os,omitempty" bson:"system_os,omitempty"`                     //【系统】系统类型
+	SystemArch        string        `json:"system_arch,omitempty" bson:"system_arch,omitempty"`                 //【系统】系统架构
+	SystemCpuQuantity int           `json:"system_cpu_quantity,omitempty" bson:"system_cpu_quantity,omitempty"` //【系统】CPU核数
+	GoVersion         string        `json:"go_version,omitempty" bson:"go_version,omitempty"`                   //【程序】Go版本
+	SdkVersion        string        `json:"sdk_version,omitempty" bson:"sdk_version,omitempty"`                 //【程序】Sdk版本
+	RunTime           dorm.BsonTime `json:"run_time,omitempty" bson:"run_time,omitempty"`                       //【系统】运行时间
+	RunIp             string        `json:"run_ip,omitempty" bson:"run_ip,omitempty"`                           //【系统】外网ip
+	RunResult         string        `json:"run_result,omitempty" bson:"run_result,omitempty"`                   //【系统】结果
 }
 
 // Task 任务

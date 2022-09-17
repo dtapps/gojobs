@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go.dtapp.net/dorm"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gojobs/jobs_mongo_model"
 	"go.dtapp.net/gostring"
@@ -71,7 +72,7 @@ func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWai
 						SystemCpuQuantity: c.config.systemCpuQuantity,
 						GoVersion:         c.config.goVersion,
 						SdkVersion:        c.config.sdkVersion,
-						RunTime:           gotime.Current().Format(),
+						RunTime:           dorm.NewBsonTimeCurrent(),
 						RunIp:             config.CurrentIp,
 					},
 					CurrentRunInfo: jobs_mongo_model.TaskRunInfo{
@@ -82,7 +83,7 @@ func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWai
 						SystemCpuQuantity: c.config.systemCpuQuantity,
 						GoVersion:         c.config.goVersion,
 						SdkVersion:        c.config.sdkVersion,
-						RunTime:           gotime.Current().Format(),
+						RunTime:           dorm.NewBsonTimeCurrent(),
 						RunIp:             config.CurrentIp,
 					},
 					NextRunInfo: jobs_mongo_model.TaskRunInfo{
@@ -93,7 +94,7 @@ func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWai
 						SystemCpuQuantity: c.config.systemCpuQuantity,
 						GoVersion:         c.config.goVersion,
 						SdkVersion:        c.config.sdkVersion,
-						RunTime:           gotime.Current().AfterSeconds(config.Frequency).Format(),
+						RunTime:           dorm.NewBsonTimeFromTime(gotime.Current().AfterSeconds(config.Frequency).Time),
 						RunIp:             config.CurrentIp,
 					},
 					CreateTime: primitive.NewDateTimeFromTime(gotime.Current().Time),
