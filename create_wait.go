@@ -51,7 +51,7 @@ func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWai
 		go func() {
 			_, err = c.db.mongoClient.Database(c.db.mongoDatabaseName).
 				Collection(jobs_mongo_model.Task{}.TableName()).
-				InsertOne(&jobs_mongo_model.Task{
+				InsertOne(ctx, &jobs_mongo_model.Task{
 					Id:             primitive.NewObjectID(),
 					Status:         TASK_WAIT,
 					Params:         config.Params,

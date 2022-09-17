@@ -214,22 +214,30 @@ func (c *GinClient) Middleware() gin.HandlerFunc {
 
 			clientIp := gorequest.ClientIp(ginCtx.Request)
 
-			requestClientIpCountry, requestClientIpRegion, requestClientIpProvince, requestClientIpCity, requestClientIpIsp := "", "", "", "", ""
+			var requestClientIpCountry string
+			var requestClientIpProvince string
+			var requestClientIpCity string
+			var requestClientIpIsp string
+			var requestClientIpLocationLatitude float64
+			var requestClientIpLocationLongitude float64
 			if c.ipService != nil {
 				if net.ParseIP(clientIp).To4() != nil {
 					// IPv4
-					_, info := c.ipService.Ipv4(clientIp)
-					requestClientIpCountry = info.Country
-					requestClientIpRegion = info.Region
-					requestClientIpProvince = info.Province
-					requestClientIpCity = info.City
-					requestClientIpIsp = info.ISP
+					info := c.ipService.Analyse(clientIp)
+					requestClientIpCountry = info.Ip2regionV2info.Country
+					requestClientIpProvince = info.Ip2regionV2info.Province
+					requestClientIpCity = info.Ip2regionV2info.City
+					requestClientIpIsp = info.Ip2regionV2info.Operator
+					requestClientIpLocationLatitude = info.GeoipInfo.Location.Latitude
+					requestClientIpLocationLongitude = info.GeoipInfo.Location.Longitude
 				} else if net.ParseIP(clientIp).To16() != nil {
 					// IPv6
-					info := c.ipService.Ipv6(clientIp)
-					requestClientIpCountry = info.Country
-					requestClientIpProvince = info.Province
-					requestClientIpCity = info.City
+					info := c.ipService.Analyse(clientIp)
+					requestClientIpCountry = info.Ipv6wryInfo.Country
+					requestClientIpProvince = info.Ipv6wryInfo.Province
+					requestClientIpCity = info.Ipv6wryInfo.City
+					requestClientIpLocationLatitude = info.GeoipInfo.Location.Latitude
+					requestClientIpLocationLongitude = info.GeoipInfo.Location.Longitude
 				}
 			}
 
@@ -241,12 +249,12 @@ func (c *GinClient) Middleware() gin.HandlerFunc {
 					if c.logDebug {
 						c.zapLog.WithTraceIdStr(traceId).Sugar().Infof("[golog.gin.Middleware]准备使用{gormRecordJson}保存数据：%s", data)
 					}
-					c.gormRecordJson(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpRegion, requestClientIpProvince, requestClientIpCity, requestClientIpIsp)
+					c.gormRecordJson(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpProvince, requestClientIpCity, requestClientIpIsp)
 				} else {
 					if c.logDebug {
 						c.zapLog.WithTraceIdStr(traceId).Sugar().Infof("[golog.gin.Middleware]准备使用{gormRecordXml}保存数据：%s", data)
 					}
-					c.gormRecordXml(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpRegion, requestClientIpProvince, requestClientIpCity, requestClientIpIsp)
+					c.gormRecordXml(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpProvince, requestClientIpCity, requestClientIpIsp)
 				}
 			}
 			// 记录
@@ -255,12 +263,12 @@ func (c *GinClient) Middleware() gin.HandlerFunc {
 					if c.logDebug {
 						c.zapLog.WithTraceIdStr(traceId).Sugar().Infof("[golog.gin.Middleware]准备使用{mongoRecordJson}保存数据：%s", data)
 					}
-					c.mongoRecordJson(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpRegion, requestClientIpProvince, requestClientIpCity, requestClientIpIsp)
+					c.mongoRecordJson(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpProvince, requestClientIpCity, requestClientIpIsp, requestClientIpLocationLatitude, requestClientIpLocationLongitude)
 				} else {
 					if c.logDebug {
 						c.zapLog.WithTraceIdStr(traceId).Sugar().Infof("[golog.gin.Middleware]准备使用{mongoRecordXml}保存数据：%s", data)
 					}
-					c.mongoRecordXml(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpRegion, requestClientIpProvince, requestClientIpCity, requestClientIpIsp)
+					c.mongoRecordXml(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpProvince, requestClientIpCity, requestClientIpIsp, requestClientIpLocationLatitude, requestClientIpLocationLongitude)
 				}
 			}
 		}()

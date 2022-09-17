@@ -29,19 +29,36 @@ func (c *Client) mongoCreateCollectionTask(ctx context.Context) {
 
 // 创建索引
 func (c *Client) mongoCreateIndexesTask(ctx context.Context) {
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
-		{"status", 1},
-	}}))
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
-		{"frequency", 1},
-	}}))
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
-		{"custom_id", 1},
-	}}))
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
-		{"type", 1},
-	}}))
-	c.zapLog.WithTraceId(ctx).Sugar().Info(c.db.mongoClient.Db.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{
-		{"specify_ip", 1},
-	}}))
+	indexes, err := c.db.mongoClient.Database(c.db.mongoDatabaseName).Collection(jobs_mongo_model.Task{}.TableName()).CreateManyIndexes(ctx, []mongo.IndexModel{
+		{
+			Keys: bson.D{{
+				Key:   "status",
+				Value: 1,
+			}},
+		}, {
+			Keys: bson.D{{
+				Key:   "frequency",
+				Value: 1,
+			}},
+		}, {
+			Keys: bson.D{{
+				Key:   "custom_id",
+				Value: 1,
+			}},
+		}, {
+			Keys: bson.D{{
+				Key:   "type",
+				Value: 1,
+			}},
+		}, {
+			Keys: bson.D{{
+				Key:   "specify_ip",
+				Value: 1,
+			}},
+		},
+	})
+	if err != nil {
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("创建索引：%s", err)
+	}
+	c.zapLog.WithTraceId(ctx).Sugar().Infof("创建索引：%s", indexes)
 }

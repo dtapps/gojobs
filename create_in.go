@@ -51,7 +51,7 @@ func (c *Client) CreateInCustomId(ctx context.Context, config *ConfigCreateInCus
 		go func() {
 			_, err = c.db.mongoClient.Database(c.db.mongoDatabaseName).
 				Collection(jobs_mongo_model.Task{}.TableName()).
-				InsertOne(&jobs_mongo_model.Task{
+				InsertOne(ctx, &jobs_mongo_model.Task{
 					Id:             primitive.NewObjectID(),
 					Status:         TASK_IN,
 					Params:         config.Params,
@@ -149,7 +149,7 @@ func (c *Client) CreateInCustomIdOnly(ctx context.Context, config *ConfigCreateI
 		go func() {
 			_, err = c.db.mongoClient.Database(c.db.mongoDatabaseName).
 				Collection(jobs_mongo_model.Task{}.TableName()).
-				InsertOne(&jobs_mongo_model.Task{
+				InsertOne(ctx, &jobs_mongo_model.Task{
 					Id:             primitive.NewObjectID(),
 					Status:         TASK_IN,
 					Params:         config.Params,
@@ -245,7 +245,7 @@ func (c *Client) CreateInCustomIdMaxNumber(ctx context.Context, config *ConfigCr
 		go func() {
 			_, err = c.db.mongoClient.Database(c.db.mongoDatabaseName).
 				Collection(jobs_mongo_model.Task{}.TableName()).
-				InsertOne(&jobs_mongo_model.Task{
+				InsertOne(ctx, &jobs_mongo_model.Task{
 					Id:             primitive.NewObjectID(),
 					Status:         TASK_IN,
 					Params:         config.Params,
@@ -346,7 +346,7 @@ func (c *Client) CreateInCustomIdMaxNumberOnly(ctx context.Context, config *Conf
 		go func() {
 			_, err = c.db.mongoClient.Database(c.db.mongoDatabaseName).
 				Collection(jobs_mongo_model.Task{}.TableName()).
-				InsertOne(&jobs_mongo_model.Task{
+				InsertOne(ctx, &jobs_mongo_model.Task{
 					Id:             primitive.NewObjectID(),
 					Status:         TASK_IN,
 					Params:         config.Params,
