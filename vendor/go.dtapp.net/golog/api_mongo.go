@@ -154,16 +154,6 @@ func (c *ApiClient) mongoCreateIndexes(ctx context.Context) {
 			}},
 		}, {
 			Keys: bson.D{{
-				Key:   "system_host_name",
-				Value: 1,
-			}},
-		}, {
-			Keys: bson.D{{
-				Key:   "system_inside_ip",
-				Value: 1,
-			}},
-		}, {
-			Keys: bson.D{{
 				Key:   "system_os",
 				Value: 1,
 			}},
@@ -171,11 +161,6 @@ func (c *ApiClient) mongoCreateIndexes(ctx context.Context) {
 			Keys: bson.D{{
 				Key:   "system_arch",
 				Value: -1,
-			}},
-		}, {
-			Keys: bson.D{{
-				Key:   "system_cpu_quantity",
-				Value: 1,
 			}},
 		}, {
 			Keys: bson.D{{

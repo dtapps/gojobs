@@ -9,11 +9,10 @@ require (
 	go.dtapp.net/dorm v1.0.36
 	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.34
-	go.dtapp.net/golog v1.0.77
+	go.dtapp.net/golog v1.0.78
 	go.dtapp.net/gostring v1.0.10
 	go.dtapp.net/gotime v1.0.5
 	go.dtapp.net/gotrace_id v1.0.6
-	go.mongodb.org/mongo-driver v1.10.2
 	gorm.io/gorm v1.23.9
 )
 
@@ -78,6 +77,7 @@ require (
 	go.dtapp.net/gorandom v1.0.1 // indirect
 	go.dtapp.net/gorequest v1.0.31 // indirect
 	go.dtapp.net/gourl v1.0.0 // indirect
+	go.mongodb.org/mongo-driver v1.10.2 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect

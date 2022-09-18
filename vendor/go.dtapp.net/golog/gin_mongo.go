@@ -44,7 +44,7 @@ type ginMongoLog struct {
 	RequestBody       interface{}                          `json:"request_body,omitempty" bson:"request_body,omitempty"`               //【请求】请求主体
 	RequestUrlQuery   interface{}                          `json:"request_url_query,omitempty" bson:"request_url_query,omitempty"`     //【请求】请求URL参数
 	RequestIp         string                               `json:"request_ip,omitempty" bson:"request_ip,omitempty"`                   //【请求】请求客户端Ip
-	RequestIpCountry  string                               `json:"request_ip_country,omitempty" bson:"request_ip_country,omitempty"`   //【请求】请求客户端城市
+	RequestIpCountry  string                               `json:"request_ip_country,omitempty" bson:"request_ip_country,omitempty"`   //【请求】请求客户端国家
 	RequestIpProvince string                               `json:"request_ip_province,omitempty" bson:"request_ip_province,omitempty"` //【请求】请求客户端省份
 	RequestIpCity     string                               `json:"request_ip_city,omitempty" bson:"request_ip_city,omitempty"`         //【请求】请求客户端城市
 	RequestIpIsp      string                               `json:"request_ip_isp,omitempty" bson:"request_ip_isp,omitempty"`           //【请求】请求客户端运营商
@@ -160,11 +160,6 @@ func (c *GinClient) mongoCreateIndexes(ctx context.Context) {
 			}},
 		}, {
 			Keys: bson.D{{
-				Key:   "request_proto",
-				Value: 1,
-			}},
-		}, {
-			Keys: bson.D{{
 				Key:   "request_ip",
 				Value: 1,
 			}},
@@ -205,11 +200,6 @@ func (c *GinClient) mongoCreateIndexes(ctx context.Context) {
 			}},
 		}, {
 			Keys: bson.D{{
-				Key:   "system_inside_ip",
-				Value: 1,
-			}},
-		}, {
-			Keys: bson.D{{
 				Key:   "system_os",
 				Value: 1,
 			}},
@@ -217,11 +207,6 @@ func (c *GinClient) mongoCreateIndexes(ctx context.Context) {
 			Keys: bson.D{{
 				Key:   "system_arch",
 				Value: -1,
-			}},
-		}, {
-			Keys: bson.D{{
-				Key:   "system_cpu_quantity",
-				Value: 1,
 			}},
 		}, {
 			Keys: bson.D{{
@@ -286,7 +271,7 @@ func (c *GinClient) mongoRecordJson(ginCtx *gin.Context, traceId string, request
 		RequestReferer:    ginCtx.Request.Referer(),                                     //【请求】请求referer
 		RequestUrlQuery:   ginCtx.Request.URL.Query(),                                   //【请求】请求URL参数
 		RequestIp:         clientIp,                                                     //【请求】请求客户端Ip
-		RequestIpCountry:  requestClientIpCountry,                                       //【请求】请求客户端城市
+		RequestIpCountry:  requestClientIpCountry,                                       //【请求】请求客户端国家
 		RequestIpProvince: requestClientIpProvince,                                      //【请求】请求客户端省份
 		RequestIpCity:     requestClientIpCity,                                          //【请求】请求客户端城市
 		RequestIpIsp:      requestClientIpIsp,                                           //【请求】请求客户端运营商
@@ -347,7 +332,7 @@ func (c *GinClient) mongoRecordXml(ginCtx *gin.Context, traceId string, requestT
 		RequestReferer:    ginCtx.Request.Referer(),                                     //【请求】请求referer
 		RequestUrlQuery:   ginCtx.Request.URL.Query(),                                   //【请求】请求URL参数
 		RequestIp:         clientIp,                                                     //【请求】请求客户端Ip
-		RequestIpCountry:  requestClientIpCountry,                                       //【请求】请求客户端城市
+		RequestIpCountry:  requestClientIpCountry,                                       //【请求】请求客户端国家
 		RequestIpProvince: requestClientIpProvince,                                      //【请求】请求客户端省份
 		RequestIpCity:     requestClientIpCity,                                          //【请求】请求客户端城市
 		RequestIpIsp:      requestClientIpIsp,                                           //【请求】请求客户端运营商

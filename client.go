@@ -11,10 +11,6 @@ import (
 // client *dorm.GormClient
 type gormClientFun func() *dorm.GormClient
 
-// client *dorm.MongoClient
-// databaseName string
-type mongoClientFun func() (*dorm.MongoClient, string)
-
 // client *dorm.RedisClient
 type redisClientFun func() *dorm.RedisClient
 
@@ -28,18 +24,19 @@ type redisPrefixFun func() (lockKeyPrefix, lockKeySeparator, cornKeyPrefix, corn
 // ClientConfig 实例配置
 type ClientConfig struct {
 	GormClientFun  gormClientFun  // 数据库驱动
-	MongoClientFun mongoClientFun // 数据库驱动
 	RedisClientFun redisClientFun // 数据库驱动
 	RedisPrefixFun redisPrefixFun // 前缀
 	Debug          bool           // 日志开关
 	ZapLog         *golog.ZapLog  // 日志服务
 	CurrentIp      string         // 当前ip
+	JsonStatus     bool           // json状态
 }
 
 // Client 实例
 type Client struct {
-	zapLog *golog.ZapLog // 日志服务
-	config struct {
+	gormClient *dorm.GormClient // 数据库
+	zapLog     *golog.ZapLog    // 日志服务
+	config     struct {
 		systemHostName    string // 主机名
 		systemInsideIp    string // 内网ip
 		systemOs          string // 系统类型
@@ -50,6 +47,7 @@ type Client struct {
 		systemMacAddrS    string // Mac地址
 		systemOutsideIp   string // 外网ip
 		debug             bool   // 日志开关
+		jsonStatus        bool   // json状态
 	}
 	cache struct {
 		redisClient      *dorm.RedisClient     // 数据库
@@ -58,11 +56,6 @@ type Client struct {
 		lockKeySeparator string                // 锁Key分隔符 :
 		cornKeyPrefix    string                // 任务Key前缀 xxx_cron
 		cornKeyCustom    string                // 任务Key自定义
-	}
-	db struct {
-		gormClient        *dorm.GormClient  // 数据库
-		mongoClient       *dorm.MongoClient // 数据库
-		mongoDatabaseName string            // 数据库名
 	}
 }
 
@@ -76,6 +69,8 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	c.zapLog = config.ZapLog
 
 	c.config.debug = config.Debug
+
+	c.config.jsonStatus = config.JsonStatus
 
 	// 配置外网ip
 	if config.CurrentIp == "" {
@@ -122,34 +117,12 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	// 配置关系数据库
 	gormClient := config.GormClientFun()
 	if gormClient != nil && gormClient.Db != nil {
-		c.db.gormClient = gormClient
+		c.gormClient = gormClient
 
 		c.autoMigrateTask(ctx)
+		c.autoMigrateTaskLog(ctx)
 	} else {
 		return nil, gormClientFunNoConfig
-	}
-
-	if c.config.debug {
-		log.Printf("[gojobs]配置关系数据库成功：%+v\n", c.db)
-	}
-
-	// 配置非关系数据库
-	mongoClient, databaseName := config.MongoClientFun()
-	if mongoClient != nil && mongoClient.Db != nil {
-		c.db.mongoClient = mongoClient
-		if databaseName == "" {
-			return nil, mongoClientFunNoConfig
-		}
-		c.db.mongoDatabaseName = databaseName
-
-		c.mongoCreateCollectionTask(ctx)
-		c.mongoCreateIndexesTask(ctx)
-	} else {
-		return nil, mongoClientFunNoConfig
-	}
-
-	if c.config.debug {
-		log.Printf("[gojobs]配置非关系数据库成功：%+v\n", c.db)
 	}
 
 	if c.config.debug {
