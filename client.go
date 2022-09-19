@@ -31,17 +31,15 @@ type Client struct {
 	gormClient *dorm.GormClient // 数据库
 	zapLog     *golog.ZapLog    // 日志服务
 	config     struct {
-		systemHostName    string // 主机名
-		systemInsideIp    string // 内网ip
-		systemOs          string // 系统类型
-		systemArch        string // 系统架构
-		systemCpuQuantity int    // cpu核数
-		goVersion         string // go版本
-		sdkVersion        string // sdk版本
-		systemMacAddrS    string // Mac地址
-		systemOutsideIp   string // 外网ip
-		debug             bool   // 日志开关
-		jsonStatus        bool   // json状态
+		systemHostName  string // 主机名
+		systemInsideIp  string // 内网ip
+		systemOs        string // 系统类型
+		systemArch      string // 系统架构
+		goVersion       string // go版本
+		sdkVersion      string // sdk版本
+		systemOutsideIp string // 外网ip
+		debug           bool   // 日志开关
+		jsonStatus      bool   // json状态
 	}
 	cache struct {
 		redisClient      *dorm.RedisClient     // 数据库

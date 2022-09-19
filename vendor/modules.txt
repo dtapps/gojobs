@@ -257,9 +257,6 @@ github.com/youmark/pkcs8
 # go.dtapp.net/dorm v1.0.38
 ## explicit; go 1.19
 go.dtapp.net/dorm
-# go.dtapp.net/goarray v1.0.1
-## explicit; go 1.18
-go.dtapp.net/goarray
 # go.dtapp.net/goip v1.0.34
 ## explicit; go 1.19
 go.dtapp.net/goip

@@ -518,8 +518,6 @@ github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxt
 github.com/ziutek/mymysql v1.5.4/go.mod h1:LMSpPZ6DbqWFxNCHW77HeMg9I646SAhApZ/wKdgO/C0=
 go.dtapp.net/dorm v1.0.38 h1:9OgWY5bnar6D0Xdho62xn7RluXJNe8i7Kz/IeSUObF4=
 go.dtapp.net/dorm v1.0.38/go.mod h1:z9ksZ4Y0HHH0odjEiG57d90/ZUBM51qXEWJC8fS+dEM=
-go.dtapp.net/goarray v1.0.1 h1:cHNHaJ2MFcuJPA1WKU2PM1EUZShS1vQqEH7n6YXsQVU=
-go.dtapp.net/goarray v1.0.1/go.mod h1:/MPhlFCAhQyeNV1M0v1PAOOX33Sg705fVjUgMO12IBQ=
 go.dtapp.net/goip v1.0.34 h1:aW2CuPpQwcDOJiyx/gHbvrha3/x+poFRpDxsLtO4EVw=
 go.dtapp.net/goip v1.0.34/go.mod h1:EctL6B8ue/kZKPr+kKZPU6YTTpNhihane9BHHffwo6Q=
 go.dtapp.net/golog v1.0.82 h1:VSWaZLYjmtnI7h6cp9HGXrp+CVW+zS7Wii5kGd9sY88=

@@ -7,7 +7,6 @@ require (
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
 	go.dtapp.net/dorm v1.0.38
-	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.34
 	go.dtapp.net/golog v1.0.82
 	go.dtapp.net/gostring v1.0.10
