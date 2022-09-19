@@ -19,32 +19,20 @@ import (
 
 // GinClient 框架
 type GinClient struct {
-	gormClient  *dorm.GormClient  // 数据库驱动
-	mongoClient *dorm.MongoClient // 数据库驱动
-	ipService   *goip.Client      // ip服务
-	zapLog      *ZapLog           // 日志服务
-	logDebug    bool              // 日志开关
-	gormConfig  struct {
+	gormClient *dorm.GormClient // 数据库驱动
+	ipService  *goip.Client     // ip服务
+	zapLog     *ZapLog          // 日志服务
+	logDebug   bool             // 日志开关
+	gormConfig struct {
 		tableName string // 表名
 		insideIp  string // 内网ip
 		hostname  string // 主机名
 		goVersion string // go版本
 	}
-	mongoConfig struct {
-		databaseName   string // 库名
-		collectionName string // 表名
-		insideIp       string // 内网ip
-		hostname       string // 主机名
-		goVersion      string // go版本
-	}
-	log struct {
-		gorm  bool // 日志开关
-		mongo bool // 日志开关
-	}
 	config struct {
-		os       string // 系统类型
-		arch     string // 系统架构
-		maxProCs int    // CPU核数
+		os         string // 系统类型
+		arch       string // 系统架构
+		jsonStatus bool   // json状态
 	}
 }
 
@@ -52,18 +40,13 @@ type GinClient struct {
 // string 表名
 type ginGormClientFun func() (*dorm.GormClient, string)
 
-// client 数据库服务
-// string 库名
-// string 表名
-type ginMongoClientFun func() (*dorm.MongoClient, string, string)
-
 // GinClientConfig 框架实例配置
 type GinClientConfig struct {
-	IpService      *goip.Client      // ip服务
-	GormClientFun  ginGormClientFun  // 日志配置
-	MongoClientFun apiMongoClientFun // 日志配置
-	Debug          bool              // 日志开关
-	ZapLog         *ZapLog           // 日志服务
+	IpService     *goip.Client     // ip服务
+	GormClientFun ginGormClientFun // 日志配置
+	Debug         bool             // 日志开关
+	ZapLog        *ZapLog          // 日志服务
+	JsonStatus    bool             // json状态
 }
 
 // NewGinClient 创建框架实例化
@@ -80,14 +63,14 @@ func NewGinClient(config *GinClientConfig) (*GinClient, error) {
 
 	c.logDebug = config.Debug
 
+	c.config.jsonStatus = config.JsonStatus
+
 	c.config.os = runtime.GOOS
 	c.config.arch = runtime.GOARCH
-	c.config.maxProCs = runtime.GOMAXPROCS(0)
 
 	gormClient, gormTableName := config.GormClientFun()
-	mongoClient, mongoDatabaseName, mongoCollectionName := config.MongoClientFun()
 
-	if (gormClient == nil || gormClient.Db == nil) || (mongoClient == nil || mongoClient.Db == nil) {
+	if gormClient == nil || gormClient.Db == nil {
 		return nil, errors.New("没有设置驱动")
 	}
 
@@ -112,38 +95,6 @@ func NewGinClient(config *GinClientConfig) (*GinClient, error) {
 		c.gormConfig.hostname = hostname
 		c.gormConfig.insideIp = goip.GetInsideIp(ctx)
 		c.gormConfig.goVersion = runtime.Version()
-
-		c.log.gorm = true
-
-	}
-
-	if mongoClient != nil || mongoClient.Db != nil {
-
-		c.mongoClient = mongoClient
-
-		if mongoDatabaseName == "" {
-			return nil, errors.New("没有设置库名")
-		}
-		c.mongoConfig.databaseName = mongoDatabaseName
-
-		if mongoCollectionName == "" {
-			return nil, errors.New("没有设置表名")
-		}
-		c.mongoConfig.collectionName = mongoCollectionName
-
-		c.ipService = config.IpService
-
-		c.mongoConfig.hostname = hostname
-		c.mongoConfig.insideIp = goip.GetInsideIp(ctx)
-		c.mongoConfig.goVersion = runtime.Version()
-
-		c.log.mongo = true
-
-		// 创建时间序列集合
-		c.mongoCreateCollection(ctx)
-
-		// 创建索引
-		c.mongoCreateIndexes(ctx)
 
 	}
 
@@ -244,32 +195,16 @@ func (c *GinClient) Middleware() gin.HandlerFunc {
 			var traceId = gotrace_id.GetGinTraceId(ginCtx)
 
 			// 记录
-			if c.log.gorm {
-				if dataJson {
-					if c.logDebug {
-						c.zapLog.WithTraceIdStr(traceId).Sugar().Infof("[golog.gin.Middleware]准备使用{gormRecordJson}保存数据：%s", data)
-					}
-					c.gormRecordJson(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpProvince, requestClientIpCity, requestClientIpIsp)
-				} else {
-					if c.logDebug {
-						c.zapLog.WithTraceIdStr(traceId).Sugar().Infof("[golog.gin.Middleware]准备使用{gormRecordXml}保存数据：%s", data)
-					}
-					c.gormRecordXml(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpProvince, requestClientIpCity, requestClientIpIsp)
+			if dataJson {
+				if c.logDebug {
+					c.zapLog.WithTraceIdStr(traceId).Sugar().Infof("[golog.gin.Middleware]准备使用{gormRecordJson}保存数据：%s", data)
 				}
-			}
-			// 记录
-			if c.log.mongo {
-				if dataJson {
-					if c.logDebug {
-						c.zapLog.WithTraceIdStr(traceId).Sugar().Infof("[golog.gin.Middleware]准备使用{mongoRecordJson}保存数据：%s", data)
-					}
-					c.mongoRecordJson(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpProvince, requestClientIpCity, requestClientIpIsp, requestClientIpLocationLatitude, requestClientIpLocationLongitude)
-				} else {
-					if c.logDebug {
-						c.zapLog.WithTraceIdStr(traceId).Sugar().Infof("[golog.gin.Middleware]准备使用{mongoRecordXml}保存数据：%s", data)
-					}
-					c.mongoRecordXml(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpProvince, requestClientIpCity, requestClientIpIsp, requestClientIpLocationLatitude, requestClientIpLocationLongitude)
+				c.gormRecordJson(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpProvince, requestClientIpCity, requestClientIpIsp, requestClientIpLocationLatitude, requestClientIpLocationLongitude)
+			} else {
+				if c.logDebug {
+					c.zapLog.WithTraceIdStr(traceId).Sugar().Infof("[golog.gin.Middleware]准备使用{gormRecordXml}保存数据：%s", data)
 				}
+				c.gormRecordXml(ginCtx, traceId, requestTime, data, responseCode, responseBody, startTime, endTime, clientIp, requestClientIpCountry, requestClientIpProvince, requestClientIpCity, requestClientIpIsp, requestClientIpLocationLatitude, requestClientIpLocationLongitude)
 			}
 		}()
 	}
