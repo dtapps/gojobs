@@ -72,6 +72,10 @@ func NewClient(config *ClientConfig) (*Client, error) {
 		c.config.systemOutsideIp = config.CurrentIp
 	}
 
+	if c.config.systemOutsideIp == "" {
+		return nil, currentIpNoConfig
+	}
+
 	if c.config.debug {
 		log.Printf("[gojobs]配置外网ip成功：%+v\n", c.config.systemOutsideIp)
 	}

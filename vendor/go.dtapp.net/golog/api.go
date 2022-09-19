@@ -6,8 +6,6 @@ import (
 	"go.dtapp.net/dorm"
 	"go.dtapp.net/goip"
 	"go.dtapp.net/gorequest"
-	"os"
-	"runtime"
 )
 
 // ApiClientFun *ApiClient 驱动
@@ -22,17 +20,18 @@ type ApiClient struct {
 	gormClient *dorm.GormClient // 数据库驱动
 	zapLog     *ZapLog          // 日志服务
 	logDebug   bool             // 日志开关
-	currentIp  string           // 当前ip
 	gormConfig struct {
 		tableName string // 表名
-		insideIp  string // 内网ip
-		hostname  string // 主机名
-		goVersion string // go版本
 	}
 	config struct {
-		os         string // 系统类型
-		arch       string // 系统架构
-		jsonStatus bool   // json状态
+		systemHostName  string // 主机名
+		systemInsideIp  string // 内网ip
+		systemOs        string // 系统类型
+		systemArch      string // 系统架构
+		goVersion       string // go版本
+		sdkVersion      string // sdk版本
+		systemOutsideIp string // 外网ip
+		jsonStatus      bool   // json状态
 	}
 }
 
@@ -62,19 +61,18 @@ func NewApiClient(config *ApiClientConfig) (*ApiClient, error) {
 		config.CurrentIp = goip.GetOutsideIp(ctx)
 	}
 	if config.CurrentIp != "" && config.CurrentIp != "0.0.0.0" {
-		c.currentIp = config.CurrentIp
+		c.config.systemOutsideIp = config.CurrentIp
 	}
 
-	c.config.os = runtime.GOOS
-	c.config.arch = runtime.GOARCH
+	if c.config.systemOutsideIp == "" {
+		return nil, currentIpNoConfig
+	}
 
 	gormClient, gormTableName := config.GormClientFun()
 
 	if gormClient == nil || gormClient.Db == nil {
-		return nil, errors.New("没有设置驱动")
+		return nil, gormClientFunNoConfig
 	}
-
-	hostname, _ := os.Hostname()
 
 	if gormClient != nil || gormClient.Db != nil {
 
@@ -90,11 +88,10 @@ func NewApiClient(config *ApiClientConfig) (*ApiClient, error) {
 			return nil, errors.New("创建表失败：" + err.Error())
 		}
 
-		c.gormConfig.hostname = hostname
-		c.gormConfig.insideIp = goip.GetInsideIp(ctx)
-		c.gormConfig.goVersion = runtime.Version()
-
 	}
+
+	// 配置信息
+	c.setConfig(ctx)
 
 	return c, nil
 }

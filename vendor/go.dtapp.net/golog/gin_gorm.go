@@ -15,8 +15,6 @@ import (
 	"gorm.io/datatypes"
 	"io/ioutil"
 	"net"
-	"os"
-	"runtime"
 	"time"
 )
 
@@ -48,7 +46,7 @@ func NewGinGormClient(config *GinGormClientConfig) (*GinClient, error) {
 	client, tableName := config.GormClientFun()
 
 	if client == nil || client.Db == nil {
-		return nil, errors.New("没有设置驱动")
+		return nil, gormClientFunNoConfig
 	}
 
 	c.gormClient = client
@@ -65,11 +63,8 @@ func NewGinGormClient(config *GinGormClientConfig) (*GinClient, error) {
 		return nil, errors.New("创建表失败：" + err.Error())
 	}
 
-	hostname, _ := os.Hostname()
-
-	c.gormConfig.hostname = hostname
-	c.gormConfig.insideIp = goip.GetInsideIp(ctx)
-	c.gormConfig.goVersion = runtime.Version()
+	// 配置信息
+	c.setConfig(ctx)
 
 	return c, nil
 }
@@ -93,14 +88,12 @@ func (c *GinClient) gormAutoMigrate() (err error) {
 // gormRecord 记录日志
 func (c *GinClient) gormRecord(data ginPostgresqlLogString) (err error) {
 
-	data.SystemHostName = c.gormConfig.hostname
-	data.SystemInsideIp = c.gormConfig.insideIp
-	data.GoVersion = c.gormConfig.goVersion
-
-	data.SdkVersion = Version
-
-	data.SystemOs = c.config.os
-	data.SystemArch = c.config.arch
+	data.SystemHostName = c.config.systemHostName
+	data.SystemInsideIp = c.config.systemInsideIp
+	data.GoVersion = c.config.goVersion
+	data.SdkVersion = c.config.sdkVersion
+	data.SystemOs = c.config.systemOs
+	data.SystemArch = c.config.systemArch
 
 	if c.config.jsonStatus {
 		err = c.gormClient.Db.Table(c.gormConfig.tableName).Create(&ginPostgresqlLogJson{
