@@ -17,11 +17,11 @@ import (
 
 // ApiGormClientConfig 接口实例配置
 type ApiGormClientConfig struct {
-	GormClientFun apiGormClientFun // 日志配置
-	Debug         bool             // 日志开关
-	ZapLog        *ZapLog          // 日志服务
-	CurrentIp     string           // 当前ip
-	JsonStatus    bool             // json状态
+	GormClientFun dorm.GormClientTableFun // 日志配置
+	Debug         bool                    // 日志开关
+	ZapLog        *ZapLog                 // 日志服务
+	CurrentIp     string                  // 当前ip
+	JsonStatus    bool                    // json状态
 }
 
 // NewApiGormClient 创建接口实例化

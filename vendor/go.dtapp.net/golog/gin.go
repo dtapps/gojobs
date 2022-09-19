@@ -17,6 +17,10 @@ import (
 	"runtime"
 )
 
+// GinClientFun *GinClient 驱动
+// jsonStatus bool json状态
+type GinClientFun func() (*GinClient, bool)
+
 // GinClient 框架
 type GinClient struct {
 	gormClient *dorm.GormClient // 数据库驱动
@@ -36,17 +40,13 @@ type GinClient struct {
 	}
 }
 
-// client 数据库服务
-// string 表名
-type ginGormClientFun func() (*dorm.GormClient, string)
-
 // GinClientConfig 框架实例配置
 type GinClientConfig struct {
-	IpService     *goip.Client     // ip服务
-	GormClientFun ginGormClientFun // 日志配置
-	Debug         bool             // 日志开关
-	ZapLog        *ZapLog          // 日志服务
-	JsonStatus    bool             // json状态
+	IpService     *goip.Client            // ip服务
+	GormClientFun dorm.GormClientTableFun // 日志配置
+	Debug         bool                    // 日志开关
+	ZapLog        *ZapLog                 // 日志服务
+	JsonStatus    bool                    // json状态
 }
 
 // NewGinClient 创建框架实例化

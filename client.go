@@ -8,12 +8,6 @@ import (
 	"log"
 )
 
-// client *dorm.GormClient
-type gormClientFun func() *dorm.GormClient
-
-// client *dorm.RedisClient
-type redisClientFun func() *dorm.RedisClient
-
 // 前缀
 // lockKeyPrefix 锁Key前缀 xxx_lock
 // lockKeySeparator 锁Key分隔符 :
@@ -23,13 +17,13 @@ type redisPrefixFun func() (lockKeyPrefix, lockKeySeparator, cornKeyPrefix, corn
 
 // ClientConfig 实例配置
 type ClientConfig struct {
-	GormClientFun  gormClientFun  // 数据库驱动
-	RedisClientFun redisClientFun // 数据库驱动
-	RedisPrefixFun redisPrefixFun // 前缀
-	Debug          bool           // 日志开关
-	ZapLog         *golog.ZapLog  // 日志服务
-	CurrentIp      string         // 当前ip
-	JsonStatus     bool           // json状态
+	GormClientFun  dorm.GormClientFun  // 数据库驱动
+	RedisClientFun dorm.RedisClientFun // 数据库驱动
+	RedisPrefixFun redisPrefixFun      // 前缀
+	Debug          bool                // 日志开关
+	ZapLog         *golog.ZapLog       // 日志服务
+	CurrentIp      string              // 当前ip
+	JsonStatus     bool                // json状态
 }
 
 // Client 实例

@@ -10,6 +10,10 @@ import (
 	"runtime"
 )
 
+// ApiClientFun *ApiClient 驱动
+// jsonStatus bool json状态
+type ApiClientFun func() (*ApiClient, bool)
+
 // ApiClient 接口
 type ApiClient struct {
 	gormClient *dorm.GormClient // 数据库驱动
@@ -29,17 +33,13 @@ type ApiClient struct {
 	}
 }
 
-// client 数据库服务
-// string 表名
-type apiGormClientFun func() (*dorm.GormClient, string)
-
 // ApiClientConfig 接口实例配置
 type ApiClientConfig struct {
-	GormClientFun apiGormClientFun // 日志配置
-	Debug         bool             // 日志开关
-	ZapLog        *ZapLog          // 日志服务
-	CurrentIp     string           // 当前ip
-	JsonStatus    bool             // json状态
+	GormClientFun dorm.GormClientTableFun // 日志配置
+	Debug         bool                    // 日志开关
+	ZapLog        *ZapLog                 // 日志服务
+	CurrentIp     string                  // 当前ip
+	JsonStatus    bool                    // json状态
 }
 
 // NewApiClient 创建接口实例化
