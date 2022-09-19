@@ -7,3 +7,4 @@
 gomod.sh
 grpc_build.sh
 *_test.go
+/vendor/

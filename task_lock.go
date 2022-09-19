@@ -1,24 +1,41 @@
-package jobs_gorm_model
+package gojobs
 
 import (
 	"context"
 	"errors"
-	"go.dtapp.net/gojobs"
+	"go.dtapp.net/gojobs/jobs_gorm_model"
 )
 
 type TaskLockOperation struct {
-	task   Task           // 任务
-	client *gojobs.Client // 实例
+	client *Client              // 实例
+	task   jobs_gorm_model.Task // 任务
 }
 
-func (task Task) NewLock(c *gojobs.Client) (*TaskLockOperation, error) {
+func (c *Client) NewLock(task jobs_gorm_model.Task) (*TaskLockOperation, error) {
 	if task.Id == 0 {
 		return nil, errors.New("任务数据不正常")
 	}
 	return &TaskLockOperation{
-		task:   task,
 		client: c,
+		task:   task,
 	}, nil
+}
+
+// Lock 上锁
+func (tlo *TaskLockOperation) Lock(ctx context.Context, id any) error {
+	_, err := tlo.client.Lock(ctx, tlo.task, id)
+	return err
+}
+
+// Unlock 解锁
+func (tlo *TaskLockOperation) Unlock(ctx context.Context, id any) error {
+	return tlo.client.Unlock(ctx, tlo.task, id)
+}
+
+// LockForever 永远上锁
+func (tlo *TaskLockOperation) LockForever(ctx context.Context, id any) error {
+	_, err := tlo.client.LockForever(ctx, tlo.task, id)
+	return err
 }
 
 // LockId 上锁

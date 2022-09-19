@@ -9,7 +9,7 @@ require (
 	go.dtapp.net/dorm v1.0.38
 	go.dtapp.net/goarray v1.0.1
 	go.dtapp.net/goip v1.0.34
-	go.dtapp.net/golog v1.0.81
+	go.dtapp.net/golog v1.0.82
 	go.dtapp.net/gostring v1.0.10
 	go.dtapp.net/gotime v1.0.5
 	go.dtapp.net/gotrace_id v1.0.6
@@ -91,7 +91,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/datatypes v1.0.7 // indirect
 	gorm.io/driver/mysql v1.3.6 // indirect
-	gorm.io/driver/postgres v1.3.9 // indirect
+	gorm.io/driver/postgres v1.3.10 // indirect
 	mellium.im/sasl v0.3.0 // indirect
 	modernc.org/ccgo/v3 v3.16.8 // indirect
 	xorm.io/builder v0.3.12 // indirect

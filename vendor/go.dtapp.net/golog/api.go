@@ -11,8 +11,11 @@ import (
 )
 
 // ApiClientFun *ApiClient 驱动
+type ApiClientFun func() *ApiClient
+
+// ApiClientJsonFun *ApiClient 驱动
 // jsonStatus bool json状态
-type ApiClientFun func() (*ApiClient, bool)
+type ApiClientJsonFun func() (*ApiClient, bool)
 
 // ApiClient 接口
 type ApiClient struct {

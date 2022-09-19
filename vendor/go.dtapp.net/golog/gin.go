@@ -18,8 +18,11 @@ import (
 )
 
 // GinClientFun *GinClient 驱动
+type GinClientFun func() *GinClient
+
+// GinClientJsonFun *GinClient 驱动
 // jsonStatus bool json状态
-type GinClientFun func() (*GinClient, bool)
+type GinClientJsonFun func() (*GinClient, bool)
 
 // GinClient 框架
 type GinClient struct {
