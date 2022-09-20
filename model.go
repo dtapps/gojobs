@@ -40,7 +40,7 @@ func (c *Client) MongoTaskLogDelete(ctx context.Context, hour int64) (*mongo.Del
 
 // 创建时间序列集合
 func (c *Client) mongoCreateCollectionTaskLog(ctx context.Context) {
-	err := c.mongoClient.Db.Database(c.mongoConfig.databaseName).CreateCollection(ctx, jobs_mongo_model.TaskLog{}.CollectionName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("log_time")))
+	err := c.mongoClient.Database(c.mongoConfig.databaseName).CreateCollection(ctx, jobs_mongo_model.TaskLog{}.CollectionName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("log_time")))
 	if err != nil {
 		c.zapLog.WithTraceId(ctx).Sugar().Errorf("创建时间序列集合：%s", err)
 	}
@@ -50,16 +50,10 @@ func (c *Client) mongoCreateCollectionTaskLog(ctx context.Context) {
 func (c *Client) mongoCreateIndexesTaskLog(ctx context.Context) {
 	indexes, err := c.mongoClient.Database(c.mongoConfig.databaseName).Collection(jobs_mongo_model.TaskLog{}.CollectionName()).CreateManyIndexes(ctx, []mongo.IndexModel{{
 		Keys: bson.D{{
-			Key:   "task_id",
-			Value: 1,
-		}},
-	}, {
-		Keys: bson.D{{
-			Key:   "task_result_code",
+			Key:   "log_time",
 			Value: -1,
 		}},
-	},
-	})
+	}})
 	if err != nil {
 		c.zapLog.WithTraceId(ctx).Sugar().Errorf("创建索引：%s", err)
 	}
