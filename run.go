@@ -2,9 +2,12 @@ package gojobs
 
 import (
 	"context"
+	"go.dtapp.net/dorm"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
+	"go.dtapp.net/gojobs/jobs_mongo_model"
 	"go.dtapp.net/gotime"
 	"go.dtapp.net/gotrace_id"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Run 运行
@@ -29,6 +32,24 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 		SdkVersion:      c.config.sdkVersion,
 		SystemOutsideIp: c.config.systemOutsideIp,
 	})
+	if c.mongoConfig.stats {
+		c.mongoClient.Database(c.mongoConfig.databaseName).Collection(jobs_mongo_model.TaskLog{}.CollectionName()).InsertOne(ctx, jobs_mongo_model.TaskLog{
+			LogId:           primitive.NewObjectID(),
+			LogTime:         primitive.NewDateTimeFromTime(gotime.Current().Time),
+			TaskId:          task.Id,
+			TaskRunId:       runId,
+			TaskResultCode:  taskResultCode,
+			TaskResultDesc:  taskResultDesc,
+			TaskResultTime:  dorm.NewBsonTimeCurrent(),
+			SystemHostName:  c.config.systemHostName,
+			SystemInsideIp:  c.config.systemInsideIp,
+			SystemOs:        c.config.systemOs,
+			SystemArch:      c.config.systemArch,
+			GoVersion:       c.config.goVersion,
+			SdkVersion:      c.config.sdkVersion,
+			SystemOutsideIp: c.config.systemOutsideIp,
+		})
+	}
 
 	switch taskResultCode {
 	case 0:

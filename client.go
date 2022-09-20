@@ -5,7 +5,6 @@ import (
 	"go.dtapp.net/dorm"
 	"go.dtapp.net/goip"
 	"go.dtapp.net/golog"
-	"log"
 )
 
 // 前缀
@@ -18,6 +17,7 @@ type redisPrefixFun func() (lockKeyPrefix, lockKeySeparator, cornKeyPrefix, corn
 // ClientConfig 实例配置
 type ClientConfig struct {
 	GormClientFun  dorm.GormClientFun  // 数据库驱动
+	MongoClientFun dorm.MongoClientFun // 数据库驱动
 	RedisClientFun dorm.RedisClientFun // 数据库驱动
 	RedisPrefixFun redisPrefixFun      // 前缀
 	Debug          bool                // 日志开关
@@ -28,9 +28,10 @@ type ClientConfig struct {
 
 // Client 实例
 type Client struct {
-	gormClient *dorm.GormClient // 数据库
-	zapLog     *golog.ZapLog    // 日志服务
-	config     struct {
+	gormClient  *dorm.GormClient  // 数据库
+	mongoClient *dorm.MongoClient // 数据库
+	zapLog      *golog.ZapLog     // 日志服务
+	config      struct {
 		systemHostName  string // 主机名
 		systemInsideIp  string // 内网ip
 		systemOs        string // 系统类型
@@ -48,6 +49,10 @@ type Client struct {
 		lockKeySeparator string                // 锁Key分隔符 :
 		cornKeyPrefix    string                // 任务Key前缀 xxx_cron
 		cornKeyCustom    string                // 任务Key自定义
+	}
+	mongoConfig struct {
+		stats        bool   // 状态
+		databaseName string // 库名
 	}
 }
 
@@ -76,10 +81,6 @@ func NewClient(config *ClientConfig) (*Client, error) {
 		return nil, currentIpNoConfig
 	}
 
-	if c.config.debug {
-		log.Printf("[gojobs]配置外网ip成功：%+v\n", c.config.systemOutsideIp)
-	}
-
 	// 配置缓存
 	redisClient := config.RedisClientFun()
 	if redisClient != nil && redisClient.Db != nil {
@@ -89,26 +90,14 @@ func NewClient(config *ClientConfig) (*Client, error) {
 		return nil, redisPrefixFunNoConfig
 	}
 
-	if c.config.debug {
-		log.Printf("[gojobs]配置缓存成功：%+v\n", c.cache)
-	}
-
 	// 配置缓存前缀
 	c.cache.lockKeyPrefix, c.cache.lockKeySeparator, c.cache.cornKeyPrefix, c.cache.cornKeyCustom = config.RedisPrefixFun()
 	if c.cache.lockKeyPrefix == "" || c.cache.lockKeySeparator == "" || c.cache.cornKeyPrefix == "" || c.cache.cornKeyCustom == "" {
 		return nil, redisPrefixFunNoConfig
 	}
 
-	if c.config.debug {
-		log.Printf("[gojobs]配置缓存前缀成功：%+v\n", c.cache)
-	}
-
 	// 配置信息
 	c.setConfig(ctx)
-
-	if c.config.debug {
-		log.Printf("[gojobs]配置信息成功：%+v\n", c.config)
-	}
 
 	// 配置关系数据库
 	gormClient := config.GormClientFun()
@@ -121,8 +110,21 @@ func NewClient(config *ClientConfig) (*Client, error) {
 		return nil, gormClientFunNoConfig
 	}
 
-	if c.config.debug {
-		log.Printf("[gojobs]创建实例成功：%+v\n", c)
+	// 配置非关系数据库
+	mongoClient, databaseName := config.MongoClientFun()
+	if mongoClient != nil && mongoClient.Db != nil {
+		c.mongoClient = mongoClient
+
+		if databaseName == "" {
+			return nil, mongoClientFunNoConfig
+		} else {
+			c.mongoConfig.databaseName = databaseName
+		}
+
+		c.mongoCreateCollectionTaskLog(ctx)
+		c.mongoCreateIndexesTaskLog(ctx)
+
+		c.mongoConfig.stats = true
 	}
 
 	return c, nil

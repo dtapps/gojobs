@@ -2,12 +2,18 @@ package gojobs
 
 import (
 	"github.com/go-redis/redis/v9"
+	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 )
 
 // GetDb 获取数据库驱动
 func (c *Client) GetDb() *gorm.DB {
 	return c.gormClient.Db
+}
+
+// GetMongoDb 获取数据库驱动
+func (c *Client) GetMongoDb() *mongo.Client {
+	return c.mongoClient.Db
 }
 
 // GetRedis 获取缓存数据库驱动
