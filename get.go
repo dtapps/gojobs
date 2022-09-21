@@ -8,17 +8,17 @@ import (
 
 // GetDb 获取数据库驱动
 func (c *Client) GetDb() *gorm.DB {
-	return c.gormClient.Db
+	return c.gormClient.GetDb()
 }
 
 // GetMongoDb 获取数据库驱动
 func (c *Client) GetMongoDb() *mongo.Client {
-	return c.mongoClient.Db
+	return c.mongoClient.GetDb()
 }
 
 // GetRedis 获取缓存数据库驱动
 func (c *Client) GetRedis() *redis.Client {
-	return c.cache.redisClient.Db
+	return c.cache.redisClient.GetDb()
 }
 
 // GetCurrentIp 获取当前ip

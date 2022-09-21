@@ -13,7 +13,7 @@ import (
 
 // 创建模型
 func (c *Client) autoMigrateTask(ctx context.Context) {
-	err := c.gormClient.Db.AutoMigrate(&jobs_gorm_model.Task{})
+	err := c.gormClient.GetDb().AutoMigrate(&jobs_gorm_model.Task{})
 	if err != nil {
 		c.zapLog.WithTraceId(ctx).Sugar().Errorf("创建模型：%s", err)
 	}
@@ -21,7 +21,7 @@ func (c *Client) autoMigrateTask(ctx context.Context) {
 
 // 创建模型
 func (c *Client) autoMigrateTaskLog(ctx context.Context) {
-	err := c.gormClient.Db.AutoMigrate(&jobs_gorm_model.TaskLog{})
+	err := c.gormClient.GetDb().AutoMigrate(&jobs_gorm_model.TaskLog{})
 	if err != nil {
 		c.zapLog.WithTraceId(ctx).Sugar().Errorf("创建模型：%s", err)
 	}
@@ -29,13 +29,13 @@ func (c *Client) autoMigrateTaskLog(ctx context.Context) {
 
 // GormTaskLogDelete 删除
 func (c *Client) GormTaskLogDelete(ctx context.Context, hour int64) error {
-	return c.gormClient.Db.Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
+	return c.gormClient.GetDb().Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
 }
 
 // MongoTaskLogDelete 删除
 func (c *Client) MongoTaskLogDelete(ctx context.Context, hour int64) (*mongo.DeleteResult, error) {
 	filter := bson.D{{"log_time", bson.D{{"$lt", primitive.NewDateTimeFromTime(gotime.Current().BeforeHour(hour).Time)}}}}
-	return c.mongoClient.Db.Database(c.mongoConfig.databaseName).Collection(jobs_mongo_model.TaskLog{}.CollectionName()).DeleteMany(ctx, filter)
+	return c.mongoClient.Database(c.mongoConfig.databaseName).Collection(jobs_mongo_model.TaskLog{}.CollectionName()).DeleteMany(ctx, filter)
 }
 
 // 创建时间序列集合
@@ -48,7 +48,7 @@ func (c *Client) mongoCreateCollectionTaskLog(ctx context.Context) {
 
 // 创建索引
 func (c *Client) mongoCreateIndexesTaskLog(ctx context.Context) {
-	indexes, err := c.mongoClient.Database(c.mongoConfig.databaseName).Collection(jobs_mongo_model.TaskLog{}.CollectionName()).CreateManyIndexes(ctx, []mongo.IndexModel{{
+	_, err := c.mongoClient.Database(c.mongoConfig.databaseName).Collection(jobs_mongo_model.TaskLog{}.CollectionName()).CreateManyIndexes(ctx, []mongo.IndexModel{{
 		Keys: bson.D{{
 			Key:   "log_time",
 			Value: -1,
@@ -57,5 +57,4 @@ func (c *Client) mongoCreateIndexesTaskLog(ctx context.Context) {
 	if err != nil {
 		c.zapLog.WithTraceId(ctx).Sugar().Errorf("创建索引：%s", err)
 	}
-	c.zapLog.WithTraceId(ctx).Sugar().Infof("创建索引：%s", indexes)
 }

@@ -83,7 +83,7 @@ func NewClient(config *ClientConfig) (*Client, error) {
 
 	// 配置缓存
 	redisClient := config.RedisClientFun()
-	if redisClient != nil && redisClient.Db != nil {
+	if redisClient != nil && redisClient.GetDb() != nil {
 		c.cache.redisClient = redisClient
 		c.cache.redisLockClient = c.cache.redisClient.NewLock()
 	} else {
@@ -101,7 +101,7 @@ func NewClient(config *ClientConfig) (*Client, error) {
 
 	// 配置关系数据库
 	gormClient := config.GormClientFun()
-	if gormClient != nil && gormClient.Db != nil {
+	if gormClient != nil && gormClient.GetDb() != nil {
 		c.gormClient = gormClient
 
 		c.autoMigrateTask(ctx)
@@ -112,7 +112,7 @@ func NewClient(config *ClientConfig) (*Client, error) {
 
 	// 配置非关系数据库
 	mongoClient, databaseName := config.MongoClientFun()
-	if mongoClient != nil && mongoClient.Db != nil {
+	if mongoClient != nil && mongoClient.GetDb() != nil {
 		c.mongoClient = mongoClient
 
 		if databaseName == "" {
