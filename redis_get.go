@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go.dtapp.net/goip"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gostring"
 	"math/rand"
@@ -21,6 +22,10 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_
 		currentIp       = ""    // 当前Ip
 		appointIpStatus = false // 指定Ip状态
 	)
+
+	if v.SpecifyIp != "" {
+		v.SpecifyIp = goip.IsIp(v.SpecifyIp)
+	}
 
 	// 赋值ip
 	if v.SpecifyIp != "" && v.SpecifyIp != SpecifyIpNull {
