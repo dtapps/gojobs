@@ -62,7 +62,7 @@ type ConfigCreateInCustomIdOnly struct {
 
 // CreateInCustomIdOnly 创建正在运行唯一任务
 func (c *Client) CreateInCustomIdOnly(ctx context.Context, config *ConfigCreateInCustomIdOnly) error {
-	query := c.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
+	query := c.TaskTypeTakeIn(ctx, config.Tx, config.CustomId, config.Type)
 	if query.Id != 0 {
 		return TaskIsExist
 	}
@@ -145,7 +145,7 @@ type ConfigCreateInCustomIdMaxNumberOnly struct {
 
 // CreateInCustomIdMaxNumberOnly 创建正在运行唯一任务并限制数量
 func (c *Client) CreateInCustomIdMaxNumberOnly(ctx context.Context, config *ConfigCreateInCustomIdMaxNumberOnly) error {
-	query := c.TaskTypeTakeIn(config.Tx, config.CustomId, config.Type)
+	query := c.TaskTypeTakeIn(ctx, config.Tx, config.CustomId, config.Type)
 	if query.Id != 0 {
 		return TaskIsExist
 	}

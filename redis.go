@@ -11,8 +11,8 @@ import (
 // message 消息
 func (c *Client) Publish(ctx context.Context, channel string, message interface{}) error {
 	publish, err := c.cache.redisClient.Publish(ctx, channel, message).Result()
-	if c.config.debug == true {
-		c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs.Publish] %s %s %v %s\n", channel, message, publish, err)
+	if err != nil {
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]发布失败 %s %s %v %s\n", channel, message, publish, err)
 	}
 	return err
 }

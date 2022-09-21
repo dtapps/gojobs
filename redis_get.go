@@ -30,10 +30,10 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_
 
 	// 只有一个客户端在线
 	if len(workers) == 1 {
-		if appointIpStatus == true {
+		if appointIpStatus {
 			// 判断是否指定某ip执行
-			if gostring.Contains(workers[0], currentIp) == true {
-				c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs.GetIssueAddress]只有一个客户端在线，指定某ip执行：", workers[0], currentIp)
+			if gostring.Contains(workers[0], currentIp) {
+				c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs]只有一个客户端在线，指定某ip执行：", workers[0], currentIp)
 				return workers[0], nil
 			}
 			return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
@@ -42,10 +42,10 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_
 	}
 
 	// 优先处理指定某ip执行
-	if appointIpStatus == true {
+	if appointIpStatus {
 		for wk, wv := range workers {
-			if gostring.Contains(wv, currentIp) == true {
-				c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs.GetIssueAddress]优先处理指定某ip执行：", workers[wk], currentIp)
+			if gostring.Contains(wv, currentIp) {
+				c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs]优先处理指定某ip执行：", workers[wk], currentIp)
 				return workers[wk], nil
 			}
 		}
@@ -56,7 +56,7 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_
 		if address == "" {
 			return address, errors.New("获取执行的客户端异常")
 		}
-		c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs.GetIssueAddress]随机返回一个：", address, currentIp)
+		c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs]随机返回一个：", address, currentIp)
 		return address, nil
 	}
 }
@@ -64,12 +64,11 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_
 // GetSubscribeClientList 获取在线的客户端
 func (c *Client) GetSubscribeClientList(ctx context.Context) (client []string, err error) {
 
-	if c.config.debug == true {
-		c.zapLog.WithTraceId(ctx).Sugar().Info("[jobs.GetSubscribeClientList]：", c.cache.cornKeyPrefix+"_*")
-	}
-
 	// 查询活跃的channel
 	client, err = c.cache.redisClient.PubSubChannels(ctx, c.cache.cornKeyPrefix+"_*").Result()
+	if err != nil {
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]获取在线的客户端失败：%s，%v", c.cache.cornKeyPrefix+"_*", err)
+	}
 
 	return client, err
 }

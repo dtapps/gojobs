@@ -39,8 +39,6 @@ type Client struct {
 		goVersion       string // go版本
 		sdkVersion      string // sdk版本
 		systemOutsideIp string // 外网ip
-		debug           bool   // 日志开关
-		jsonStatus      bool   // json状态
 	}
 	cache struct {
 		redisClient      *dorm.RedisClient     // 数据库
@@ -64,10 +62,6 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	c := &Client{}
 
 	c.zapLog = config.ZapLog
-
-	c.config.debug = config.Debug
-
-	c.config.jsonStatus = config.JsonStatus
 
 	// 配置外网ip
 	if config.CurrentIp == "" {
