@@ -3,7 +3,6 @@ package gojobs
 import (
 	"context"
 	"go.dtapp.net/dorm"
-	"go.dtapp.net/goip"
 	"go.dtapp.net/golog"
 )
 
@@ -20,10 +19,8 @@ type ClientConfig struct {
 	MongoClientFun dorm.MongoClientFun // 数据库驱动
 	RedisClientFun dorm.RedisClientFun // 数据库驱动
 	RedisPrefixFun redisPrefixFun      // 前缀
-	Debug          bool                // 日志开关
 	ZapLog         *golog.ZapLog       // 日志服务
 	CurrentIp      string              // 当前ip
-	JsonStatus     bool                // json状态
 }
 
 // Client 实例
@@ -63,10 +60,6 @@ func NewClient(config *ClientConfig) (*Client, error) {
 
 	c.zapLog = config.ZapLog
 
-	// 配置外网ip
-	if config.CurrentIp == "" {
-		config.CurrentIp = goip.GetOutsideIp(ctx)
-	}
 	if config.CurrentIp != "" && config.CurrentIp != "0.0.0.0" {
 		c.config.systemOutsideIp = config.CurrentIp
 	}

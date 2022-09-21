@@ -7,8 +7,8 @@ require (
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
 	go.dtapp.net/dorm v1.0.42
-	go.dtapp.net/goip v1.0.37
-	go.dtapp.net/golog v1.0.90
+	go.dtapp.net/goip v1.0.38
+	go.dtapp.net/golog v1.0.92
 	go.dtapp.net/gostring v1.0.10
 	go.dtapp.net/gotime v1.0.5
 	go.dtapp.net/gotrace_id v1.0.6

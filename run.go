@@ -15,7 +15,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 
 	runId := gotrace_id.GetTraceIdContext(ctx)
 	if runId == "" {
-		c.zapLog.WithTraceId(ctx).Sugar().Error("[jobs]上下文没有跟踪编号")
+		c.zapLog.WithTraceId(ctx).Sugar().Error("上下文没有跟踪编号")
 		return
 	}
 
@@ -61,7 +61,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 				NextRunTime: gotime.Current().AfterSeconds(task.Frequency).Time,
 			}).Error
 		if err != nil {
-			c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]保存失败：%s", err.Error())
+			c.zapLog.WithTraceId(ctx).Sugar().Errorf("保存失败：%s", err.Error())
 		}
 		return
 	case CodeSuccess:
@@ -77,7 +77,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 				NextRunTime: gotime.Current().AfterSeconds(task.Frequency).Time,
 			}).Error
 		if err != nil {
-			c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]保存失败：%s", err.Error())
+			c.zapLog.WithTraceId(ctx).Sugar().Errorf("保存失败：%s", err.Error())
 		}
 	case CodeEnd:
 		// 执行成功、提前结束
@@ -92,7 +92,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 				NextRunTime: gotime.Current().Time,
 			}).Error
 		if err != nil {
-			c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]保存失败：%s", err.Error())
+			c.zapLog.WithTraceId(ctx).Sugar().Errorf("保存失败：%s", err.Error())
 		}
 	case CodeError:
 		// 执行失败
@@ -107,7 +107,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 				NextRunTime: gotime.Current().AfterSeconds(task.Frequency).Time,
 			}).Error
 		if err != nil {
-			c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]保存失败：%s", err.Error())
+			c.zapLog.WithTraceId(ctx).Sugar().Errorf("保存失败：%s", err.Error())
 		}
 	}
 
@@ -120,7 +120,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 					Status: TASK_TIMEOUT,
 				}).Error
 			if err != nil {
-				c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]保存失败：%s", err.Error())
+				c.zapLog.WithTraceId(ctx).Sugar().Errorf("保存失败：%s", err.Error())
 			}
 		}
 	}

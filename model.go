@@ -29,7 +29,11 @@ func (c *Client) autoMigrateTaskLog(ctx context.Context) {
 
 // GormTaskLogDelete 删除
 func (c *Client) GormTaskLogDelete(ctx context.Context, hour int64) error {
-	return c.gormClient.GetDb().Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
+	err := c.gormClient.GetDb().Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
+	if err != nil {
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("删除失败：%s", err)
+	}
+	return err
 }
 
 // MongoTaskLogDelete 删除

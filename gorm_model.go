@@ -10,7 +10,7 @@ import (
 func (c *Client) TaskTakeId(ctx context.Context, tx *gorm.DB, id uint) (result jobs_gorm_model.Task) {
 	err := tx.Where("id = ?", id).Take(&result).Error
 	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]编号查询任务：%v", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("编号查询任务：%v", err)
 	}
 	return result
 }
@@ -19,7 +19,7 @@ func (c *Client) TaskTakeId(ctx context.Context, tx *gorm.DB, id uint) (result j
 func (c *Client) TaskTake(ctx context.Context, tx *gorm.DB, customId string) (result jobs_gorm_model.Task) {
 	err := tx.Where("custom_id = ?", customId).Take(&result).Error
 	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]自定义编号查询任务：%v", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("自定义编号查询任务：%v", err)
 	}
 	return result
 }
@@ -28,7 +28,7 @@ func (c *Client) TaskTake(ctx context.Context, tx *gorm.DB, customId string) (re
 func (c *Client) taskTake(ctx context.Context, tx *gorm.DB, customId, status string) (result jobs_gorm_model.Task) {
 	err := tx.Where("custom_id = ?", customId).Where("status = ?", status).Take(&result).Error
 	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]自定义编号加状态查询任务：%v", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("自定义编号加状态查询任务：%v", err)
 	}
 	return result
 }
@@ -62,7 +62,7 @@ func (c *Client) TaskTakeWait(ctx context.Context, tx *gorm.DB, customId string)
 func (c *Client) TaskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type string) (result jobs_gorm_model.Task) {
 	err := tx.Where("custom_id = ?", customId).Where("type = ?", Type).Take(&result).Error
 	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]查询单任务：%v", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("查询单任务：%v", err)
 	}
 	return result
 }
@@ -71,7 +71,7 @@ func (c *Client) TaskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type s
 func (c *Client) taskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type, status string) (result jobs_gorm_model.Task) {
 	err := tx.Where("custom_id = ?", customId).Where("type = ?", Type).Where("status = ?", status).Take(&result).Error
 	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]查询单任务：%v", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("查询单任务：%v", err)
 	}
 	return result
 }
@@ -105,7 +105,7 @@ func (c *Client) TaskTypeTakeWait(ctx context.Context, tx *gorm.DB, customId, Ty
 func (c *Client) TaskFindAll(ctx context.Context, tx *gorm.DB, frequency int64) (results []jobs_gorm_model.Task) {
 	err := tx.Where("frequency = ?", frequency).Order("id asc").Find(&results).Error
 	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]查询多任务：%v", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("查询多任务：%v", err)
 	}
 	return results
 }
@@ -114,7 +114,7 @@ func (c *Client) TaskFindAll(ctx context.Context, tx *gorm.DB, frequency int64) 
 func (c *Client) taskFindAll(ctx context.Context, tx *gorm.DB, frequency int64, status string) (results []jobs_gorm_model.Task) {
 	err := tx.Where("frequency = ?", frequency).Where("status = ?", status).Order("id asc").Find(&results).Error
 	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]查询多任务：%v", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("查询多任务：%v", err)
 	}
 	return results
 }
@@ -153,7 +153,7 @@ func (c *Client) StartTask(ctx context.Context, tx *gorm.DB, id uint) error {
 			StatusDesc: "启动任务",
 		}).Error
 	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]任务启动失败：%v", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("任务启动失败：%v", err)
 	}
 	return err
 }
@@ -170,7 +170,7 @@ func (c *Client) StartTaskCustom(ctx context.Context, tx *gorm.DB, customId stri
 			StatusDesc: "启动任务",
 		}).Error
 	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]任务启动自定义失败：%v", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("任务启动自定义失败：%v", err)
 	}
 	return err
 }
@@ -188,7 +188,7 @@ func (c *Client) UpdateFrequency(ctx context.Context, tx *gorm.DB, id uint, freq
 			Frequency: frequency,
 		}).Error
 	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("[jobs]更新任务频率失败：%v", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("更新任务频率失败：%v", err)
 	}
 	return err
 }
