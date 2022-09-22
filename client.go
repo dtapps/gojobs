@@ -108,8 +108,8 @@ func NewClient(config *ClientConfig) (*Client, error) {
 			c.mongoConfig.databaseName = databaseName
 		}
 
-		c.mongoCreateCollectionTaskLog(ctx)
-		c.mongoCreateIndexesTaskLog(ctx)
+		TaskLog{}.createCollection(ctx, c.zapLog, c.mongoClient, c.mongoConfig.databaseName)
+		TaskLog{}.createIndexes(ctx, c.zapLog, c.mongoClient, c.mongoConfig.databaseName)
 
 		c.mongoConfig.stats = true
 	}

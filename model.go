@@ -4,10 +4,7 @@ import (
 	"context"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gotime"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.dtapp.net/gotrace_id"
 )
 
 // 创建模型
@@ -35,29 +32,35 @@ func (c *Client) GormTaskLogDelete(ctx context.Context, hour int64) error {
 	return err
 }
 
-// MongoTaskLogDelete 删除
-func (c *Client) MongoTaskLogDelete(ctx context.Context, hour int64) (*mongo.DeleteResult, error) {
-	filter := bson.D{{"log_time", bson.D{{"$lt", primitive.NewDateTimeFromTime(gotime.Current().BeforeHour(hour).Time)}}}}
-	return c.mongoClient.Database(c.mongoConfig.databaseName).Collection(TaskLog{}.CollectionName()).DeleteMany(ctx, filter)
-}
-
-// 创建时间序列集合
-func (c *Client) mongoCreateCollectionTaskLog(ctx context.Context) {
-	err := c.mongoClient.Database(c.mongoConfig.databaseName).CreateCollection(ctx, TaskLog{}.CollectionName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("log_time")))
-	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("创建时间序列集合：%s", err)
+// TaskLogRecord 记录
+func (c *Client) TaskLogRecord(ctx context.Context, task jobs_gorm_model.Task, taskResultCode int, taskResultDesc string) {
+	runId := gotrace_id.GetTraceIdContext(ctx)
+	c.GormTaskLogRecord(ctx, task, runId, taskResultCode, taskResultDesc)
+	if c.mongoConfig.stats {
+		c.MongoTaskLogRecord(ctx, task, runId, taskResultCode, taskResultDesc)
 	}
 }
 
-// 创建索引
-func (c *Client) mongoCreateIndexesTaskLog(ctx context.Context) {
-	_, err := c.mongoClient.Database(c.mongoConfig.databaseName).Collection(TaskLog{}.CollectionName()).CreateManyIndexes(ctx, []mongo.IndexModel{{
-		Keys: bson.D{{
-			Key:   "log_time",
-			Value: -1,
-		}},
-	}})
-	if err != nil {
-		c.zapLog.WithTraceId(ctx).Sugar().Errorf("创建索引：%s", err)
+// GormTaskLogRecord 记录
+func (c *Client) GormTaskLogRecord(ctx context.Context, task jobs_gorm_model.Task, runId string, taskResultCode int, taskResultDesc string) {
+
+	taskLog := jobs_gorm_model.TaskLog{
+		TaskId:          task.Id,
+		TaskRunId:       runId,
+		TaskResultCode:  taskResultCode,
+		TaskResultDesc:  taskResultDesc,
+		SystemHostName:  c.config.systemHostName,
+		SystemInsideIp:  c.config.systemInsideIp,
+		SystemOs:        c.config.systemOs,
+		SystemArch:      c.config.systemArch,
+		GoVersion:       c.config.goVersion,
+		SdkVersion:      c.config.sdkVersion,
+		SystemOutsideIp: c.config.systemOutsideIp,
 	}
+	err := c.gormClient.GetDb().Create(&taskLog).Error
+	if err != nil {
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("记录失败：%s", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("记录数据：%+v", taskLog)
+	}
+
 }

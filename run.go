@@ -2,11 +2,9 @@ package gojobs
 
 import (
 	"context"
-	"go.dtapp.net/dorm"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gotime"
 	"go.dtapp.net/gotrace_id"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Run 运行
@@ -18,42 +16,9 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 		return
 	}
 
-	c.gormClient.GetDb().Create(&jobs_gorm_model.TaskLog{
-		TaskId:          task.Id,
-		TaskRunId:       runId,
-		TaskResultCode:  taskResultCode,
-		TaskResultDesc:  taskResultDesc,
-		SystemHostName:  c.config.systemHostName,
-		SystemInsideIp:  c.config.systemInsideIp,
-		SystemOs:        c.config.systemOs,
-		SystemArch:      c.config.systemArch,
-		GoVersion:       c.config.goVersion,
-		SdkVersion:      c.config.sdkVersion,
-		SystemOutsideIp: c.config.systemOutsideIp,
-	})
+	c.GormTaskLogRecord(ctx, task, runId, taskResultCode, taskResultDesc)
 	if c.mongoConfig.stats {
-
-		taskLog := TaskLog{
-			LogId:   primitive.NewObjectID(),
-			LogTime: primitive.NewDateTimeFromTime(gotime.Current().Time),
-		}
-
-		taskLog.Task.Id = task.Id
-		taskLog.Task.RunId = runId
-		taskLog.Task.ResultCode = taskResultCode
-		taskLog.Task.ResultDesc = taskResultDesc
-		taskLog.Task.ResultTime = dorm.NewBsonTimeCurrent()
-
-		taskLog.System.HostName = c.config.systemHostName
-		taskLog.System.InsideIp = c.config.systemInsideIp
-		taskLog.System.OutsideIp = c.config.systemOutsideIp
-		taskLog.System.Os = c.config.systemOs
-		taskLog.System.Arch = c.config.systemArch
-
-		taskLog.Version.Go = c.config.goVersion
-		taskLog.Version.Sdk = c.config.sdkVersion
-
-		c.mongoClient.Database(c.mongoConfig.databaseName).Collection(TaskLog{}.CollectionName()).InsertOne(ctx, taskLog)
+		c.MongoTaskLogRecord(ctx, task, runId, taskResultCode, taskResultDesc)
 	}
 
 	switch taskResultCode {

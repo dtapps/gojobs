@@ -1,8 +1,15 @@
 package gojobs
 
 import (
+	"context"
 	"go.dtapp.net/dorm"
+	"go.dtapp.net/gojobs/jobs_gorm_model"
+	"go.dtapp.net/golog"
+	"go.dtapp.net/gotime"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // TaskLog 任务日志模型
@@ -31,4 +38,62 @@ type TaskLog struct {
 
 func (TaskLog) CollectionName() string {
 	return "task_log"
+}
+
+// 创建时间序列集合
+func (TaskLog) createCollection(ctx context.Context, zapLog *golog.ZapLog, db *dorm.MongoClient, databaseName string) {
+	err := db.Database(databaseName).CreateCollection(ctx, TaskLog{}.CollectionName(), options.CreateCollection().SetTimeSeriesOptions(options.TimeSeries().SetTimeField("log_time")))
+	if err != nil {
+		zapLog.WithTraceId(ctx).Sugar().Errorf("创建时间序列集合：%s", err)
+	}
+}
+
+// 创建索引
+func (TaskLog) createIndexes(ctx context.Context, zapLog *golog.ZapLog, db *dorm.MongoClient, databaseName string) {
+	_, err := db.Database(databaseName).Collection(TaskLog{}.CollectionName()).CreateManyIndexes(ctx, []mongo.IndexModel{{
+		Keys: bson.D{{
+			Key:   "log_time",
+			Value: -1,
+		}},
+	}})
+	if err != nil {
+		zapLog.WithTraceId(ctx).Sugar().Errorf("创建索引：%s", err)
+	}
+}
+
+// MongoTaskLogRecord 记录
+func (c *Client) MongoTaskLogRecord(ctx context.Context, task jobs_gorm_model.Task, runId string, taskResultCode int, taskResultDesc string) {
+
+	taskLog := TaskLog{
+		LogId:   primitive.NewObjectID(),
+		LogTime: primitive.NewDateTimeFromTime(gotime.Current().Time),
+	}
+
+	taskLog.Task.Id = task.Id
+	taskLog.Task.RunId = runId
+	taskLog.Task.ResultCode = taskResultCode
+	taskLog.Task.ResultDesc = taskResultDesc
+	taskLog.Task.ResultTime = dorm.NewBsonTimeCurrent()
+
+	taskLog.System.HostName = c.config.systemHostName
+	taskLog.System.InsideIp = c.config.systemInsideIp
+	taskLog.System.OutsideIp = c.config.systemOutsideIp
+	taskLog.System.Os = c.config.systemOs
+	taskLog.System.Arch = c.config.systemArch
+
+	taskLog.Version.Go = c.config.goVersion
+	taskLog.Version.Sdk = c.config.sdkVersion
+
+	_, err := c.mongoClient.Database(c.mongoConfig.databaseName).Collection(TaskLog{}.CollectionName()).InsertOne(ctx, taskLog)
+	if err != nil {
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("记录失败：%s", err)
+		c.zapLog.WithTraceId(ctx).Sugar().Errorf("记录数据：%+v", taskLog)
+	}
+
+}
+
+// MongoTaskLogDelete 删除
+func (c *Client) MongoTaskLogDelete(ctx context.Context, hour int64) (*mongo.DeleteResult, error) {
+	filter := bson.D{{"log_time", bson.D{{"$lt", primitive.NewDateTimeFromTime(gotime.Current().BeforeHour(hour).Time)}}}}
+	return c.mongoClient.Database(c.mongoConfig.databaseName).Collection(TaskLog{}.CollectionName()).DeleteMany(ctx, filter)
 }
