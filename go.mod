@@ -6,9 +6,10 @@ require (
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/shirou/gopsutil v3.21.11+incompatible
 	go.dtapp.net/dorm v1.0.42
 	go.dtapp.net/goip v1.0.38
-	go.dtapp.net/golog v1.0.94
+	go.dtapp.net/golog v1.0.96
 	go.dtapp.net/gostring v1.0.10
 	go.dtapp.net/gotime v1.0.5
 	go.dtapp.net/gotrace_id v1.0.6
@@ -24,6 +25,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.8.1 // indirect
+	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.11.1 // indirect
@@ -60,6 +62,8 @@ require (
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
+	github.com/tklauser/go-sysconf v0.3.10 // indirect
+	github.com/tklauser/numcpus v0.5.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
@@ -74,6 +78,7 @@ require (
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
+	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.dtapp.net/gorandom v1.0.1 // indirect
 	go.dtapp.net/gorequest v1.0.31 // indirect
 	go.dtapp.net/gourl v1.0.0 // indirect

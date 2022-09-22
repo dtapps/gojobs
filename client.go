@@ -29,13 +29,19 @@ type Client struct {
 	mongoClient *dorm.MongoClient // 数据库
 	zapLog      *golog.ZapLog     // 日志服务
 	config      struct {
-		systemHostName  string // 主机名
-		systemInsideIp  string // 内网ip
-		systemOs        string // 系统类型
-		systemArch      string // 系统架构
-		goVersion       string // go版本
-		sdkVersion      string // sdk版本
-		systemOutsideIp string // 外网ip
+		systemHostname      string  // 主机名
+		systemOs            string  // 系统类型
+		systemVersion       string  // 系统版本
+		systemKernel        string  // 系统内核
+		systemKernelVersion string  // 系统内核版本
+		systemBootTime      uint64  // 系统开机时间
+		cpuCores            int     // CPU核数
+		cpuModelName        string  // CPU型号名称
+		cpuMhz              float64 // CPU兆赫
+		systemInsideIp      string  // 内网ip
+		systemOutsideIp     string  // 外网ip
+		goVersion           string  // go版本
+		sdkVersion          string  // sdk版本
 	}
 	cache struct {
 		redisClient      *dorm.RedisClient     // 数据库

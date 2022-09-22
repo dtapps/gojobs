@@ -17,23 +17,27 @@ type TaskLog struct {
 	LogId   primitive.ObjectID `json:"log_id,omitempty" bson:"_id,omitempty"` //【记录】编号
 	LogTime primitive.DateTime `json:"log_time,omitempty" bson:"log_time"`    //【记录】时间
 	Task    struct {
-		Id         uint          `json:"id,omitempty" bson:"id,omitempty"`                   //【任务】编号
-		RunId      string        `json:"run_id,omitempty" bson:"run_id,omitempty"`           //【任务】执行编号
-		ResultCode int           `json:"result_code,omitempty" bson:"result_code,omitempty"` //【任务】执行状态码
-		ResultDesc string        `json:"result_desc,omitempty" bson:"result_desc,omitempty"` //【任务】执行结果
-		ResultTime dorm.BsonTime `json:"result_time,omitempty" bson:"result_time,omitempty"` //【任务】执行时间
-	} `json:"task,omitempty" bson:"task,omitempty"` //【任务】信息
+		Id         uint          `json:"id" bson:"id"`                   //【任务】编号
+		RunId      string        `json:"run_id" bson:"run_id"`           //【任务】执行编号
+		ResultCode int           `json:"result_code" bson:"result_code"` //【任务】执行状态码
+		ResultDesc string        `json:"result_desc" bson:"result_desc"` //【任务】执行结果
+		ResultTime dorm.BsonTime `json:"result_time" bson:"result_time"` //【任务】执行时间
+	} `json:"task" bson:"task"` //【任务】信息
 	System struct {
-		HostName  string `json:"host_name,omitempty" bson:"host_name,omitempty"`   //【系统】主机名
-		InsideIp  string `json:"inside_ip,omitempty" bson:"inside_ip,omitempty"`   //【系统】内网ip
-		OutsideIp string `json:"outside_ip,omitempty" bson:"outside_ip,omitempty"` //【系统】外网ip
-		Os        string `json:"os,omitempty" bson:"os,omitempty"`                 //【系统】系统类型
-		Arch      string `json:"arch,omitempty" bson:"arch,omitempty"`             //【系统】系统架构
-	} `json:"system,omitempty" bson:"system,omitempty"` //【系统】信息
-	Version struct {
-		Go  string `json:"go,omitempty" bson:"go,omitempty"`   //【程序】Go版本
-		Sdk string `json:"sdk,omitempty" bson:"sdk,omitempty"` //【程序】Sdk版本
-	} `json:"version,omitempty" bson:"version,omitempty"` //【程序】版本信息
+		Hostname      string        `json:"hostname" bson:"hostname"`                                 //【系统】主机名
+		Os            string        `json:"os" bson:"os"`                                             //【系统】系统类型
+		Version       string        `json:"version" bson:"version"`                                   //【系统】系统版本
+		Kernel        string        `json:"kernel" bson:"kernel"`                                     //【系统】系统内核
+		KernelVersion string        `json:"kernel_version" bson:"kernel_version"`                     //【系统】系统内核版本
+		BootTime      dorm.BsonTime `json:"boot_time" bson:"boot_time"`                               //【系统】系统开机时间
+		CpuCores      int           `json:"cpu_cores,omitempty" bson:"cpu_cores,omitempty"`           //【系统】CPU核数
+		CpuModelName  string        `json:"cpu_model_name,omitempty" bson:"cpu_model_name,omitempty"` //【系统】CPU型号名称
+		CpuMhz        float64       `json:"cpu_mhz,omitempty" bson:"cpu_mhz,omitempty"`               //【系统】CPU兆赫
+		InsideIp      string        `json:"inside_ip" bson:"inside_ip"`                               //【系统】内网ip
+		OutsideIp     string        `json:"outside_ip" bson:"outside_ip"`                             //【系统】外网ip
+		GoVersion     string        `json:"go_version" bson:"go_version"`                             //【系统】go版本
+		SdkVersion    string        `json:"sdk_version" bson:"sdk_version"`                           //【系统】sdk版本
+	} `json:"system" bson:"system"` //【系统】信息
 }
 
 func (TaskLog) CollectionName() string {
@@ -75,14 +79,19 @@ func (c *Client) MongoTaskLogRecord(ctx context.Context, task jobs_gorm_model.Ta
 	taskLog.Task.ResultDesc = taskResultDesc
 	taskLog.Task.ResultTime = dorm.NewBsonTimeCurrent()
 
-	taskLog.System.HostName = c.config.systemHostName
-	taskLog.System.InsideIp = c.config.systemInsideIp
-	taskLog.System.OutsideIp = c.config.systemOutsideIp
-	taskLog.System.Os = c.config.systemOs
-	taskLog.System.Arch = c.config.systemArch
-
-	taskLog.Version.Go = c.config.goVersion
-	taskLog.Version.Sdk = c.config.sdkVersion
+	taskLog.System.Hostname = c.config.systemHostname                                                              //【系统】主机名
+	taskLog.System.Os = c.config.systemOs                                                                          //【系统】系统类型
+	taskLog.System.Version = c.config.systemVersion                                                                //【系统】系统版本
+	taskLog.System.Kernel = c.config.systemKernel                                                                  //【系统】系统内核
+	taskLog.System.KernelVersion = c.config.systemKernelVersion                                                    //【系统】系统内核版本
+	taskLog.System.BootTime = dorm.NewBsonTimeFromTime(gotime.SetCurrentUnix(int64(c.config.systemBootTime)).Time) //【系统】系统开机时间
+	taskLog.System.CpuCores = c.config.cpuCores                                                                    //【系统】CPU核数
+	taskLog.System.CpuModelName = c.config.cpuModelName                                                            //【程序】CPU型号名称
+	taskLog.System.CpuMhz = c.config.cpuMhz                                                                        //【系统】CPU兆赫
+	taskLog.System.InsideIp = c.config.systemInsideIp                                                              //【系统】内网ip
+	taskLog.System.OutsideIp = c.config.systemOutsideIp                                                            //【系统】外网ip
+	taskLog.System.GoVersion = c.config.goVersion                                                                  //【系统】Go版本
+	taskLog.System.SdkVersion = c.config.sdkVersion                                                                //【系统】Sdk版本
 
 	_, err := c.mongoClient.Database(c.mongoConfig.databaseName).Collection(TaskLog{}.CollectionName()).InsertOne(ctx, taskLog)
 	if err != nil {
