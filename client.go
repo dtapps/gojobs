@@ -3,6 +3,7 @@ package gojobs
 import (
 	"context"
 	"go.dtapp.net/dorm"
+	"go.dtapp.net/goip"
 	"go.dtapp.net/golog"
 )
 
@@ -69,7 +70,7 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	if config.CurrentIp != "" && config.CurrentIp != "0.0.0.0" {
 		c.config.systemOutsideIp = config.CurrentIp
 	}
-
+	c.config.systemOutsideIp = goip.IsIp(c.config.systemOutsideIp)
 	if c.config.systemOutsideIp == "" {
 		return nil, currentIpNoConfig
 	}
