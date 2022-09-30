@@ -7,9 +7,9 @@ require (
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
-	go.dtapp.net/dorm v1.0.45
+	go.dtapp.net/dorm v1.0.50
 	go.dtapp.net/goip v1.0.38
-	go.dtapp.net/golog v1.0.99
+	go.dtapp.net/golog v1.0.100
 	go.dtapp.net/gostring v1.0.10
 	go.dtapp.net/gotime v1.0.5
 	go.dtapp.net/gotrace_id v1.0.6
@@ -44,7 +44,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.15.10 // indirect
+	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lib/pq v1.10.7 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
@@ -85,11 +85,11 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
-	golang.org/x/crypto v0.0.0-20220924013350-4ba4fb4dd9e7 // indirect
+	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20220923203811-8be639271d50 // indirect
-	golang.org/x/sync v0.0.0-20220923202941-7f9b1623fab7 // indirect
-	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
+	golang.org/x/net v0.0.0-20220927171203-f486391704dc // indirect
+	golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0 // indirect
+	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
