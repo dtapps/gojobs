@@ -3,18 +3,18 @@ module go.dtapp.net/gojobs
 go 1.19
 
 require (
-	github.com/go-redis/redis/v9 v9.0.0-beta.2
+	github.com/go-redis/redis/v9 v9.0.0-beta.3
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	go.dtapp.net/dorm v1.0.50
 	go.dtapp.net/goip v1.0.38
-	go.dtapp.net/golog v1.0.100
+	go.dtapp.net/golog v1.0.101
 	go.dtapp.net/gostring v1.0.10
 	go.dtapp.net/gotime v1.0.5
 	go.dtapp.net/gotrace_id v1.0.6
-	go.mongodb.org/mongo-driver v1.10.2
-	gorm.io/gorm v1.23.10
+	go.mongodb.org/mongo-driver v1.10.3
+	gorm.io/gorm v1.24.0
 )
 
 require (
@@ -85,16 +85,16 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
-	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be // indirect
+	golang.org/x/crypto v0.0.0-20221005025214-4161e89ecf1b // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20220927171203-f486391704dc // indirect
+	golang.org/x/net v0.0.0-20221004154528-8021a29435af // indirect
 	golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0 // indirect
-	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec // indirect
+	golang.org/x/sys v0.0.0-20221006211917-84dc82d7e875 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/driver/mysql v1.3.6 // indirect
-	gorm.io/driver/postgres v1.3.10 // indirect
+	gorm.io/driver/mysql v1.4.0 // indirect
+	gorm.io/driver/postgres v1.4.4 // indirect
 	mellium.im/sasl v0.3.0 // indirect
 	modernc.org/ccgo/v3 v3.16.8 // indirect
 	xorm.io/builder v0.3.12 // indirect

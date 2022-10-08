@@ -2,9 +2,12 @@ package gojobs
 
 import (
 	"context"
+	"github.com/go-redis/redis/v9"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/host"
 	"go.dtapp.net/goip"
+	"go.dtapp.net/golog"
+	"go.mongodb.org/mongo-driver/version"
 	"log"
 	"runtime"
 )
@@ -76,4 +79,10 @@ func (c *Client) setConfig(ctx context.Context) {
 
 	c.config.sdkVersion = Version
 	c.config.goVersion = runtime.Version()
+
+	c.config.mongoSdkVersion = version.Driver
+
+	c.config.redisSdkVersion = redis.Version()
+
+	c.config.logVersion = golog.Version
 }
