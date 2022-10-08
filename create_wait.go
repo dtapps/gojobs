@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gostring"
+	"go.dtapp.net/gotime"
 	"gorm.io/gorm"
 )
 
@@ -40,6 +41,7 @@ func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWai
 		CreatedIp:      config.CurrentIp,
 		SpecifyIp:      config.SpecifyIp,
 		UpdatedIp:      config.CurrentIp,
+		NextRunTime:    gotime.Current().AfterSeconds(config.Frequency).Time,
 	}).Error
 	if err != nil {
 		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err.Error()))

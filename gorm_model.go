@@ -3,6 +3,7 @@ package gojobs
 import (
 	"context"
 	"go.dtapp.net/gojobs/jobs_gorm_model"
+	"go.dtapp.net/gotime"
 	"gorm.io/gorm"
 )
 
@@ -183,9 +184,10 @@ func (c *Client) EditTask(tx *gorm.DB, id uint) *gorm.DB {
 // UpdateFrequency 更新任务频率
 func (c *Client) UpdateFrequency(ctx context.Context, tx *gorm.DB, id uint, frequency int64) error {
 	err := c.EditTask(tx, id).
-		Select("frequency").
+		Select("frequency", "next_run_time").
 		Updates(jobs_gorm_model.Task{
-			Frequency: frequency,
+			Frequency:   frequency,
+			NextRunTime: gotime.Current().AfterSeconds(frequency).Time,
 		}).Error
 	if err != nil {
 		c.zapLog.WithTraceId(ctx).Sugar().Errorf("更新任务频率失败：%v", err)

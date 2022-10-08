@@ -7,7 +7,7 @@ require (
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
-	go.dtapp.net/dorm v1.0.50
+	go.dtapp.net/dorm v1.0.51
 	go.dtapp.net/goip v1.0.38
 	go.dtapp.net/golog v1.0.101
 	go.dtapp.net/gostring v1.0.10
@@ -93,7 +93,7 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/driver/mysql v1.4.0 // indirect
+	gorm.io/driver/mysql v1.4.1 // indirect
 	gorm.io/driver/postgres v1.4.4 // indirect
 	mellium.im/sasl v0.3.0 // indirect
 	modernc.org/ccgo/v3 v3.16.8 // indirect
