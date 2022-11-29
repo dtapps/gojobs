@@ -9,7 +9,7 @@ require (
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	go.dtapp.net/dorm v1.0.54
 	go.dtapp.net/goip v1.0.39
-	go.dtapp.net/golog v1.0.101
+	go.dtapp.net/golog v1.0.102
 	go.dtapp.net/gostring v1.0.10
 	go.dtapp.net/gotime v1.0.5
 	go.dtapp.net/gotrace_id v1.0.6
@@ -77,7 +77,7 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.dtapp.net/gorandom v1.0.1 // indirect
-	go.dtapp.net/gorequest v1.0.35 // indirect
+	go.dtapp.net/gorequest v1.0.36 // indirect
 	go.dtapp.net/gourl v1.0.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
