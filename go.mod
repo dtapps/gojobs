@@ -4,7 +4,6 @@ go 1.19
 
 require (
 	github.com/go-redis/redis/v9 v9.0.0-rc.2
-	github.com/jasonlvhit/gocron v0.0.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	go.dtapp.net/dorm v1.0.54
@@ -92,7 +91,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/mysql v1.4.4 // indirect
 	gorm.io/driver/postgres v1.4.5 // indirect
-	mellium.im/sasl v0.3.0 // indirect
+	mellium.im/sasl v0.3.1 // indirect
 	modernc.org/ccgo/v3 v3.16.8 // indirect
 	xorm.io/builder v0.3.12 // indirect
 	xorm.io/xorm v1.3.2 // indirect
