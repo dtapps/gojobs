@@ -9,7 +9,7 @@ import (
 
 // 创建模型
 func (c *Client) autoMigrateTask(ctx context.Context) {
-	err := c.gormClient.GetDb().AutoMigrate(&jobs_gorm_model.Task{})
+	err := c.gormClient.AutoMigrate(&jobs_gorm_model.Task{})
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("创建模型：%s", err))

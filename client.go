@@ -2,9 +2,10 @@ package gojobs
 
 import (
 	"context"
-	"go.dtapp.net/dorm"
+	"github.com/redis/go-redis/v9"
 	"go.dtapp.net/goip"
 	"go.dtapp.net/golog"
+	"gorm.io/gorm"
 )
 
 // 前缀
@@ -16,26 +17,25 @@ type redisPrefixFun func() (lockKeyPrefix, lockKeySeparator, cornKeyPrefix, corn
 
 // ClientConfig 实例配置
 type ClientConfig struct {
-	GormClientFun  dorm.GormClientFun  // 数据库驱动
-	RedisClientFun dorm.RedisClientFun // 数据库驱动
-	RedisPrefixFun redisPrefixFun      // 前缀
-	CurrentIp      string              // 当前IP
+	GormClient     *gorm.DB       // 数据库驱动
+	RedisClient    *redis.Client  // 数据库驱动
+	RedisPrefixFun redisPrefixFun // 前缀
+	CurrentIp      string         // 当前IP
 }
 
 // Client 实例
 type Client struct {
-	gormClient *dorm.GormClient // 数据库
+	gormClient *gorm.DB // 数据库
 	config     struct {
 		systemInsideIp  string // 内网ip
 		systemOutsideIp string // 外网ip
 	}
 	cache struct {
-		redisClient      *dorm.RedisClient     // 数据库
-		redisLockClient  *dorm.RedisClientLock // 锁服务
-		lockKeyPrefix    string                // 锁Key前缀 xxx_lock
-		lockKeySeparator string                // 锁Key分隔符 :
-		cornKeyPrefix    string                // 任务Key前缀 xxx_cron
-		cornKeyCustom    string                // 任务Key自定义
+		redisClient      *redis.Client // 数据库
+		lockKeyPrefix    string        // 锁Key前缀 xxx_lock
+		lockKeySeparator string        // 锁Key分隔符 :
+		cornKeyPrefix    string        // 任务Key前缀 xxx_cron
+		cornKeyCustom    string        // 任务Key自定义
 	}
 	slog struct {
 		status bool        // 状态
@@ -64,10 +64,9 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	c.config.systemInsideIp = goip.GetInsideIp(ctx)
 
 	// 配置缓存
-	redisClient := config.RedisClientFun()
-	if redisClient != nil && redisClient.GetDb() != nil {
+	redisClient := config.RedisClient
+	if redisClient != nil {
 		c.cache.redisClient = redisClient
-		c.cache.redisLockClient = c.cache.redisClient.NewLock()
 	} else {
 		return nil, redisPrefixFunNoConfig
 	}
@@ -79,8 +78,8 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	}
 
 	// 配置关系数据库
-	gormClient := config.GormClientFun()
-	if gormClient != nil && gormClient.GetDb() != nil {
+	gormClient := config.GormClient
+	if gormClient != nil {
 		c.gormClient = gormClient
 
 		c.autoMigrateTask(ctx)

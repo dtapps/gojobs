@@ -4,7 +4,7 @@
 .idea
 .vscode
 *.log
-gomod.sh
+mod.sh
 grpc_build.sh
 *_test.go
 /vendor/
