@@ -6,5 +6,9 @@
 *.log
 mod.sh
 grpc_build.sh
-*_test.go
 /vendor/
+cron_spec_test.go
+jobs_test.go
+master_test.go
+redis_test.go
+worker_test.go
