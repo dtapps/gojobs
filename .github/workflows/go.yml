@@ -17,3 +17,13 @@ jobs:
         # 测试代码
       - name: Run Test
         run: go test -v .
+
+        # https://coveralls.io/
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@v2.2.3
+
+        # https://app.codecov.io/
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
