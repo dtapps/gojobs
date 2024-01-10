@@ -26,21 +26,21 @@ type ConfigCreateWaitCustomId struct {
 // CreateWaitCustomId 创建正在运行任务
 func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWaitCustomId) error {
 	if config.CurrentIp == "" {
-		config.CurrentIp = c.config.systemOutsideIp
+		config.CurrentIp = c.config.systemOutsideIP
 	}
 	err := config.Tx.Create(&jobs_gorm_model.Task{
 		Status:         TASK_WAIT,
 		Params:         config.Params,
 		StatusDesc:     "首次添加等待任务",
 		Frequency:      config.Frequency,
-		RunId:          gostring.GetUuId(),
-		CustomId:       config.CustomId,
+		RunID:          gostring.GetUuId(),
+		CustomID:       config.CustomId,
 		CustomSequence: config.CustomSequence,
 		Type:           config.Type,
 		TypeName:       config.TypeName,
-		CreatedIp:      config.CurrentIp,
-		SpecifyIp:      config.SpecifyIp,
-		UpdatedIp:      config.CurrentIp,
+		CreatedIP:      config.CurrentIp,
+		SpecifyIP:      config.SpecifyIp,
+		UpdatedIP:      config.CurrentIp,
 		NextRunTime:    gotime.Current().AfterSeconds(config.Frequency).Time,
 	}).Error
 	if err != nil {

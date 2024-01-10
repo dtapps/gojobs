@@ -12,7 +12,7 @@ type TaskLockOperation struct {
 }
 
 func (c *Client) NewLock(task jobs_gorm_model.Task) (*TaskLockOperation, error) {
-	if task.Id == 0 {
+	if task.ID == 0 {
 		return nil, errors.New("任务数据不正常")
 	}
 	return &TaskLockOperation{

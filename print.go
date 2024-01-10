@@ -1,9 +1,13 @@
 package gojobs
 
-import "log"
+import (
+	"context"
+)
 
-func (c *Client) Println(isPrint bool, v ...any) {
+func (c *Client) Println(ctx context.Context, isPrint bool, v ...any) {
 	if isPrint {
-		log.Println(v)
+		if c.slog.status {
+			c.slog.client.WithTraceId(ctx).Info("", v...)
+		}
 	}
 }

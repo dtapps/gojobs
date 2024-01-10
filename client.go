@@ -3,7 +3,6 @@ package gojobs
 import (
 	"context"
 	"github.com/redis/go-redis/v9"
-	"go.dtapp.net/goip"
 	"go.dtapp.net/golog"
 	"gorm.io/gorm"
 )
@@ -27,8 +26,22 @@ type ClientConfig struct {
 type Client struct {
 	gormClient *gorm.DB // 数据库
 	config     struct {
-		systemInsideIp  string // 内网ip
-		systemOutsideIp string // 外网ip
+		systemHostname      string  // 主机名
+		systemOs            string  // 系统类型
+		systemVersion       string  // 系统版本
+		systemKernel        string  // 系统内核
+		systemKernelVersion string  // 系统内核版本
+		systemUpTime        uint64  // 系统运行时间
+		systemBootTime      uint64  // 系统开机时间
+		cpuCores            int     // CPU核数
+		cpuModelName        string  // CPU型号名称
+		cpuMhz              float64 // CPU兆赫
+		systemInsideIP      string  // 内网IP
+		systemOutsideIP     string  // 外网IP
+		goVersion           string  // go版本
+		sdkVersion          string  // sdk版本
+		logVersion          string  // log版本
+		redisSdkVersion     string  // redis版本
 	}
 	cache struct {
 		redisClient      *redis.Client // 数据库
@@ -41,10 +54,6 @@ type Client struct {
 		status bool        // 状态
 		client *golog.SLog // 日志服务
 	}
-	runSlog struct {
-		status bool        // 状态
-		client *golog.SLog // 日志服务
-	}
 }
 
 // NewClient 创建实例
@@ -54,14 +63,9 @@ func NewClient(config *ClientConfig) (*Client, error) {
 
 	c := &Client{}
 
-	if config.CurrentIp != "" && config.CurrentIp != "0.0.0.0" {
-		c.config.systemOutsideIp = config.CurrentIp
-	}
-	c.config.systemOutsideIp = goip.IsIp(c.config.systemOutsideIp)
-	if c.config.systemOutsideIp == "" {
+	if config.CurrentIp == "" || config.CurrentIp == "0.0.0.0" {
 		return nil, currentIpNoConfig
 	}
-	c.config.systemInsideIp = goip.GetInsideIp(ctx)
 
 	// 配置缓存
 	redisClient := config.RedisClient
@@ -76,6 +80,9 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	if c.cache.lockKeyPrefix == "" || c.cache.lockKeySeparator == "" || c.cache.cornKeyPrefix == "" || c.cache.cornKeyCustom == "" {
 		return nil, redisPrefixFunNoConfig
 	}
+
+	// 配置信息
+	c.setConfig(ctx, config.CurrentIp)
 
 	// 配置关系数据库
 	gormClient := config.GormClient

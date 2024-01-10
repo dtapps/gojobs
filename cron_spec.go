@@ -15,20 +15,20 @@ const (
 // 每隔n秒执行一次
 const specSeconds = "*/%d * * * * *"
 
-// 每隔n秒执行一次
-type seconds struct {
+// Seconds 每隔n秒执行一次
+type Seconds struct {
 	n int64
 }
 
 // GetSeconds 每隔n秒执行一次
-func GetSeconds(n int64) *seconds {
-	s := seconds{}
+func GetSeconds(n int64) *Seconds {
+	s := Seconds{}
 	s.n = n
 	return &s
 }
 
 // Spec 每隔n秒执行一次
-func (s seconds) Spec() string {
+func (s Seconds) Spec() string {
 	if s.n < 0 || s.n > 59 {
 		return ""
 	}
@@ -36,7 +36,7 @@ func (s seconds) Spec() string {
 }
 
 // Frequency 每隔n秒执行一次
-func (s seconds) Frequency() int64 {
+func (s Seconds) Frequency() int64 {
 	if s.n < 0 || s.n > 59 {
 		return -1
 	}

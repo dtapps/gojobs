@@ -23,13 +23,13 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_
 		appointIpStatus = false // 指定Ip状态
 	)
 
-	if v.SpecifyIp != "" {
-		v.SpecifyIp = goip.IsIp(v.SpecifyIp)
+	if v.SpecifyIP != "" {
+		v.SpecifyIP = goip.IsIp(v.SpecifyIP)
 	}
 
 	// 赋值ip
-	if v.SpecifyIp != "" && v.SpecifyIp != SpecifyIpNull {
-		currentIp = v.SpecifyIp
+	if v.SpecifyIP != "" && v.SpecifyIP != SpecifyIpNull {
+		currentIp = v.SpecifyIP
 		appointIpStatus = true
 	}
 
