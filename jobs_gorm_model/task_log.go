@@ -10,7 +10,7 @@ type TaskLog struct {
 	TaskRunID       string    `gorm:"comment:【任务】执行编号" json:"task_run_id"`                                // 【任务】执行编号
 	TaskResultCode  int       `gorm:"index;comment:【任务】执行状态码" json:"task_result_code"`                    // 【任务】执行状态码
 	TaskResultDesc  string    `gorm:"comment:【任务】执行结果" json:"task_result_desc"`                           // 【任务】执行结果
-	SystemHostName  string    `gorm:"index;comment:【系统】主机名" json:"system_host_name,omitempty"`            //【系统】主机名
+	SystemHostName  string    `gorm:"comment:【系统】主机名" json:"system_host_name,omitempty"`                  //【系统】主机名
 	SystemInsideIP  string    `gorm:"default:0.0.0.0;comment:【系统】内网IP" json:"system_inside_ip,omitempty"` //【系统】内网IP
 	SystemOutsideIP string    `gorm:"default:0.0.0.0;comment:【系统】外网IP" json:"system_outside_ip"`          //【系统】外网IP
 	SystemOs        string    `gorm:"comment:【系统】类型" json:"system_os,omitempty"`                          //【系统】类型

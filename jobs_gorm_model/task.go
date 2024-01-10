@@ -14,9 +14,9 @@ type Task struct {
 	Frequency      int64          `gorm:"index;comment:频率(秒单位)" json:"frequency"`                 // 频率(秒单位)
 	Number         int64          `gorm:"comment:当前次数" json:"number"`                             // 当前次数
 	MaxNumber      int64          `gorm:"comment:最大次数" json:"max_number"`                         // 最大次数
-	RunID          string         `gorm:"index;comment:执行编号" json:"run_id"`                       // 执行编号
+	RunID          string         `gorm:"comment:执行编号" json:"run_id"`                             // 执行编号
 	CustomID       string         `gorm:"index;comment:自定义编号" json:"custom_id"`                   // 自定义编号
-	CustomSequence int64          `gorm:"index;comment:自定义顺序" json:"custom_sequence"`             // 自定义顺序
+	CustomSequence int64          `gorm:"comment:自定义顺序" json:"custom_sequence"`                   // 自定义顺序
 	Type           string         `gorm:"index;comment:类型" json:"type"`                           // 类型
 	TypeName       string         `gorm:"comment:类型名称" json:"type_name"`                          // 类型名称
 	CreatedIP      string         `gorm:"default:0.0.0.0;comment:创建外网IP" json:"created_ip"`       // 创建外网IP
