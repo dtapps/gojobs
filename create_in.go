@@ -28,7 +28,7 @@ func (c *Client) CreateInCustomId(ctx context.Context, config *ConfigCreateInCus
 	if config.CurrentIp == "" {
 		config.CurrentIp = c.config.systemOutsideIP
 	}
-	err := config.Tx.Create(&jobs_gorm_model.Task{
+	err := config.Tx.WithContext(ctx).Create(&jobs_gorm_model.Task{
 		Status:         TASK_IN,
 		Params:         config.Params,
 		StatusDesc:     "首次添加任务",
@@ -71,7 +71,7 @@ func (c *Client) CreateInCustomIdOnly(ctx context.Context, config *ConfigCreateI
 	if config.CurrentIp == "" {
 		config.CurrentIp = c.config.systemOutsideIP
 	}
-	err := config.Tx.Create(&jobs_gorm_model.Task{
+	err := config.Tx.WithContext(ctx).Create(&jobs_gorm_model.Task{
 		Status:         TASK_IN,
 		Params:         config.Params,
 		StatusDesc:     "首次添加任务",
@@ -111,7 +111,7 @@ func (c *Client) CreateInCustomIdMaxNumber(ctx context.Context, config *ConfigCr
 	if config.CurrentIp == "" {
 		config.CurrentIp = c.config.systemOutsideIP
 	}
-	err := config.Tx.Create(&jobs_gorm_model.Task{
+	err := config.Tx.WithContext(ctx).Create(&jobs_gorm_model.Task{
 		Status:         TASK_IN,
 		Params:         config.Params,
 		StatusDesc:     "首次添加任务",
@@ -156,7 +156,7 @@ func (c *Client) CreateInCustomIdMaxNumberOnly(ctx context.Context, config *Conf
 	if config.CurrentIp == "" {
 		config.CurrentIp = c.config.systemOutsideIP
 	}
-	err := config.Tx.Create(&jobs_gorm_model.Task{
+	err := config.Tx.WithContext(ctx).Create(&jobs_gorm_model.Task{
 		Status:         TASK_IN,
 		Params:         config.Params,
 		StatusDesc:     "首次添加任务",

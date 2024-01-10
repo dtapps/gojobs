@@ -9,7 +9,7 @@ import (
 
 // 创建模型
 func (c *Client) autoMigrateTask(ctx context.Context) {
-	err := c.gormClient.AutoMigrate(
+	err := c.gormClient.WithContext(ctx).AutoMigrate(
 		&jobs_gorm_model.Task{},
 		&jobs_gorm_model.TaskLog{},
 	)
@@ -22,7 +22,7 @@ func (c *Client) autoMigrateTask(ctx context.Context) {
 
 // GormTaskLogDelete 删除
 func (c *Client) GormTaskLogDelete(ctx context.Context, hour int64) error {
-	err := c.gormClient.Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
+	err := c.gormClient.WithContext(ctx).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -33,7 +33,7 @@ func (c *Client) GormTaskLogDelete(ctx context.Context, hour int64) error {
 
 // GormTaskLogInDelete 删除任务运行
 func (c *Client) GormTaskLogInDelete(ctx context.Context, hour int64) error {
-	err := c.gormClient.Where("task_result_status = ?", TASK_IN).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
+	err := c.gormClient.WithContext(ctx).Where("task_result_status = ?", TASK_IN).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -44,7 +44,7 @@ func (c *Client) GormTaskLogInDelete(ctx context.Context, hour int64) error {
 
 // GormTaskLogSuccessDelete 删除任务完成
 func (c *Client) GormTaskLogSuccessDelete(ctx context.Context, hour int64) error {
-	err := c.gormClient.Where("task_result_status = ?", TASK_SUCCESS).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
+	err := c.gormClient.WithContext(ctx).Where("task_result_status = ?", TASK_SUCCESS).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -55,7 +55,7 @@ func (c *Client) GormTaskLogSuccessDelete(ctx context.Context, hour int64) error
 
 // GormTaskLogErrorDelete 删除任务异常
 func (c *Client) GormTaskLogErrorDelete(ctx context.Context, hour int64) error {
-	err := c.gormClient.Where("task_result_status = ?", TASK_ERROR).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
+	err := c.gormClient.WithContext(ctx).Where("task_result_status = ?", TASK_ERROR).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -66,7 +66,7 @@ func (c *Client) GormTaskLogErrorDelete(ctx context.Context, hour int64) error {
 
 // GormTaskLogTimeoutDelete 删除任务超时
 func (c *Client) GormTaskLogTimeoutDelete(ctx context.Context, hour int64) error {
-	err := c.gormClient.Where("task_result_status = ?", TASK_TIMEOUT).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
+	err := c.gormClient.WithContext(ctx).Where("task_result_status = ?", TASK_TIMEOUT).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -77,7 +77,7 @@ func (c *Client) GormTaskLogTimeoutDelete(ctx context.Context, hour int64) error
 
 // GormTaskLogWaitDelete 删除任务等待
 func (c *Client) GormTaskLogWaitDelete(ctx context.Context, hour int64) error {
-	err := c.gormClient.Where("task_result_status = ?", TASK_WAIT).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
+	err := c.gormClient.WithContext(ctx).Where("task_result_status = ?", TASK_WAIT).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).Delete(&jobs_gorm_model.TaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -114,7 +114,7 @@ func (c *Client) GormTaskLogRecord(ctx context.Context, task jobs_gorm_model.Tas
 		CpuModelName:    c.config.cpuModelName,
 		CpuMhz:          c.config.cpuMhz,
 	}
-	err := c.gormClient.Create(&taskLog).Error
+	err := c.gormClient.WithContext(ctx).Create(&taskLog).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("记录失败：%s", err))

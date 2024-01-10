@@ -7,7 +7,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	go.dtapp.net/goip v1.0.46
-	go.dtapp.net/golog v1.0.114
+	go.dtapp.net/golog v1.0.116
 	go.dtapp.net/gorequest v1.0.46
 	go.dtapp.net/gostring v1.0.13
 	go.dtapp.net/gotime v1.0.6

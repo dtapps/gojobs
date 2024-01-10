@@ -87,7 +87,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 
 	switch taskResultCode {
 	case 0:
-		err := c.EditTask(c.gormClient, task.ID).
+		err := c.EditTask(ctx, c.gormClient, task.ID).
 			Select("run_id", "result", "next_run_time").
 			Updates(jobs_gorm_model.Task{
 				RunID:       runId,
@@ -102,7 +102,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 		return
 	case CodeSuccess:
 		// 执行成功
-		err := c.EditTask(c.gormClient, task.ID).
+		err := c.EditTask(ctx, c.gormClient, task.ID).
 			Select("status_desc", "number", "run_id", "updated_ip", "result", "next_run_time").
 			Updates(jobs_gorm_model.Task{
 				StatusDesc:  "执行成功",
@@ -119,7 +119,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 		}
 	case CodeEnd:
 		// 执行成功、提前结束
-		err := c.EditTask(c.gormClient, task.ID).
+		err := c.EditTask(ctx, c.gormClient, task.ID).
 			Select("status", "status_desc", "number", "updated_ip", "result", "next_run_time").
 			Updates(jobs_gorm_model.Task{
 				Status:      TASK_SUCCESS,
@@ -136,7 +136,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 		}
 	case CodeError:
 		// 执行失败
-		err := c.EditTask(c.gormClient, task.ID).
+		err := c.EditTask(ctx, c.gormClient, task.ID).
 			Select("status_desc", "number", "run_id", "updated_ip", "result", "next_run_time").
 			Updates(jobs_gorm_model.Task{
 				StatusDesc:  "执行失败",
@@ -156,7 +156,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 	if task.MaxNumber != 0 {
 		if task.Number+1 >= task.MaxNumber {
 			// 关闭执行
-			err := c.EditTask(c.gormClient, task.ID).
+			err := c.EditTask(ctx, c.gormClient, task.ID).
 				Select("status").
 				Updates(jobs_gorm_model.Task{
 					Status: TASK_TIMEOUT,
