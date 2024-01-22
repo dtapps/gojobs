@@ -12,17 +12,17 @@ import (
 
 // Lock 上锁
 func (c *Client) Lock(ctx context.Context, info jobs_gorm_model.Task, id any) (string, error) {
-	return c.lock(ctx, fmt.Sprintf("%s%s%v%s%v", c.cache.lockKeyPrefix, c.cache.lockKeySeparator, info.Type, c.cache.lockKeySeparator, id), fmt.Sprintf("[Lock] 已在%s@%s机器上锁成功，时间：%v", c.config.systemInsideIP, c.config.systemOutsideIP, gotime.Current().Format()), time.Duration(info.Frequency)*3*time.Second)
+	return c.lock(ctx, fmt.Sprintf("%s%s%v%s%v", c.redisConfig.lockKeyPrefix, c.redisConfig.lockKeySeparator, info.Type, c.redisConfig.lockKeySeparator, id), fmt.Sprintf("[Lock] 已在%s@%s机器上锁成功，时间：%v", c.config.systemInsideIP, c.config.systemOutsideIP, gotime.Current().Format()), time.Duration(info.Frequency)*3*time.Second)
 }
 
 // Unlock Lock 解锁
 func (c *Client) Unlock(ctx context.Context, info jobs_gorm_model.Task, id any) error {
-	return c.unlock(ctx, fmt.Sprintf("%s%s%v%s%v", c.cache.lockKeyPrefix, c.cache.lockKeySeparator, info.Type, c.cache.lockKeySeparator, id))
+	return c.unlock(ctx, fmt.Sprintf("%s%s%v%s%v", c.redisConfig.lockKeyPrefix, c.redisConfig.lockKeySeparator, info.Type, c.redisConfig.lockKeySeparator, id))
 }
 
 // LockForever 永远上锁
 func (c *Client) LockForever(ctx context.Context, info jobs_gorm_model.Task, id any) (string, error) {
-	return c.lockForever(ctx, fmt.Sprintf("%s%s%v%s%v", c.cache.lockKeyPrefix, c.cache.lockKeySeparator, info.Type, c.cache.lockKeySeparator, id), fmt.Sprintf("[LockForever] 已在%s@%s机器永远上锁成功，时间：%v", c.config.systemInsideIP, c.config.systemOutsideIP, gotime.Current().Format()))
+	return c.lockForever(ctx, fmt.Sprintf("%s%s%v%s%v", c.redisConfig.lockKeyPrefix, c.redisConfig.lockKeySeparator, info.Type, c.redisConfig.lockKeySeparator, id), fmt.Sprintf("[LockForever] 已在%s@%s机器永远上锁成功，时间：%v", c.config.systemInsideIP, c.config.systemOutsideIP, gotime.Current().Format()))
 }
 
 // Lock 上锁
@@ -34,10 +34,10 @@ func (c *Client) lock(ctx context.Context, key string, val string, ttl time.Dura
 		return resp, errors.New("长期请使用 LockForever 方法")
 	}
 	// 获取
-	get, err := c.cache.redisClient.Get(ctx, key).Result()
+	get, err := c.redisConfig.client.Get(ctx, key).Result()
 	if errors.Is(err, redis.Nil) {
 		// 设置
-		err = c.cache.redisClient.Set(ctx, key, val, ttl).Err()
+		err = c.redisConfig.client.Set(ctx, key, val, ttl).Err()
 		if err != nil {
 			return resp, errors.New(fmt.Sprintf("上锁失败：%s", err.Error()))
 		}
@@ -52,7 +52,7 @@ func (c *Client) lock(ctx context.Context, key string, val string, ttl time.Dura
 // Unlock 解锁
 // key 锁名
 func (c *Client) unlock(ctx context.Context, key string) error {
-	_, err := c.cache.redisClient.Del(ctx, key).Result()
+	_, err := c.redisConfig.client.Del(ctx, key).Result()
 	if err != nil {
 		return errors.New(fmt.Sprintf("解锁失败：%s", err.Error()))
 	}
@@ -64,10 +64,10 @@ func (c *Client) unlock(ctx context.Context, key string) error {
 // val 锁内容
 func (c *Client) lockForever(ctx context.Context, key string, val string) (resp string, err error) {
 	// 获取
-	get, err := c.cache.redisClient.Get(ctx, key).Result()
+	get, err := c.redisConfig.client.Get(ctx, key).Result()
 	if errors.Is(err, redis.Nil) {
 		// 设置
-		err = c.cache.redisClient.Set(ctx, key, val, 0).Err()
+		err = c.redisConfig.client.Set(ctx, key, val, 0).Err()
 		if err != nil {
 			return resp, errors.New(fmt.Sprintf("上锁失败：%s", err.Error()))
 		}

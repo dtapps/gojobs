@@ -53,7 +53,7 @@ func getSystem() (result systemResult) {
 }
 
 // 设置配置信息
-func (c *Client) setConfig(ctx context.Context, systemOutsideIp string) {
+func (c *Client) setConfig(ctx context.Context, systemOutsideIP string) {
 
 	info := getSystem()
 
@@ -68,13 +68,13 @@ func (c *Client) setConfig(ctx context.Context, systemOutsideIp string) {
 	c.config.cpuMhz = info.CpuMhz
 
 	c.config.systemInsideIP = gorequest.GetInsideIp(ctx)
-	c.config.systemOutsideIP = systemOutsideIp
+	c.config.systemOutsideIP = systemOutsideIP
 
 	c.config.goVersion = runtime.Version()      // go版本
 	c.config.sdkVersion = Version               // sdk版本
 	c.config.systemVersion = info.SystemVersion // 系统版本
 	c.config.logVersion = golog.Version         // log版本
-	c.config.redisSdkVersion = redis.Version()  // redis版本
+	c.config.redisSdkVersion = redis.Version()  // redisSdk版本
 
 }
 

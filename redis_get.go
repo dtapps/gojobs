@@ -76,10 +76,10 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_
 func (c *Client) GetSubscribeClientList(ctx context.Context) (client []string, err error) {
 
 	// 查询活跃的channel
-	client, err = c.cache.redisClient.PubSubChannels(ctx, c.cache.cornKeyPrefix+"_*").Result()
+	client, err = c.redisConfig.client.PubSubChannels(ctx, c.redisConfig.cornKeyPrefix+"_*").Result()
 	if err != nil {
 		if c.slog.status {
-			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("获取在线的客户端失败：%s，%v", c.cache.cornKeyPrefix+"_*", err))
+			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("获取在线的客户端失败：%s，%v", c.redisConfig.cornKeyPrefix+"_*", err))
 		}
 	}
 
