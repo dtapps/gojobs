@@ -2,11 +2,14 @@ package gojobs
 
 import (
 	"context"
+	"errors"
 	"github.com/redis/go-redis/v9"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/host"
 	"go.dtapp.net/golog"
 	"go.dtapp.net/gorequest"
+	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 	"runtime"
 )
 
@@ -76,6 +79,80 @@ func (c *Client) setConfig(ctx context.Context, systemOutsideIP string) {
 	c.config.logVersion = golog.Version         // log版本
 	c.config.redisSdkVersion = redis.Version()  // redisSdk版本
 
+}
+
+// ConfigGormClientFun GORM配置
+func (c *Client) ConfigGormClientFun(ctx context.Context, client *gorm.DB, taskTableName string, taskLogStatus bool, taskLogTableName string) error {
+	if client == nil {
+		return errors.New("请配置 Gorm")
+	}
+
+	// 配置数据库
+	c.gormConfig.client = client
+	if taskTableName == "" {
+		c.gormConfig.taskTableName = "task"
+	} else {
+		c.gormConfig.taskTableName = taskTableName
+	}
+	c.gormConfig.taskLogStatus = taskLogStatus
+	if c.gormConfig.taskLogStatus {
+		if taskLogTableName == "" {
+			c.gormConfig.taskLogTableName = "task_log"
+		} else {
+			c.gormConfig.taskLogTableName = taskLogTableName
+		}
+	}
+
+	c.autoMigrateTask(ctx)
+
+	return nil
+}
+
+// ConfigMongoClientFun MONGO配置
+func (c *Client) ConfigMongoClientFun(ctx context.Context, client *mongo.Client, databaseName string, taskLogStatus bool, taskLogCollectionName string) error {
+	if client == nil {
+		return errors.New("请配置 Mongo")
+	}
+
+	// 配置数据库
+	c.mongoConfig.client = client
+	if databaseName == "" {
+		return errors.New("请配置 Mongo 库名")
+	} else {
+		c.mongoConfig.databaseName = databaseName
+	}
+	c.mongoConfig.taskLogStatus = taskLogStatus
+	if c.mongoConfig.taskLogStatus {
+		if taskLogCollectionName == "" {
+			return errors.New("请配置 Mongo 任务日志集合名")
+		} else {
+			c.mongoConfig.taskLogCollectionName = taskLogCollectionName
+		}
+	}
+
+	return nil
+}
+
+// ConfigRedisClientFun REDIS配置
+// lockKeyPrefix 锁Key前缀 xxx_lock
+// lockKeySeparator 锁Key分隔符 :
+// cornKeyPrefix 任务Key前缀 xxx_cron
+// cornKeyCustom 任务Key自定义 xxx_cron_自定义  xxx_cron_自定义_*
+func (c *Client) ConfigRedisClientFun(ctx context.Context, client *redis.Client, lockKeyPrefix string, lockKeySeparator string, cornKeyPrefix string, cornKeyCustom string) error {
+	if client == nil {
+		return errors.New("请配置 Redis")
+	}
+
+	// 配置缓存
+	c.redisConfig.client = client
+
+	// 配置缓存前缀
+	c.redisConfig.lockKeyPrefix, c.redisConfig.lockKeySeparator, c.redisConfig.cornKeyPrefix, c.redisConfig.cornKeyCustom = lockKeyPrefix, lockKeySeparator, cornKeyPrefix, cornKeyCustom
+	if c.redisConfig.lockKeyPrefix == "" || c.redisConfig.lockKeySeparator == "" || c.redisConfig.cornKeyPrefix == "" || c.redisConfig.cornKeyCustom == "" {
+		return errors.New("请配置 Redis 前缀")
+	}
+
+	return nil
 }
 
 // ConfigSLogClientFun 日志配置

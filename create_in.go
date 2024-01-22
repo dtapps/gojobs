@@ -67,7 +67,7 @@ type ConfigCreateInCustomIdOnly struct {
 func (c *Client) CreateInCustomIdOnly(ctx context.Context, config *ConfigCreateInCustomIdOnly) error {
 	query := c.TaskTypeTakeIn(ctx, config.Tx, config.CustomId, config.Type)
 	if query.ID != 0 {
-		return TaskIsExist
+		return errors.New("任务已存在")
 	}
 	if config.CurrentIp == "" {
 		config.CurrentIp = c.config.systemOutsideIP
@@ -154,7 +154,7 @@ type ConfigCreateInCustomIdMaxNumberOnly struct {
 func (c *Client) CreateInCustomIdMaxNumberOnly(ctx context.Context, config *ConfigCreateInCustomIdMaxNumberOnly) error {
 	query := c.TaskTypeTakeIn(ctx, config.Tx, config.CustomId, config.Type)
 	if query.ID != 0 {
-		return TaskIsExist
+		return errors.New("任务已存在")
 	}
 	if config.CurrentIp == "" {
 		config.CurrentIp = c.config.systemOutsideIP

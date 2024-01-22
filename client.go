@@ -2,32 +2,12 @@ package gojobs
 
 import (
 	"context"
+	"errors"
 	"github.com/redis/go-redis/v9"
 	"go.dtapp.net/golog"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 )
-
-// 前缀
-// lockKeyPrefix 锁Key前缀 xxx_lock
-// lockKeySeparator 锁Key分隔符 :
-// cornKeyPrefix 任务Key前缀 xxx_cron
-// cornKeyCustom 任务Key自定义 xxx_cron_自定义  xxx_cron_自定义_*
-type redisPrefixFun func() (lockKeyPrefix, lockKeySeparator, cornKeyPrefix, cornKeyCustom string)
-
-// ClientConfig 实例配置
-type ClientConfig struct {
-	GormClient                 *gorm.DB       // 关系数据库驱动
-	GormTaskTableName          string         // 关系数据库任务表名
-	GormTaskLogTableName       string         // 关系数据库任务日志表名
-	MongoClient                *mongo.Client  // MONGO数据库驱动
-	MongoDatabaseName          string         // MONGO数据库名
-	MongoTaskCollectionName    string         // MONGO数据库任务集合名
-	MongoTaskLogCollectionName string         // MONGO数据库任务日志集合名
-	RedisClient                *redis.Client  // Redis数据库驱动
-	RedisPrefixFun             redisPrefixFun // Redis数据前缀
-	CurrentIP                  string         // 当前IP
-}
 
 // Client 实例
 type Client struct {
@@ -59,12 +39,13 @@ type Client struct {
 	gormConfig struct {
 		client           *gorm.DB // 数据库
 		taskTableName    string   // 任务表名
+		taskLogStatus    bool     // 任务日志状态
 		taskLogTableName string   // 任务日志表名
 	}
 	mongoConfig struct {
 		client                *mongo.Client // 数据库
 		databaseName          string        // 库名
-		taskCollectionName    string        // 任务集合名
+		taskLogStatus         bool          // 任务日志状态
 		taskLogCollectionName string        // 任务日志集合名
 	}
 	slog struct {
@@ -74,50 +55,16 @@ type Client struct {
 }
 
 // NewClient 创建实例
-func NewClient(ctx context.Context, config *ClientConfig) (*Client, error) {
+func NewClient(ctx context.Context, currentIP string) (*Client, error) {
 
 	c := &Client{}
 
-	if config.CurrentIP == "" || config.CurrentIP == "0.0.0.0" {
-		return nil, currentIpNoConfig
-	}
-
-	// 配置缓存
-	redisClient := config.RedisClient
-	if redisClient != nil {
-		c.redisConfig.client = redisClient
-	} else {
-		return nil, redisPrefixFunNoConfig
-	}
-
-	// 配置缓存前缀
-	c.redisConfig.lockKeyPrefix, c.redisConfig.lockKeySeparator, c.redisConfig.cornKeyPrefix, c.redisConfig.cornKeyCustom = config.RedisPrefixFun()
-	if c.redisConfig.lockKeyPrefix == "" || c.redisConfig.lockKeySeparator == "" || c.redisConfig.cornKeyPrefix == "" || c.redisConfig.cornKeyCustom == "" {
-		return nil, redisPrefixFunNoConfig
+	if currentIP == "" || currentIP == "0.0.0.0" {
+		return nil, errors.New("请配置 CurrentIp")
 	}
 
 	// 配置信息
-	c.setConfig(ctx, config.CurrentIP)
-
-	// 配置关系数据库
-	gormClient := config.GormClient
-	if gormClient != nil {
-		c.gormConfig.client = gormClient
-		if config.GormTaskTableName == "" {
-			c.gormConfig.taskTableName = "task"
-		} else {
-			c.gormConfig.taskTableName = config.GormTaskTableName
-		}
-		if config.GormTaskLogTableName == "" {
-			c.gormConfig.taskLogTableName = "task_log"
-		} else {
-			c.gormConfig.taskLogTableName = config.GormTaskLogTableName
-		}
-
-		c.autoMigrateTask(ctx)
-	} else {
-		return nil, gormClientFunNoConfig
-	}
+	c.setConfig(ctx, currentIP)
 
 	return c, nil
 }
