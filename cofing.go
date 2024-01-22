@@ -8,6 +8,7 @@ import (
 	"github.com/shirou/gopsutil/host"
 	"go.dtapp.net/golog"
 	"go.dtapp.net/gorequest"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 	"runtime"
@@ -112,7 +113,7 @@ func (c *Client) ConfigGormClientFun(ctx context.Context, client *gorm.DB, taskT
 }
 
 // ConfigMongoClientFun MONGO配置
-func (c *Client) ConfigMongoClientFun(ctx context.Context, client *mongo.Client, databaseName string, taskLogStatus bool, taskLogCollectionName string) error {
+func (c *Client) ConfigMongoClientFun(ctx context.Context, client *mongo.Client, databaseName string, taskLogStatus bool, taskLogCollectionName string) (err error) {
 	if client == nil {
 		return errors.New("请配置 Mongo")
 	}
@@ -132,11 +133,20 @@ func (c *Client) ConfigMongoClientFun(ctx context.Context, client *mongo.Client,
 		}
 	}
 
-	err := c.mongoCreateCollectionTaskLog(ctx)
-	if err != nil {
-		return err
+	isExist := false
+	collectionNames, _ := c.mongoConfig.client.Database(c.mongoConfig.databaseName).ListCollectionNames(ctx, bson.M{})
+	for _, v := range collectionNames {
+		if v == c.mongoConfig.taskLogCollectionName {
+			isExist = true
+		}
 	}
-	err = c.mongoCreateIndexesTaskLog(ctx)
+	if isExist == false {
+		err = c.mongoCreateCollectionTaskLog(ctx)
+		if err != nil {
+			return err
+		}
+		err = c.mongoCreateIndexesTaskLog(ctx)
+	}
 
 	return err
 }
