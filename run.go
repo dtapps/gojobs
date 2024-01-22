@@ -83,7 +83,10 @@ func (c *Client) Run(ctx context.Context, task gormModelTask, taskResultCode int
 	}
 
 	if c.gormConfig.taskLogStatus {
-		c.TaskLogRecord(ctx, task, runId, taskResultCode, taskResultDesc)
+		go c.GormTaskLogRecord(ctx, task, runId, taskResultCode, taskResultDesc)
+	}
+	if c.mongoConfig.taskLogStatus {
+		go c.MongoTaskLogRecord(ctx, task, runId, taskResultCode, taskResultDesc)
 	}
 
 	switch taskResultCode {

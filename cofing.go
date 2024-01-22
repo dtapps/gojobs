@@ -89,17 +89,16 @@ func (c *Client) ConfigGormClientFun(ctx context.Context, client *gorm.DB, taskT
 
 	// 配置数据库
 	c.gormConfig.client = client
-	if taskTableName == "" {
-		c.gormConfig.taskTableName = "task"
-	} else {
-		c.gormConfig.taskTableName = taskTableName
+	c.gormConfig.taskTableName = taskTableName
+	if c.gormConfig.taskTableName == "" {
+		return errors.New("请配置 Gorm 库名")
 	}
+
 	c.gormConfig.taskLogStatus = taskLogStatus
 	if c.gormConfig.taskLogStatus {
-		if taskLogTableName == "" {
-			c.gormConfig.taskLogTableName = "task_log"
-		} else {
-			c.gormConfig.taskLogTableName = taskLogTableName
+		c.gormConfig.taskLogTableName = taskLogTableName
+		if c.gormConfig.taskLogTableName == "" {
+			return errors.New("请配置 Gorm 任务日志表名")
 		}
 	}
 
@@ -120,21 +119,26 @@ func (c *Client) ConfigMongoClientFun(ctx context.Context, client *mongo.Client,
 
 	// 配置数据库
 	c.mongoConfig.client = client
-	if databaseName == "" {
+	c.mongoConfig.databaseName = databaseName
+	if c.mongoConfig.databaseName == "" {
 		return errors.New("请配置 Mongo 库名")
-	} else {
-		c.mongoConfig.databaseName = databaseName
 	}
+
 	c.mongoConfig.taskLogStatus = taskLogStatus
 	if c.mongoConfig.taskLogStatus {
-		if taskLogCollectionName == "" {
+		c.mongoConfig.taskLogCollectionName = taskLogCollectionName
+		if c.mongoConfig.taskLogCollectionName == "" {
 			return errors.New("请配置 Mongo 任务日志集合名")
-		} else {
-			c.mongoConfig.taskLogCollectionName = taskLogCollectionName
 		}
 	}
 
-	return nil
+	err := c.mongoCreateCollectionTaskLog(ctx)
+	if err != nil {
+		return err
+	}
+	err = c.mongoCreateIndexesTaskLog(ctx)
+
+	return err
 }
 
 // ConfigRedisClientFun REDIS配置

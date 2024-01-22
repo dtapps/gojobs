@@ -12,9 +12,9 @@ type gormModelTaskLog struct {
 	LogID           uint      `gorm:"primaryKey;comment:【日志】编号" json:"log_id"`                            // 【日志】编号
 	LogTime         time.Time `gorm:"autoCreateTime;index;comment:【日志】时间" json:"log_time"`                // 【日志】时间
 	TaskID          uint      `gorm:"index;comment:【任务】编号" json:"task_id"`                                // 【任务】编号
-	TaskRunID       string    `gorm:"comment:【任务】执行编号" json:"task_run_id"`                                // 【任务】执行编号
-	TaskResultCode  int       `gorm:"index;comment:【任务】执行状态码" json:"task_result_code"`                    // 【任务】执行状态码
-	TaskResultDesc  string    `gorm:"comment:【任务】执行结果" json:"task_result_desc"`                           // 【任务】执行结果
+	TaskRunID       string    `gorm:"comment:【任务】执行编号" json:"task_run_id"`                                //【任务】执行编号
+	TaskResultCode  int       `gorm:"index;comment:【任务】执行状态码" json:"task_result_code"`                    //【任务】执行状态码
+	TaskResultDesc  string    `gorm:"comment:【任务】执行结果" json:"task_result_desc"`                           //【任务】执行结果
 	SystemHostName  string    `gorm:"comment:【系统】主机名" json:"system_host_name,omitempty"`                  //【系统】主机名
 	SystemInsideIP  string    `gorm:"default:0.0.0.0;comment:【系统】内网IP" json:"system_inside_ip,omitempty"` //【系统】内网IP
 	SystemOutsideIP string    `gorm:"default:0.0.0.0;comment:【系统】外网IP" json:"system_outside_ip"`          //【系统】外网IP
@@ -137,41 +137,35 @@ func (c *Client) GormTaskLogWaitDelete(ctx context.Context, hour int64) error {
 	return err
 }
 
-// TaskLogRecord 记录
-func (c *Client) TaskLogRecord(ctx context.Context, task gormModelTask, runId string, taskResultCode int, taskResultDesc string) {
-	c.GormTaskLogRecord(ctx, task, runId, taskResultCode, taskResultDesc)
-}
-
 // GormTaskLogRecord 记录
 func (c *Client) GormTaskLogRecord(ctx context.Context, task gormModelTask, runId string, taskResultCode int, taskResultDesc string) {
-
 	taskLog := gormModelTaskLog{
-		TaskID:         task.ID,
-		TaskRunID:      runId,
-		TaskResultCode: taskResultCode,
-		TaskResultDesc: taskResultDesc,
-
-		SystemHostName:  c.config.systemHostname,
-		SystemInsideIP:  c.config.systemInsideIP,
-		SystemOutsideIP: c.config.systemOutsideIP,
-		SystemOs:        c.config.systemOs,
-		SystemArch:      c.config.systemKernel,
-		SystemUpTime:    c.config.systemUpTime,
-		SystemBootTime:  c.config.systemBootTime,
-		GoVersion:       c.config.goVersion,
-		SdkVersion:      c.config.sdkVersion,
-		SystemVersion:   c.config.sdkVersion,
-		CpuCores:        c.config.cpuCores,
-		CpuModelName:    c.config.cpuModelName,
-		CpuMhz:          c.config.cpuMhz,
+		TaskID:          task.ID,                  //【任务】编号
+		TaskRunID:       runId,                    //【任务】执行编号
+		TaskResultCode:  taskResultCode,           //【任务】执行状态码
+		TaskResultDesc:  taskResultDesc,           //【任务】执行结果
+		SystemHostName:  c.config.systemHostname,  //【系统】主机名
+		SystemInsideIP:  c.config.systemInsideIP,  //【系统】内网IP
+		SystemOutsideIP: c.config.systemOutsideIP, //【系统】外网IP
+		SystemOs:        c.config.systemOs,        //【系统】类型
+		SystemArch:      c.config.systemKernel,    //【系统】架构
+		SystemUpTime:    c.config.systemUpTime,    //【系统】运行时间
+		SystemBootTime:  c.config.systemBootTime,  //【系统】开机时间
+		GoVersion:       c.config.goVersion,       //【程序】Go版本
+		SdkVersion:      c.config.sdkVersion,      //【程序】Sdk版本
+		SystemVersion:   c.config.sdkVersion,      //【程序】System版本
+		CpuCores:        c.config.cpuCores,        //【程序】核数
+		CpuModelName:    c.config.cpuModelName,    //【程序】型号名称
+		CpuMhz:          c.config.cpuMhz,          //【程序】兆赫
 	}
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
 		Create(&taskLog).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("记录失败：%s", err))
+		}
+		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("记录数据：%+v", taskLog))
 		}
 	}
-
 }
