@@ -10,7 +10,9 @@ import (
 
 // TaskTakeId 编号查询任务
 func (c *Client) TaskTakeId(ctx context.Context, tx *gorm.DB, id uint) (result jobs_gorm_model.Task) {
-	err := tx.WithContext(ctx).Where("id = ?", id).Take(&result).Error
+	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+		Where("id = ?", id).
+		Take(&result).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("编号查询任务：%v", err))
@@ -21,7 +23,9 @@ func (c *Client) TaskTakeId(ctx context.Context, tx *gorm.DB, id uint) (result j
 
 // TaskTake 自定义编号查询任务
 func (c *Client) TaskTake(ctx context.Context, tx *gorm.DB, customId string) (result jobs_gorm_model.Task) {
-	err := tx.WithContext(ctx).Where("custom_id = ?", customId).Take(&result).Error
+	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+		Where("custom_id = ?", customId).
+		Take(&result).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("自定义编号查询任务：%v", err))
@@ -32,7 +36,10 @@ func (c *Client) TaskTake(ctx context.Context, tx *gorm.DB, customId string) (re
 
 // 自定义编号加状态查询任务
 func (c *Client) taskTake(ctx context.Context, tx *gorm.DB, customId, status string) (result jobs_gorm_model.Task) {
-	err := tx.WithContext(ctx).Where("custom_id = ?", customId).Where("status = ?", status).Take(&result).Error
+	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+		Where("custom_id = ?", customId).
+		Where("status = ?", status).
+		Take(&result).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("自定义编号加状态查询任务：%v", err))
@@ -68,7 +75,10 @@ func (c *Client) TaskTakeWait(ctx context.Context, tx *gorm.DB, customId string)
 
 // TaskTypeTake 查询单任务
 func (c *Client) TaskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type string) (result jobs_gorm_model.Task) {
-	err := tx.WithContext(ctx).Where("custom_id = ?", customId).Where("type = ?", Type).Take(&result).Error
+	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+		Where("custom_id = ?", customId).
+		Where("type = ?", Type).
+		Take(&result).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("查询单任务：%v", err))
@@ -79,7 +89,10 @@ func (c *Client) TaskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type s
 
 // 查询单任务
 func (c *Client) taskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type, status string) (result jobs_gorm_model.Task) {
-	err := tx.WithContext(ctx).Where("custom_id = ?", customId).Where("type = ?", Type).Where("status = ?", status).Take(&result).Error
+	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+		Where("custom_id = ?", customId).Where("type = ?", Type).
+		Where("status = ?", status).
+		Take(&result).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("查询单任务：%v", err))
@@ -115,7 +128,10 @@ func (c *Client) TaskTypeTakeWait(ctx context.Context, tx *gorm.DB, customId, Ty
 
 // TaskFindAll 查询多任务
 func (c *Client) TaskFindAll(ctx context.Context, tx *gorm.DB, frequency int64) (results []jobs_gorm_model.Task) {
-	err := tx.WithContext(ctx).Where("frequency = ?", frequency).Order("id asc").Find(&results).Error
+	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+		Where("frequency = ?", frequency).
+		Order("id asc").
+		Find(&results).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("查询多任务：%v", err))
@@ -126,7 +142,11 @@ func (c *Client) TaskFindAll(ctx context.Context, tx *gorm.DB, frequency int64) 
 
 // TaskFindAllType 查询多任务
 func (c *Client) TaskFindAllType(ctx context.Context, tx *gorm.DB, Type string, frequency int64) (results []jobs_gorm_model.Task) {
-	err := tx.WithContext(ctx).Where("type = ?", Type).Where("frequency = ?", frequency).Order("id asc").Find(&results).Error
+	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+		Where("type = ?", Type).
+		Where("frequency = ?", frequency).
+		Order("id asc").
+		Find(&results).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("查询多任务：%v", err))
@@ -137,7 +157,11 @@ func (c *Client) TaskFindAllType(ctx context.Context, tx *gorm.DB, Type string, 
 
 // 查询多任务
 func (c *Client) taskFindAll(ctx context.Context, tx *gorm.DB, frequency int64, status string) (results []jobs_gorm_model.Task) {
-	err := tx.WithContext(ctx).Where("frequency = ?", frequency).Where("status = ?", status).Order("id asc").Find(&results).Error
+	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+		Where("frequency = ?", frequency).
+		Where("status = ?", status).
+		Order("id asc").
+		Find(&results).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("查询多任务：%v", err))
@@ -149,7 +173,11 @@ func (c *Client) taskFindAll(ctx context.Context, tx *gorm.DB, frequency int64, 
 // 查询多任务
 func (c *Client) taskFindAllType(ctx context.Context, tx *gorm.DB, Type string, frequency int64, status string) (results []jobs_gorm_model.Task) {
 	if frequency == 0 {
-		err := tx.WithContext(ctx).Where("type = ?", Type).Where("status = ?", status).Order("id asc").Find(&results).Error
+		err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+			Where("type = ?", Type).
+			Where("status = ?", status).
+			Order("id asc").
+			Find(&results).Error
 		if err != nil {
 			if c.slog.status {
 				c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("查询多任务：%v", err))
@@ -157,7 +185,12 @@ func (c *Client) taskFindAllType(ctx context.Context, tx *gorm.DB, Type string, 
 		}
 		return results
 	}
-	err := tx.WithContext(ctx).Where("type = ?", Type).Where("frequency = ?", frequency).Where("status = ?", status).Order("id asc").Find(&results).Error
+	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+		Where("type = ?", Type).
+		Where("frequency = ?", frequency).
+		Where("status = ?", status).
+		Order("id asc").
+		Find(&results).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("查询多任务：%v", err))
@@ -234,8 +267,7 @@ func (c *Client) StartTask(ctx context.Context, tx *gorm.DB, id uint) error {
 
 // StartTaskCustom 任务启动自定义
 func (c *Client) StartTaskCustom(ctx context.Context, tx *gorm.DB, customId string, customSequence int64) error {
-	err := tx.WithContext(ctx).
-		Model(&jobs_gorm_model.Task{}).
+	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Where("custom_id = ?", customId).
 		Where("custom_sequence = ?", customSequence).
 		Where("status = ?", TASK_WAIT).
@@ -254,7 +286,8 @@ func (c *Client) StartTaskCustom(ctx context.Context, tx *gorm.DB, customId stri
 
 // EditTask 任务修改
 func (c *Client) EditTask(ctx context.Context, tx *gorm.DB, id uint) *gorm.DB {
-	return tx.WithContext(ctx).Model(&jobs_gorm_model.Task{}).Where("id = ?", id)
+	return tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+		Where("id = ?", id)
 }
 
 // UpdateFrequency 更新任务频率

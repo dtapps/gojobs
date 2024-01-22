@@ -28,7 +28,3 @@ type Task struct {
 	UpdatedAt      time.Time      `gorm:"autoUpdateTime;comment:更新时间" json:"updated_at"`          // 更新时间
 	DeletedAt      gorm.DeletedAt `gorm:"index;comment:删除时间" json:"deleted_at"`                   // 删除时间
 }
-
-func (Task) TableName() string {
-	return "task"
-}

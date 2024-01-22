@@ -24,7 +24,3 @@ type TaskLog struct {
 	CpuModelName    string    `gorm:"comment:【CPU】型号名称" json:"cpu_model_name,omitempty"`                  //【CPU】型号名称
 	CpuMhz          float64   `gorm:"comment:【CPU】兆赫" json:"cpu_mhz,omitempty"`                           //【CPU】兆赫
 }
-
-func (TaskLog) TableName() string {
-	return "task_log"
-}

@@ -28,21 +28,22 @@ func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWai
 	if config.CurrentIp == "" {
 		config.CurrentIp = c.config.systemOutsideIP
 	}
-	err := config.Tx.WithContext(ctx).Create(&jobs_gorm_model.Task{
-		Status:         TASK_WAIT,
-		Params:         config.Params,
-		StatusDesc:     "首次添加等待任务",
-		Frequency:      config.Frequency,
-		RunID:          gostring.GetUuId(),
-		CustomID:       config.CustomId,
-		CustomSequence: config.CustomSequence,
-		Type:           config.Type,
-		TypeName:       config.TypeName,
-		CreatedIP:      config.CurrentIp,
-		SpecifyIP:      config.SpecifyIp,
-		UpdatedIP:      config.CurrentIp,
-		NextRunTime:    gotime.Current().AfterSeconds(config.Frequency).Time,
-	}).Error
+	err := config.Tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
+		Create(&jobs_gorm_model.Task{
+			Status:         TASK_WAIT,
+			Params:         config.Params,
+			StatusDesc:     "首次添加等待任务",
+			Frequency:      config.Frequency,
+			RunID:          gostring.GetUuId(),
+			CustomID:       config.CustomId,
+			CustomSequence: config.CustomSequence,
+			Type:           config.Type,
+			TypeName:       config.TypeName,
+			CreatedIP:      config.CurrentIp,
+			SpecifyIP:      config.SpecifyIp,
+			UpdatedIP:      config.CurrentIp,
+			NextRunTime:    gotime.Current().AfterSeconds(config.Frequency).Time,
+		}).Error
 	if err != nil {
 		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err.Error()))
 	}

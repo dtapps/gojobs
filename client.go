@@ -17,14 +17,16 @@ type redisPrefixFun func() (lockKeyPrefix, lockKeySeparator, cornKeyPrefix, corn
 
 // ClientConfig 实例配置
 type ClientConfig struct {
-	GormClient          *gorm.DB       // 关系数据库驱动
-	GormTableName       string         // 关系数据库表名
-	MongoClient         *mongo.Client  // MONGO数据库驱动
-	MongoDatabaseName   string         // MONGO数据库名
-	MongoCollectionName string         // MONGO数据库集合名
-	RedisClient         *redis.Client  // Redis数据库驱动
-	RedisPrefixFun      redisPrefixFun // Redis数据前缀
-	CurrentIP           string         // 当前IP
+	GormClient                 *gorm.DB       // 关系数据库驱动
+	GormTaskTableName          string         // 关系数据库任务表名
+	GormTaskLogTableName       string         // 关系数据库任务日志表名
+	MongoClient                *mongo.Client  // MONGO数据库驱动
+	MongoDatabaseName          string         // MONGO数据库名
+	MongoTaskCollectionName    string         // MONGO数据库任务集合名
+	MongoTaskLogCollectionName string         // MONGO数据库任务日志集合名
+	RedisClient                *redis.Client  // Redis数据库驱动
+	RedisPrefixFun             redisPrefixFun // Redis数据前缀
+	CurrentIP                  string         // 当前IP
 }
 
 // Client 实例
@@ -56,7 +58,15 @@ type Client struct {
 		cornKeyCustom    string        // 任务Key自定义
 	}
 	gormConfig struct {
-		client *gorm.DB // 数据库
+		client           *gorm.DB // 数据库
+		taskTableName    string   // 任务表名
+		taskLogTableName string   // 任务日志表名
+	}
+	mongoConfig struct {
+		client                *mongo.Client // 数据库
+		databaseName          string        // 库名
+		taskCollectionName    string        // 任务集合名
+		taskLogCollectionName string        // 任务日志集合名
 	}
 	slog struct {
 		status bool        // 状态
@@ -95,7 +105,17 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	// 配置关系数据库
 	gormClient := config.GormClient
 	if gormClient != nil {
-		c.gormClient = gormClient
+		c.gormConfig.client = gormClient
+		if config.GormTaskTableName == "" {
+			c.gormConfig.taskTableName = "task"
+		} else {
+			c.gormConfig.taskTableName = config.GormTaskTableName
+		}
+		if config.GormTaskLogTableName == "" {
+			c.gormConfig.taskLogTableName = "task_log"
+		} else {
+			c.gormConfig.taskLogTableName = config.GormTaskLogTableName
+		}
 
 		c.autoMigrateTask(ctx)
 	} else {
