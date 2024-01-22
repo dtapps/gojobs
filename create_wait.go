@@ -28,7 +28,7 @@ func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWai
 		config.CurrentIp = c.config.systemOutsideIP
 	}
 	err := config.Tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
-		Create(&gormModelTask{
+		Create(&GormModelTask{
 			Status:         TASK_WAIT,
 			Params:         config.Params,
 			StatusDesc:     "首次添加等待任务",

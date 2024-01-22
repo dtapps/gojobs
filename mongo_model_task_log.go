@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// 结构体模型
-type mongoModelTaskLog struct {
+// MongoModelTaskLog 任务日志
+type MongoModelTaskLog struct {
 	LogID           primitive.ObjectID `json:"log_id,omitempty" bson:"_id,omitempty"`                        //【记录】编号
 	LogTime         primitive.DateTime `json:"log_time,omitempty" bson:"log_time"`                           //【记录】时间
 	TaskID          uint               `json:"task_id" bson:"task_id,omitempty"`                             //【任务】编号
@@ -64,8 +64,8 @@ func (c *Client) mongoCreateIndexesTaskLog(ctx context.Context) error {
 }
 
 // MongoTaskLogRecord 记录
-func (c *Client) MongoTaskLogRecord(ctx context.Context, task gormModelTask, runId string, taskResultCode int, taskResultDesc string) {
-	taskLog := mongoModelTaskLog{
+func (c *Client) MongoTaskLogRecord(ctx context.Context, task GormModelTask, runId string, taskResultCode int, taskResultDesc string) {
+	taskLog := MongoModelTaskLog{
 		LogID:           primitive.NewObjectID(),                              //【记录】编号
 		LogTime:         primitive.NewDateTimeFromTime(gotime.Current().Time), //【记录】时间
 		TaskID:          task.ID,                                              //【任务】编号

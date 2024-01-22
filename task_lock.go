@@ -7,10 +7,10 @@ import (
 
 type TaskLockOperation struct {
 	client *Client       // 实例
-	task   gormModelTask // 任务
+	task   GormModelTask // 任务
 }
 
-func (c *Client) NewLock(task gormModelTask) (*TaskLockOperation, error) {
+func (c *Client) NewLock(task GormModelTask) (*TaskLockOperation, error) {
 	if task.ID == 0 {
 		return nil, errors.New("任务数据不正常")
 	}

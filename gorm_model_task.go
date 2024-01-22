@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-// 任务
-type gormModelTask struct {
+// GormModelTask 任务
+type GormModelTask struct {
 	ID             uint           `gorm:"primaryKey;comment:记录编号" json:"id"`                      // 记录编号
 	Status         string         `gorm:"index;comment:状态码" json:"status"`                        // 状态码
 	Params         string         `gorm:"comment:参数" json:"params"`                               // 参数
@@ -35,12 +35,12 @@ type gormModelTask struct {
 // 创建模型
 func (c *Client) gormAutoMigrateTask(ctx context.Context) error {
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskTableName).
-		AutoMigrate(&gormModelTask{})
+		AutoMigrate(&GormModelTask{})
 	return err
 }
 
 // TaskTakeId 编号查询任务
-func (c *Client) TaskTakeId(ctx context.Context, tx *gorm.DB, id uint) (result gormModelTask) {
+func (c *Client) TaskTakeId(ctx context.Context, tx *gorm.DB, id uint) (result GormModelTask) {
 	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Where("id = ?", id).
 		Take(&result).Error
@@ -53,7 +53,7 @@ func (c *Client) TaskTakeId(ctx context.Context, tx *gorm.DB, id uint) (result g
 }
 
 // TaskTake 自定义编号查询任务
-func (c *Client) TaskTake(ctx context.Context, tx *gorm.DB, customId string) (result gormModelTask) {
+func (c *Client) TaskTake(ctx context.Context, tx *gorm.DB, customId string) (result GormModelTask) {
 	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Where("custom_id = ?", customId).
 		Take(&result).Error
@@ -66,7 +66,7 @@ func (c *Client) TaskTake(ctx context.Context, tx *gorm.DB, customId string) (re
 }
 
 // 自定义编号加状态查询任务
-func (c *Client) taskTake(ctx context.Context, tx *gorm.DB, customId, status string) (result gormModelTask) {
+func (c *Client) taskTake(ctx context.Context, tx *gorm.DB, customId, status string) (result GormModelTask) {
 	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Where("custom_id = ?", customId).
 		Where("status = ?", status).
@@ -80,32 +80,32 @@ func (c *Client) taskTake(ctx context.Context, tx *gorm.DB, customId, status str
 }
 
 // TaskTakeIn 查询单任务 - 任务运行
-func (c *Client) TaskTakeIn(ctx context.Context, tx *gorm.DB, customId string) gormModelTask {
+func (c *Client) TaskTakeIn(ctx context.Context, tx *gorm.DB, customId string) GormModelTask {
 	return c.taskTake(ctx, tx, customId, TASK_IN)
 }
 
 // TaskTakeSuccess 查询单任务 - 任务完成
-func (c *Client) TaskTakeSuccess(ctx context.Context, tx *gorm.DB, customId string) gormModelTask {
+func (c *Client) TaskTakeSuccess(ctx context.Context, tx *gorm.DB, customId string) GormModelTask {
 	return c.taskTake(ctx, tx, customId, TASK_SUCCESS)
 }
 
 // TaskTakeError 查询单任务 - 任务异常
-func (c *Client) TaskTakeError(ctx context.Context, tx *gorm.DB, customId string) gormModelTask {
+func (c *Client) TaskTakeError(ctx context.Context, tx *gorm.DB, customId string) GormModelTask {
 	return c.taskTake(ctx, tx, customId, TASK_ERROR)
 }
 
 // TaskTakeTimeout 查询单任务 - 任务超时
-func (c *Client) TaskTakeTimeout(ctx context.Context, tx *gorm.DB, customId string) gormModelTask {
+func (c *Client) TaskTakeTimeout(ctx context.Context, tx *gorm.DB, customId string) GormModelTask {
 	return c.taskTake(ctx, tx, customId, TASK_TIMEOUT)
 }
 
 // TaskTakeWait 查询单任务 - 任务等待
-func (c *Client) TaskTakeWait(ctx context.Context, tx *gorm.DB, customId string) gormModelTask {
+func (c *Client) TaskTakeWait(ctx context.Context, tx *gorm.DB, customId string) GormModelTask {
 	return c.taskTake(ctx, tx, customId, TASK_WAIT)
 }
 
 // TaskTypeTake 查询单任务
-func (c *Client) TaskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type string) (result gormModelTask) {
+func (c *Client) TaskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type string) (result GormModelTask) {
 	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Where("custom_id = ?", customId).
 		Where("type = ?", Type).
@@ -119,7 +119,7 @@ func (c *Client) TaskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type s
 }
 
 // 查询单任务
-func (c *Client) taskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type, status string) (result gormModelTask) {
+func (c *Client) taskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type, status string) (result GormModelTask) {
 	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Where("custom_id = ?", customId).Where("type = ?", Type).
 		Where("status = ?", status).
@@ -133,32 +133,32 @@ func (c *Client) taskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type, 
 }
 
 // TaskTypeTakeIn 查询单任务 - 任务运行
-func (c *Client) TaskTypeTakeIn(ctx context.Context, tx *gorm.DB, customId, Type string) gormModelTask {
+func (c *Client) TaskTypeTakeIn(ctx context.Context, tx *gorm.DB, customId, Type string) GormModelTask {
 	return c.taskTypeTake(ctx, tx, customId, Type, TASK_IN)
 }
 
 // TaskTypeTakeSuccess 查询单任务 - 任务完成
-func (c *Client) TaskTypeTakeSuccess(ctx context.Context, tx *gorm.DB, customId, Type string) gormModelTask {
+func (c *Client) TaskTypeTakeSuccess(ctx context.Context, tx *gorm.DB, customId, Type string) GormModelTask {
 	return c.taskTypeTake(ctx, tx, customId, Type, TASK_SUCCESS)
 }
 
 // TaskTypeTakeError 查询单任务 - 任务异常
-func (c *Client) TaskTypeTakeError(ctx context.Context, tx *gorm.DB, customId, Type string) gormModelTask {
+func (c *Client) TaskTypeTakeError(ctx context.Context, tx *gorm.DB, customId, Type string) GormModelTask {
 	return c.taskTypeTake(ctx, tx, customId, Type, TASK_ERROR)
 }
 
 // TaskTypeTakeTimeout 查询单任务 - 任务超时
-func (c *Client) TaskTypeTakeTimeout(ctx context.Context, tx *gorm.DB, customId, Type string) gormModelTask {
+func (c *Client) TaskTypeTakeTimeout(ctx context.Context, tx *gorm.DB, customId, Type string) GormModelTask {
 	return c.taskTypeTake(ctx, tx, customId, Type, TASK_TIMEOUT)
 }
 
 // TaskTypeTakeWait 查询单任务 - 任务等待
-func (c *Client) TaskTypeTakeWait(ctx context.Context, tx *gorm.DB, customId, Type string) gormModelTask {
+func (c *Client) TaskTypeTakeWait(ctx context.Context, tx *gorm.DB, customId, Type string) GormModelTask {
 	return c.taskTypeTake(ctx, tx, customId, Type, TASK_WAIT)
 }
 
 // TaskFindAll 查询多任务
-func (c *Client) TaskFindAll(ctx context.Context, tx *gorm.DB, frequency int64) (results []gormModelTask) {
+func (c *Client) TaskFindAll(ctx context.Context, tx *gorm.DB, frequency int64) (results []GormModelTask) {
 	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Where("frequency = ?", frequency).
 		Order("id asc").
@@ -172,7 +172,7 @@ func (c *Client) TaskFindAll(ctx context.Context, tx *gorm.DB, frequency int64) 
 }
 
 // TaskFindAllType 查询多任务
-func (c *Client) TaskFindAllType(ctx context.Context, tx *gorm.DB, Type string, frequency int64) (results []gormModelTask) {
+func (c *Client) TaskFindAllType(ctx context.Context, tx *gorm.DB, Type string, frequency int64) (results []GormModelTask) {
 	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Where("type = ?", Type).
 		Where("frequency = ?", frequency).
@@ -187,7 +187,7 @@ func (c *Client) TaskFindAllType(ctx context.Context, tx *gorm.DB, Type string, 
 }
 
 // 查询多任务
-func (c *Client) taskFindAll(ctx context.Context, tx *gorm.DB, frequency int64, status string) (results []gormModelTask) {
+func (c *Client) taskFindAll(ctx context.Context, tx *gorm.DB, frequency int64, status string) (results []GormModelTask) {
 	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Where("frequency = ?", frequency).
 		Where("status = ?", status).
@@ -202,7 +202,7 @@ func (c *Client) taskFindAll(ctx context.Context, tx *gorm.DB, frequency int64, 
 }
 
 // 查询多任务
-func (c *Client) taskFindAllType(ctx context.Context, tx *gorm.DB, Type string, frequency int64, status string) (results []gormModelTask) {
+func (c *Client) taskFindAllType(ctx context.Context, tx *gorm.DB, Type string, frequency int64, status string) (results []GormModelTask) {
 	if frequency == 0 {
 		err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 			Where("type = ?", Type).
@@ -231,52 +231,52 @@ func (c *Client) taskFindAllType(ctx context.Context, tx *gorm.DB, Type string, 
 }
 
 // TaskFindAllIn 查询多任务 - 任务运行
-func (c *Client) TaskFindAllIn(ctx context.Context, tx *gorm.DB, frequency int64) []gormModelTask {
+func (c *Client) TaskFindAllIn(ctx context.Context, tx *gorm.DB, frequency int64) []GormModelTask {
 	return c.taskFindAll(ctx, tx, frequency, TASK_IN)
 }
 
 // TaskFindAllInType 查询多任务 - 任务运行
-func (c *Client) TaskFindAllInType(ctx context.Context, tx *gorm.DB, Type string) []gormModelTask {
+func (c *Client) TaskFindAllInType(ctx context.Context, tx *gorm.DB, Type string) []GormModelTask {
 	return c.taskFindAllType(ctx, tx, Type, 0, TASK_IN)
 }
 
 // TaskFindAllSuccess 查询多任务 - 任务完成
-func (c *Client) TaskFindAllSuccess(ctx context.Context, tx *gorm.DB, frequency int64) []gormModelTask {
+func (c *Client) TaskFindAllSuccess(ctx context.Context, tx *gorm.DB, frequency int64) []GormModelTask {
 	return c.taskFindAll(ctx, tx, frequency, TASK_SUCCESS)
 }
 
 // TaskFindAllSuccessType 查询多任务 - 任务完成
-func (c *Client) TaskFindAllSuccessType(ctx context.Context, tx *gorm.DB, Type string) []gormModelTask {
+func (c *Client) TaskFindAllSuccessType(ctx context.Context, tx *gorm.DB, Type string) []GormModelTask {
 	return c.taskFindAllType(ctx, tx, Type, 0, TASK_SUCCESS)
 }
 
 // TaskFindAllError 查询多任务 - 任务异常
-func (c *Client) TaskFindAllError(ctx context.Context, tx *gorm.DB, frequency int64) []gormModelTask {
+func (c *Client) TaskFindAllError(ctx context.Context, tx *gorm.DB, frequency int64) []GormModelTask {
 	return c.taskFindAll(ctx, tx, frequency, TASK_ERROR)
 }
 
 // TaskFindAllErrorType 查询多任务 - 任务异常
-func (c *Client) TaskFindAllErrorType(ctx context.Context, tx *gorm.DB, Type string) []gormModelTask {
+func (c *Client) TaskFindAllErrorType(ctx context.Context, tx *gorm.DB, Type string) []GormModelTask {
 	return c.taskFindAllType(ctx, tx, Type, 0, TASK_ERROR)
 }
 
 // TaskFindAllTimeout 查询多任务 - 任务超时
-func (c *Client) TaskFindAllTimeout(ctx context.Context, tx *gorm.DB, frequency int64) []gormModelTask {
+func (c *Client) TaskFindAllTimeout(ctx context.Context, tx *gorm.DB, frequency int64) []GormModelTask {
 	return c.taskFindAll(ctx, tx, frequency, TASK_TIMEOUT)
 }
 
 // TaskFindAllTimeoutType 查询多任务 - 任务超时
-func (c *Client) TaskFindAllTimeoutType(ctx context.Context, tx *gorm.DB, Type string) []gormModelTask {
+func (c *Client) TaskFindAllTimeoutType(ctx context.Context, tx *gorm.DB, Type string) []GormModelTask {
 	return c.taskFindAllType(ctx, tx, Type, 0, TASK_TIMEOUT)
 }
 
 // TaskFindAllWait 查询多任务 - 任务等待
-func (c *Client) TaskFindAllWait(ctx context.Context, tx *gorm.DB, frequency int64) []gormModelTask {
+func (c *Client) TaskFindAllWait(ctx context.Context, tx *gorm.DB, frequency int64) []GormModelTask {
 	return c.taskFindAll(ctx, tx, frequency, TASK_WAIT)
 }
 
 // TaskFindAllWaitType 查询多任务 - 任务等待
-func (c *Client) TaskFindAllWaitType(ctx context.Context, tx *gorm.DB, Type string) []gormModelTask {
+func (c *Client) TaskFindAllWaitType(ctx context.Context, tx *gorm.DB, Type string) []GormModelTask {
 	return c.taskFindAllType(ctx, tx, Type, 0, TASK_WAIT)
 }
 
@@ -284,7 +284,7 @@ func (c *Client) TaskFindAllWaitType(ctx context.Context, tx *gorm.DB, Type stri
 func (c *Client) StartTask(ctx context.Context, tx *gorm.DB, id uint) error {
 	err := c.EditTask(ctx, tx, id).
 		Select("status", "status_desc").
-		Updates(gormModelTask{
+		Updates(GormModelTask{
 			Status:     TASK_IN,
 			StatusDesc: "启动任务",
 		}).Error
@@ -303,7 +303,7 @@ func (c *Client) StartTaskCustom(ctx context.Context, tx *gorm.DB, customId stri
 		Where("custom_sequence = ?", customSequence).
 		Where("status = ?", TASK_WAIT).
 		Select("status", "status_desc").
-		Updates(gormModelTask{
+		Updates(GormModelTask{
 			Status:     TASK_IN,
 			StatusDesc: "启动任务",
 		}).Error
@@ -325,7 +325,7 @@ func (c *Client) EditTask(ctx context.Context, tx *gorm.DB, id uint) *gorm.DB {
 func (c *Client) UpdateFrequency(ctx context.Context, tx *gorm.DB, id uint, frequency int64) error {
 	err := c.EditTask(ctx, tx, id).
 		Select("frequency", "next_run_time").
-		Updates(gormModelTask{
+		Updates(GormModelTask{
 			Frequency:   frequency,
 			NextRunTime: gotime.Current().AfterSeconds(frequency).Time,
 		}).Error

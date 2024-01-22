@@ -10,17 +10,17 @@ import (
 )
 
 // Lock 上锁
-func (c *Client) Lock(ctx context.Context, info gormModelTask, id any) (string, error) {
+func (c *Client) Lock(ctx context.Context, info GormModelTask, id any) (string, error) {
 	return c.lock(ctx, fmt.Sprintf("%s%s%v%s%v", c.redisConfig.lockKeyPrefix, c.redisConfig.lockKeySeparator, info.Type, c.redisConfig.lockKeySeparator, id), fmt.Sprintf("[Lock] 已在%s@%s机器上锁成功，时间：%v", c.config.systemInsideIP, c.config.systemOutsideIP, gotime.Current().Format()), time.Duration(info.Frequency)*3*time.Second)
 }
 
 // Unlock Lock 解锁
-func (c *Client) Unlock(ctx context.Context, info gormModelTask, id any) error {
+func (c *Client) Unlock(ctx context.Context, info GormModelTask, id any) error {
 	return c.unlock(ctx, fmt.Sprintf("%s%s%v%s%v", c.redisConfig.lockKeyPrefix, c.redisConfig.lockKeySeparator, info.Type, c.redisConfig.lockKeySeparator, id))
 }
 
 // LockForever 永远上锁
-func (c *Client) LockForever(ctx context.Context, info gormModelTask, id any) (string, error) {
+func (c *Client) LockForever(ctx context.Context, info GormModelTask, id any) (string, error) {
 	return c.lockForever(ctx, fmt.Sprintf("%s%s%v%s%v", c.redisConfig.lockKeyPrefix, c.redisConfig.lockKeySeparator, info.Type, c.redisConfig.lockKeySeparator, id), fmt.Sprintf("[LockForever] 已在%s@%s机器永远上锁成功，时间：%v", c.config.systemInsideIP, c.config.systemOutsideIP, gotime.Current().Format()))
 }
 

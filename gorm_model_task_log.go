@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-// 任务日志
-type gormModelTaskLog struct {
+// GormModelTaskLog 任务日志
+type GormModelTaskLog struct {
 	LogID           uint      `gorm:"primaryKey;comment:【日志】编号" json:"log_id"`                            // 【日志】编号
 	LogTime         time.Time `gorm:"autoCreateTime;index;comment:【日志】时间" json:"log_time"`                // 【日志】时间
 	TaskID          uint      `gorm:"index;comment:【任务】编号" json:"task_id"`                                // 【任务】编号
@@ -36,7 +36,7 @@ func (c *Client) gormAutoMigrateTaskLog(ctx context.Context) error {
 		return nil
 	}
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
-		AutoMigrate(&gormModelTaskLog{})
+		AutoMigrate(&GormModelTaskLog{})
 	return err
 }
 
@@ -47,7 +47,7 @@ func (c *Client) GormTaskLogDelete(ctx context.Context, hour int64) error {
 	}
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
 		Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
-		Delete(&gormModelTaskLog{}).Error
+		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -63,7 +63,7 @@ func (c *Client) GormTaskLogInDelete(ctx context.Context, hour int64) error {
 	}
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
 		Where("task_result_status = ?", TASK_IN).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
-		Delete(&gormModelTaskLog{}).Error
+		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -79,7 +79,7 @@ func (c *Client) GormTaskLogSuccessDelete(ctx context.Context, hour int64) error
 	}
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
 		Where("task_result_status = ?", TASK_SUCCESS).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
-		Delete(&gormModelTaskLog{}).Error
+		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -95,7 +95,7 @@ func (c *Client) GormTaskLogErrorDelete(ctx context.Context, hour int64) error {
 	}
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
 		Where("task_result_status = ?", TASK_ERROR).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
-		Delete(&gormModelTaskLog{}).Error
+		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -111,7 +111,7 @@ func (c *Client) GormTaskLogTimeoutDelete(ctx context.Context, hour int64) error
 	}
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
 		Where("task_result_status = ?", TASK_TIMEOUT).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
-		Delete(&gormModelTaskLog{}).Error
+		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -128,7 +128,7 @@ func (c *Client) GormTaskLogWaitDelete(ctx context.Context, hour int64) error {
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
 		Where("task_result_status = ?", TASK_WAIT).
 		Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
-		Delete(&gormModelTaskLog{}).Error
+		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
 			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
@@ -138,8 +138,8 @@ func (c *Client) GormTaskLogWaitDelete(ctx context.Context, hour int64) error {
 }
 
 // GormTaskLogRecord 记录
-func (c *Client) GormTaskLogRecord(ctx context.Context, task gormModelTask, runId string, taskResultCode int, taskResultDesc string) {
-	taskLog := gormModelTaskLog{
+func (c *Client) GormTaskLogRecord(ctx context.Context, task GormModelTask, runId string, taskResultCode int, taskResultDesc string) {
+	taskLog := GormModelTaskLog{
 		TaskID:          task.ID,                  //【任务】编号
 		TaskRunID:       runId,                    //【任务】执行编号
 		TaskResultCode:  taskResultCode,           //【任务】执行状态码
