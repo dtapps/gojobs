@@ -103,9 +103,13 @@ func (c *Client) ConfigGormClientFun(ctx context.Context, client *gorm.DB, taskT
 		}
 	}
 
-	c.autoMigrateTask(ctx)
+	err := c.gormAutoMigrateTask(ctx)
+	if err != nil {
+		return err
+	}
+	err = c.gormAutoMigrateTaskLog(ctx)
 
-	return nil
+	return err
 }
 
 // ConfigMongoClientFun MONGO配置

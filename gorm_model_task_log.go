@@ -1,6 +1,11 @@
 package gojobs
 
-import "time"
+import (
+	"context"
+	"fmt"
+	"go.dtapp.net/gotime"
+	"time"
+)
 
 // 任务日志
 type gormModelTaskLog struct {
@@ -23,4 +28,150 @@ type gormModelTaskLog struct {
 	CpuCores        int       `gorm:"comment:【CPU】核数" json:"cpu_cores,omitempty"`                         //【CPU】核数
 	CpuModelName    string    `gorm:"comment:【CPU】型号名称" json:"cpu_model_name,omitempty"`                  //【CPU】型号名称
 	CpuMhz          float64   `gorm:"comment:【CPU】兆赫" json:"cpu_mhz,omitempty"`                           //【CPU】兆赫
+}
+
+// 创建模型
+func (c *Client) gormAutoMigrateTaskLog(ctx context.Context) error {
+	if c.gormConfig.taskLogStatus == false {
+		return nil
+	}
+	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
+		AutoMigrate(&gormModelTaskLog{})
+	return err
+}
+
+// GormTaskLogDelete 删除
+func (c *Client) GormTaskLogDelete(ctx context.Context, hour int64) error {
+	if c.gormConfig.taskLogStatus == false {
+		return nil
+	}
+	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
+		Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
+		Delete(&gormModelTaskLog{}).Error
+	if err != nil {
+		if c.slog.status {
+			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+		}
+	}
+	return err
+}
+
+// GormTaskLogInDelete 删除任务运行
+func (c *Client) GormTaskLogInDelete(ctx context.Context, hour int64) error {
+	if c.gormConfig.taskLogStatus == false {
+		return nil
+	}
+	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
+		Where("task_result_status = ?", TASK_IN).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
+		Delete(&gormModelTaskLog{}).Error
+	if err != nil {
+		if c.slog.status {
+			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+		}
+	}
+	return err
+}
+
+// GormTaskLogSuccessDelete 删除任务完成
+func (c *Client) GormTaskLogSuccessDelete(ctx context.Context, hour int64) error {
+	if c.gormConfig.taskLogStatus == false {
+		return nil
+	}
+	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
+		Where("task_result_status = ?", TASK_SUCCESS).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
+		Delete(&gormModelTaskLog{}).Error
+	if err != nil {
+		if c.slog.status {
+			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+		}
+	}
+	return err
+}
+
+// GormTaskLogErrorDelete 删除任务异常
+func (c *Client) GormTaskLogErrorDelete(ctx context.Context, hour int64) error {
+	if c.gormConfig.taskLogStatus == false {
+		return nil
+	}
+	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
+		Where("task_result_status = ?", TASK_ERROR).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
+		Delete(&gormModelTaskLog{}).Error
+	if err != nil {
+		if c.slog.status {
+			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+		}
+	}
+	return err
+}
+
+// GormTaskLogTimeoutDelete 删除任务超时
+func (c *Client) GormTaskLogTimeoutDelete(ctx context.Context, hour int64) error {
+	if c.gormConfig.taskLogStatus == false {
+		return nil
+	}
+	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
+		Where("task_result_status = ?", TASK_TIMEOUT).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
+		Delete(&gormModelTaskLog{}).Error
+	if err != nil {
+		if c.slog.status {
+			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+		}
+	}
+	return err
+}
+
+// GormTaskLogWaitDelete 删除任务等待
+func (c *Client) GormTaskLogWaitDelete(ctx context.Context, hour int64) error {
+	if c.gormConfig.taskLogStatus == false {
+		return nil
+	}
+	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
+		Where("task_result_status = ?", TASK_WAIT).
+		Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
+		Delete(&gormModelTaskLog{}).Error
+	if err != nil {
+		if c.slog.status {
+			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+		}
+	}
+	return err
+}
+
+// TaskLogRecord 记录
+func (c *Client) TaskLogRecord(ctx context.Context, task gormModelTask, runId string, taskResultCode int, taskResultDesc string) {
+	c.GormTaskLogRecord(ctx, task, runId, taskResultCode, taskResultDesc)
+}
+
+// GormTaskLogRecord 记录
+func (c *Client) GormTaskLogRecord(ctx context.Context, task gormModelTask, runId string, taskResultCode int, taskResultDesc string) {
+
+	taskLog := gormModelTaskLog{
+		TaskID:         task.ID,
+		TaskRunID:      runId,
+		TaskResultCode: taskResultCode,
+		TaskResultDesc: taskResultDesc,
+
+		SystemHostName:  c.config.systemHostname,
+		SystemInsideIP:  c.config.systemInsideIP,
+		SystemOutsideIP: c.config.systemOutsideIP,
+		SystemOs:        c.config.systemOs,
+		SystemArch:      c.config.systemKernel,
+		SystemUpTime:    c.config.systemUpTime,
+		SystemBootTime:  c.config.systemBootTime,
+		GoVersion:       c.config.goVersion,
+		SdkVersion:      c.config.sdkVersion,
+		SystemVersion:   c.config.sdkVersion,
+		CpuCores:        c.config.cpuCores,
+		CpuModelName:    c.config.cpuModelName,
+		CpuMhz:          c.config.cpuMhz,
+	}
+	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
+		Create(&taskLog).Error
+	if err != nil {
+		if c.slog.status {
+			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("记录失败：%s", err))
+			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("记录数据：%+v", taskLog))
+		}
+	}
+
 }
