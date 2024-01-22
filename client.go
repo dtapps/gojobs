@@ -31,8 +31,7 @@ type ClientConfig struct {
 
 // Client 实例
 type Client struct {
-	gormClient *gorm.DB // 数据库
-	config     struct {
+	config struct {
 		systemHostname      string  // 主机名
 		systemOs            string  // 系统类型
 		systemVersion       string  // 系统版本
@@ -75,9 +74,7 @@ type Client struct {
 }
 
 // NewClient 创建实例
-func NewClient(config *ClientConfig) (*Client, error) {
-
-	var ctx = context.Background()
+func NewClient(ctx context.Context, config *ClientConfig) (*Client, error) {
 
 	c := &Client{}
 

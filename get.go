@@ -7,7 +7,7 @@ import (
 
 // GetGormDb 获取数据库驱动
 func (c *Client) GetGormDb() *gorm.DB {
-	return c.gormClient
+	return c.gormConfig.client
 }
 
 // GetRedisDb 获取缓存数据库驱动
