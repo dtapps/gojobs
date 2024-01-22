@@ -2,7 +2,6 @@ package gojobs
 
 import (
 	"context"
-	"go.dtapp.net/gojobs/jobs_gorm_model"
 )
 
 const (
@@ -16,7 +15,7 @@ const (
 // Cron
 type jobs interface {
 	// Run 运行
-	Run(ctx context.Context, info jobs_gorm_model.Task, status int, result string)
+	Run(ctx context.Context, info gormModelTask, status int, result string)
 	// CreateInCustomId 创建正在运行任务
 	CreateInCustomId(ctx context.Context, config *ConfigCreateInCustomId) error
 	// CreateInCustomIdOnly 创建正在运行唯一任务

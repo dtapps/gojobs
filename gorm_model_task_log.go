@@ -1,9 +1,9 @@
-package jobs_gorm_model
+package gojobs
 
 import "time"
 
-// TaskLog 任务日志
-type TaskLog struct {
+// 任务日志
+type gormModelTaskLog struct {
 	LogID           uint      `gorm:"primaryKey;comment:【日志】编号" json:"log_id"`                            // 【日志】编号
 	LogTime         time.Time `gorm:"autoCreateTime;index;comment:【日志】时间" json:"log_time"`                // 【日志】时间
 	TaskID          uint      `gorm:"index;comment:【任务】编号" json:"task_id"`                                // 【任务】编号

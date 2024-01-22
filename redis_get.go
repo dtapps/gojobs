@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"go.dtapp.net/goip"
-	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gostring"
 	"math/rand"
 	"time"
@@ -17,7 +16,7 @@ import (
 // ---
 // address 下发地址
 // err 错误信息
-func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *jobs_gorm_model.Task) (string, error) {
+func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *gormModelTask) (string, error) {
 	var (
 		currentIp       = ""    // 当前Ip
 		appointIpStatus = false // 指定Ip状态

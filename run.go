@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"go.dtapp.net/goip"
-	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gotime"
 	"go.dtapp.net/gotrace_id"
 	"strings"
@@ -16,7 +15,7 @@ import (
 // specifyIp 指定Ip
 // tasks 过滤前的数据
 // newTasks 过滤后的数据
-func (c *Client) Filter(ctx context.Context, isMandatoryIp bool, specifyIp string, tasks []jobs_gorm_model.Task, isPrint bool) (newTasks []jobs_gorm_model.Task) {
+func (c *Client) Filter(ctx context.Context, isMandatoryIp bool, specifyIp string, tasks []gormModelTask, isPrint bool) (newTasks []gormModelTask) {
 	c.Println(ctx, isPrint, fmt.Sprintf("【Filter入参】是强制性Ip：%v；指定Ip：%v；任务数量：%v", isMandatoryIp, specifyIp, len(tasks)))
 	if specifyIp == "" {
 		specifyIp = goip.IsIp(c.GetCurrentIp())
@@ -73,7 +72,7 @@ func (c *Client) Filter(ctx context.Context, isMandatoryIp bool, specifyIp strin
 }
 
 // Run 运行
-func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultCode int, taskResultDesc string) {
+func (c *Client) Run(ctx context.Context, task gormModelTask, taskResultCode int, taskResultDesc string) {
 
 	runId := gotrace_id.GetTraceIdContext(ctx)
 	if runId == "" {
@@ -89,7 +88,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 	case 0:
 		err := c.EditTask(ctx, c.gormConfig.client, task.ID).
 			Select("run_id", "result", "next_run_time").
-			Updates(jobs_gorm_model.Task{
+			Updates(gormModelTask{
 				RunID:       runId,
 				Result:      taskResultDesc,
 				NextRunTime: gotime.Current().AfterSeconds(task.Frequency).Time,
@@ -104,7 +103,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 		// 执行成功
 		err := c.EditTask(ctx, c.gormConfig.client, task.ID).
 			Select("status_desc", "number", "run_id", "updated_ip", "result", "next_run_time").
-			Updates(jobs_gorm_model.Task{
+			Updates(gormModelTask{
 				StatusDesc:  "执行成功",
 				Number:      task.Number + 1,
 				RunID:       runId,
@@ -121,7 +120,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 		// 执行成功、提前结束
 		err := c.EditTask(ctx, c.gormConfig.client, task.ID).
 			Select("status", "status_desc", "number", "updated_ip", "result", "next_run_time").
-			Updates(jobs_gorm_model.Task{
+			Updates(gormModelTask{
 				Status:      TASK_SUCCESS,
 				StatusDesc:  "结束执行",
 				Number:      task.Number + 1,
@@ -138,7 +137,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 		// 执行失败
 		err := c.EditTask(ctx, c.gormConfig.client, task.ID).
 			Select("status_desc", "number", "run_id", "updated_ip", "result", "next_run_time").
-			Updates(jobs_gorm_model.Task{
+			Updates(gormModelTask{
 				StatusDesc:  "执行失败",
 				Number:      task.Number + 1,
 				RunID:       runId,
@@ -158,7 +157,7 @@ func (c *Client) Run(ctx context.Context, task jobs_gorm_model.Task, taskResultC
 			// 关闭执行
 			err := c.EditTask(ctx, c.gormConfig.client, task.ID).
 				Select("status").
-				Updates(jobs_gorm_model.Task{
+				Updates(gormModelTask{
 					Status: TASK_TIMEOUT,
 				}).Error
 			if err != nil {

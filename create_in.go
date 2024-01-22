@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gostring"
 	"go.dtapp.net/gotime"
 	"gorm.io/gorm"
@@ -29,7 +28,7 @@ func (c *Client) CreateInCustomId(ctx context.Context, config *ConfigCreateInCus
 		config.CurrentIp = c.config.systemOutsideIP
 	}
 	err := config.Tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
-		Create(&jobs_gorm_model.Task{
+		Create(&gormModelTask{
 			Status:         TASK_IN,
 			Params:         config.Params,
 			StatusDesc:     "首次添加任务",
@@ -73,7 +72,7 @@ func (c *Client) CreateInCustomIdOnly(ctx context.Context, config *ConfigCreateI
 		config.CurrentIp = c.config.systemOutsideIP
 	}
 	err := config.Tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
-		Create(&jobs_gorm_model.Task{
+		Create(&gormModelTask{
 			Status:         TASK_IN,
 			Params:         config.Params,
 			StatusDesc:     "首次添加任务",
@@ -114,7 +113,7 @@ func (c *Client) CreateInCustomIdMaxNumber(ctx context.Context, config *ConfigCr
 		config.CurrentIp = c.config.systemOutsideIP
 	}
 	err := config.Tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
-		Create(&jobs_gorm_model.Task{
+		Create(&gormModelTask{
 			Status:         TASK_IN,
 			Params:         config.Params,
 			StatusDesc:     "首次添加任务",
@@ -160,7 +159,7 @@ func (c *Client) CreateInCustomIdMaxNumberOnly(ctx context.Context, config *Conf
 		config.CurrentIp = c.config.systemOutsideIP
 	}
 	err := config.Tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
-		Create(&jobs_gorm_model.Task{
+		Create(&gormModelTask{
 			Status:         TASK_IN,
 			Params:         config.Params,
 			StatusDesc:     "首次添加任务",

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go.dtapp.net/gojobs/jobs_gorm_model"
 	"go.dtapp.net/gostring"
 	"go.dtapp.net/gotime"
 	"gorm.io/gorm"
@@ -29,7 +28,7 @@ func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWai
 		config.CurrentIp = c.config.systemOutsideIP
 	}
 	err := config.Tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
-		Create(&jobs_gorm_model.Task{
+		Create(&gormModelTask{
 			Status:         TASK_WAIT,
 			Params:         config.Params,
 			StatusDesc:     "首次添加等待任务",

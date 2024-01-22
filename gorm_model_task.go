@@ -1,12 +1,12 @@
-package jobs_gorm_model
+package gojobs
 
 import (
 	"gorm.io/gorm"
 	"time"
 )
 
-// Task 任务
-type Task struct {
+// 任务
+type gormModelTask struct {
 	ID             uint           `gorm:"primaryKey;comment:记录编号" json:"id"`                      // 记录编号
 	Status         string         `gorm:"index;comment:状态码" json:"status"`                        // 状态码
 	Params         string         `gorm:"comment:参数" json:"params"`                               // 参数

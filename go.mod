@@ -12,6 +12,7 @@ require (
 	go.dtapp.net/gostring v1.0.13
 	go.dtapp.net/gotime v1.0.6
 	go.dtapp.net/gotrace_id v1.0.8
+	go.mongodb.org/mongo-driver v1.13.1
 	gorm.io/gorm v1.25.5
 )
 
@@ -60,7 +61,6 @@ require (
 	go.dtapp.net/gojson v1.0.4 // indirect
 	go.dtapp.net/gorandom v1.0.2 // indirect
 	go.dtapp.net/gourl v1.0.0 // indirect
-	go.mongodb.org/mongo-driver v1.13.1 // indirect
 	golang.org/x/arch v0.7.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
