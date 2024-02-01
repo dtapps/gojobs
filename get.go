@@ -5,6 +5,11 @@ import (
 	"gorm.io/gorm"
 )
 
+// GetDb 获取数据库驱动
+func (c *Client) GetDb() *gorm.DB {
+	return c.gormConfig.client
+}
+
 // GetGormDb 获取数据库驱动
 func (c *Client) GetGormDb() *gorm.DB {
 	return c.gormConfig.client
