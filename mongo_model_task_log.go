@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 )
 
 // MongoModelTaskLog 任务日志
@@ -91,10 +92,10 @@ func (c *Client) MongoTaskLogRecord(ctx context.Context, task GormModelTask, run
 		InsertOne(ctx, taskLog)
 	if err != nil {
 		if c.slog.status {
-			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("记录失败：%s", err))
+			log.Println(fmt.Sprintf("记录失败：%s", err))
 		}
 		if c.slog.status {
-			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("记录数据：%+v", taskLog))
+			log.Println(fmt.Sprintf("记录数据：%+v", taskLog))
 		}
 	}
 }

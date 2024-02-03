@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go.dtapp.net/gotime"
+	"log"
 	"time"
 )
 
@@ -50,7 +51,7 @@ func (c *Client) GormTaskLogDelete(ctx context.Context, hour int64) error {
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+			log.Println(fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -66,7 +67,7 @@ func (c *Client) GormTaskLogInDelete(ctx context.Context, hour int64) error {
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+			log.Println(fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -82,7 +83,7 @@ func (c *Client) GormTaskLogSuccessDelete(ctx context.Context, hour int64) error
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+			log.Println(fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -98,7 +99,7 @@ func (c *Client) GormTaskLogErrorDelete(ctx context.Context, hour int64) error {
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+			log.Println(fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -114,7 +115,7 @@ func (c *Client) GormTaskLogTimeoutDelete(ctx context.Context, hour int64) error
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+			log.Println(fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -131,7 +132,7 @@ func (c *Client) GormTaskLogWaitDelete(ctx context.Context, hour int64) error {
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("删除失败：%s", err))
+			log.Println(fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -162,10 +163,10 @@ func (c *Client) GormTaskLogRecord(ctx context.Context, task GormModelTask, runI
 		Create(&taskLog).Error
 	if err != nil {
 		if c.slog.status {
-			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("记录失败：%s", err))
+			log.Println(fmt.Sprintf("记录失败：%s", err))
 		}
 		if c.slog.status {
-			c.slog.client.WithTraceId(ctx).Error(fmt.Sprintf("记录数据：%+v", taskLog))
+			log.Println(fmt.Sprintf("记录数据：%+v", taskLog))
 		}
 	}
 }

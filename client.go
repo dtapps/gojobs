@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/redis/go-redis/v9"
-	"go.dtapp.net/golog"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 )
@@ -26,8 +25,6 @@ type Client struct {
 		systemOutsideIP     string  // 外网IP
 		goVersion           string  // go版本
 		sdkVersion          string  // sdk版本
-		logVersion          string  // log版本
-		redisSdkVersion     string  // redisSdk版本
 	}
 	redisConfig struct {
 		client           *redis.Client // 数据库
@@ -49,8 +46,7 @@ type Client struct {
 		taskLogCollectionName string        // 任务日志集合名
 	}
 	slog struct {
-		status bool        // 状态
-		client *golog.SLog // 日志服务
+		status bool // 状态
 	}
 }
 

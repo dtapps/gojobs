@@ -6,7 +6,6 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/host"
-	"go.dtapp.net/golog"
 	"go.dtapp.net/gorequest"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -77,8 +76,6 @@ func (c *Client) setConfig(ctx context.Context, systemOutsideIP string) {
 	c.config.goVersion = runtime.Version()      // go版本
 	c.config.sdkVersion = Version               // sdk版本
 	c.config.systemVersion = info.SystemVersion // 系统版本
-	c.config.logVersion = golog.Version         // log版本
-	c.config.redisSdkVersion = redis.Version()  // redisSdk版本
 
 }
 
@@ -171,13 +168,4 @@ func (c *Client) ConfigRedisClientFun(ctx context.Context, client *redis.Client,
 	}
 
 	return nil
-}
-
-// ConfigSLogClientFun 日志配置
-func (c *Client) ConfigSLogClientFun(sLogFun golog.SLogFun) {
-	sLog := sLogFun()
-	if sLog != nil {
-		c.slog.client = sLog
-		c.slog.status = true
-	}
 }
