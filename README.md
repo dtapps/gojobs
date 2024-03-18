@@ -13,5 +13,5 @@
 #### 安装
 
 ```shell
-go get -v -u go.dtapp.net/gojobs@v1.0.125
+go get -v -u go.dtapp.net/gojobs@v1.0.126
 ```
