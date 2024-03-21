@@ -163,7 +163,7 @@ func (c *Cron) ListTask() {
 
 // RunListTask 任务列表
 func (c *Cron) RunListTask(spec string) {
-	_, _ = c.AddFunc(spec, func() {
+	_, _ = c.inner.AddFunc(spec, func() {
 		c.ListTask()
 	})
 }
