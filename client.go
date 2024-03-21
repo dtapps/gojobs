@@ -4,27 +4,14 @@ import (
 	"context"
 	"errors"
 	"github.com/redis/go-redis/v9"
-	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 )
 
 // Client 实例
 type Client struct {
 	config struct {
-		systemHostname      string  // 主机名
-		systemOs            string  // 系统类型
-		systemVersion       string  // 系统版本
-		systemKernel        string  // 系统内核
-		systemKernelVersion string  // 系统内核版本
-		systemUpTime        uint64  // 系统运行时间
-		systemBootTime      uint64  // 系统开机时间
-		cpuCores            int     // CPU核数
-		cpuModelName        string  // CPU型号名称
-		cpuMhz              float64 // CPU兆赫
-		systemInsideIP      string  // 内网IP
-		systemOutsideIP     string  // 外网IP
-		goVersion           string  // go版本
-		sdkVersion          string  // sdk版本
+		systemInsideIP  string // 内网IP
+		systemOutsideIP string // 外网IP
 	}
 	redisConfig struct {
 		client           *redis.Client // 数据库
@@ -38,12 +25,6 @@ type Client struct {
 		taskTableName    string   // 任务表名
 		taskLogStatus    bool     // 任务日志状态
 		taskLogTableName string   // 任务日志表名
-	}
-	mongoConfig struct {
-		client                *mongo.Client // 数据库
-		databaseName          string        // 库名
-		taskLogStatus         bool          // 任务日志状态
-		taskLogCollectionName string        // 任务日志集合名
 	}
 	slog struct {
 		status bool // 状态

@@ -4,79 +4,14 @@ import (
 	"context"
 	"errors"
 	"github.com/redis/go-redis/v9"
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/host"
 	"go.dtapp.net/gorequest"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
-	"runtime"
 )
-
-type systemResult struct {
-	SystemHostname      string  // 主机名
-	SystemOs            string  // 系统类型
-	SystemVersion       string  // 系统版本
-	SystemKernel        string  // 系统内核
-	SystemKernelVersion string  // 系统内核版本
-	SystemUpTime        uint64  // 系统运行时间
-	SystemBootTime      uint64  // 系统开机时间
-	CpuCores            int     // CPU核数
-	CpuModelName        string  // CPU型号名称
-	CpuMhz              float64 // CPU兆赫
-}
-
-// 获取系统信息
-func getSystem() (result systemResult) {
-
-	hInfo, _ := host.Info()
-
-	result.SystemHostname = hInfo.Hostname
-	result.SystemOs = hInfo.OS
-	result.SystemVersion = hInfo.PlatformVersion
-	result.SystemKernel = hInfo.KernelArch
-	result.SystemKernelVersion = hInfo.KernelVersion
-	result.SystemUpTime = hInfo.Uptime
-	if hInfo.BootTime != 0 {
-		result.SystemBootTime = hInfo.BootTime
-	}
-
-	hCpu, _ := cpu.Times(true)
-
-	result.CpuCores = len(hCpu)
-
-	cInfo, _ := cpu.Info()
-
-	if len(cInfo) > 0 {
-		result.CpuModelName = cInfo[0].ModelName
-		result.CpuMhz = cInfo[0].Mhz
-	}
-
-	return result
-}
 
 // 设置配置信息
 func (c *Client) setConfig(ctx context.Context, systemOutsideIP string) {
-
-	info := getSystem()
-
-	c.config.systemHostname = info.SystemHostname
-	c.config.systemOs = info.SystemOs
-	c.config.systemKernel = info.SystemKernel
-	c.config.systemKernelVersion = info.SystemKernelVersion
-	c.config.systemUpTime = info.SystemUpTime
-	c.config.systemBootTime = info.SystemBootTime
-	c.config.cpuCores = info.CpuCores
-	c.config.cpuModelName = info.CpuModelName
-	c.config.cpuMhz = info.CpuMhz
-
 	c.config.systemInsideIP = gorequest.GetInsideIp(ctx)
 	c.config.systemOutsideIP = systemOutsideIP
-
-	c.config.goVersion = runtime.Version()      // go版本
-	c.config.sdkVersion = Version               // sdk版本
-	c.config.systemVersion = info.SystemVersion // 系统版本
-
 }
 
 // ConfigGormClientFun GORM配置
@@ -105,45 +40,6 @@ func (c *Client) ConfigGormClientFun(ctx context.Context, client *gorm.DB, taskT
 		return err
 	}
 	err = c.gormAutoMigrateTaskLog(ctx)
-
-	return err
-}
-
-// ConfigMongoClientFun MONGO配置
-func (c *Client) ConfigMongoClientFun(ctx context.Context, client *mongo.Client, databaseName string, taskLogStatus bool, taskLogCollectionName string) (err error) {
-	if client == nil {
-		return errors.New("请配置 Mongo")
-	}
-
-	// 配置数据库
-	c.mongoConfig.client = client
-	c.mongoConfig.databaseName = databaseName
-	if c.mongoConfig.databaseName == "" {
-		return errors.New("请配置 Mongo 库名")
-	}
-
-	c.mongoConfig.taskLogStatus = taskLogStatus
-	if c.mongoConfig.taskLogStatus {
-		c.mongoConfig.taskLogCollectionName = taskLogCollectionName
-		if c.mongoConfig.taskLogCollectionName == "" {
-			return errors.New("请配置 Mongo 任务日志集合名")
-		}
-	}
-
-	isExist := false
-	collectionNames, _ := c.mongoConfig.client.Database(c.mongoConfig.databaseName).ListCollectionNames(ctx, bson.M{})
-	for _, v := range collectionNames {
-		if v == c.mongoConfig.taskLogCollectionName {
-			isExist = true
-		}
-	}
-	if isExist == false {
-		err = c.mongoCreateCollectionTaskLog(ctx)
-		if err != nil {
-			return err
-		}
-		err = c.mongoCreateIndexesTaskLog(ctx)
-	}
 
 	return err
 }
