@@ -6,7 +6,8 @@ import (
 )
 
 func TestCron(t *testing.T) {
-	c := NewCronWithSeconds()
+	c := NewCronWithSeconds(WithCronLog())
+	t.Log("c.option.log", c.option.log)
 	c.AddFunc("@every 1s", func() {
 		//fmt.Println("every 1s")
 	})

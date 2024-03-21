@@ -2,7 +2,6 @@ package gojobs
 
 import (
 	"context"
-	"fmt"
 	"github.com/robfig/cron/v3"
 	"go.dtapp.net/gotime"
 	"log"
@@ -15,23 +14,34 @@ type taskList struct {
 
 // Cron 定时任务管理器
 type Cron struct {
-	inner *cron.Cron
-	list  []taskList
+	inner  *cron.Cron
+	list   []taskList
+	option struct {
+		log bool
+	}
 }
 
 // NewCron 创建一个定时任务管理器
-func NewCron() *Cron {
-	return &Cron{
+func NewCron(opts ...CronOption) *Cron {
+	c := &Cron{
 		inner: cron.New(),
 		list:  make([]taskList, 0),
 	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
-func NewCronWithSeconds() *Cron {
-	return &Cron{
+func NewCronWithSeconds(opts ...CronOption) *Cron {
+	c := &Cron{
 		inner: cron.New(cron.WithSeconds()),
 		list:  make([]taskList, 0),
 	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 // Start 启动任务
@@ -85,13 +95,20 @@ func (c *Cron) List() []cron.EntryID {
 func (c *Cron) ListShow() {
 	for _, v := range c.list {
 		taskInfo := c.inner.Entry(v.id)
-		log.Println(fmt.Sprintf("[ID=%v][Schedule=%v][Prev=%v][Next=%v]",
+		log.Printf("[ID=%v][Schedule=%v][Prev=%v][Next=%v]",
 			taskInfo.ID,
 			taskInfo.Schedule,
 			taskInfo.Prev.Format(gotime.DateTimeZhFormat),
 			taskInfo.Next.Format(gotime.DateTimeZhFormat),
-		))
+		)
 	}
+}
+
+// RunListShow 任务列表
+func (c *Cron) RunListShow(spec string) {
+	_, _ = c.AddFunc(spec, func() {
+		c.ListShow()
+	})
 }
 
 // AddTask 添加任务
@@ -112,18 +129,41 @@ func (c *Cron) QueryTask(id cron.EntryID) cron.Entry {
 // RemoveTask 删除任务
 func (c *Cron) RemoveTask(id cron.EntryID) {
 	c.inner.Remove(id)
+	c.logTask(id, "停止成功")
+}
+
+// PrintTask 日志任务
+func (c *Cron) PrintTask(id cron.EntryID, content string) {
+	c.logTask(id, content)
+}
+
+func (c *Cron) logTask(id cron.EntryID, content string) {
+	if c.option.log {
+		for _, v := range c.list {
+			if v.id == id {
+				log.Printf("%s [ID=%v]%s\n", v.name, id, content)
+			}
+		}
+	}
 }
 
 // ListTask 任务列表
 func (c *Cron) ListTask() {
 	for _, v := range c.list {
 		taskInfo := c.inner.Entry(v.id)
-		log.Println(fmt.Sprintf("%s [ID=%v][Schedule=%v][Prev=%v][Next=%v]",
+		log.Printf("%s [ID=%v][Schedule=%v][Prev=%v][Next=%v]",
 			v.name,
 			taskInfo.ID,
 			taskInfo.Schedule,
 			taskInfo.Prev.Format(gotime.DateTimeZhFormat),
 			taskInfo.Next.Format(gotime.DateTimeZhFormat),
-		))
+		)
 	}
+}
+
+// RunListTask 任务列表
+func (c *Cron) RunListTask(spec string) {
+	_, _ = c.AddFunc(spec, func() {
+		c.ListTask()
+	})
 }
