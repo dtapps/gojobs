@@ -126,6 +126,16 @@ func (c *Cron) QueryTask(id cron.EntryID) cron.Entry {
 	return c.inner.Entry(id)
 }
 
+// QueryInfo 查询信息
+func (c *Cron) QueryInfo(id cron.EntryID) (cron.EntryID, string) {
+	for _, v := range c.list {
+		if id == v.id {
+			return v.id, v.name
+		}
+	}
+	return 0, ""
+}
+
 // RemoveTask 删除任务
 func (c *Cron) RemoveTask(id cron.EntryID) {
 	c.inner.Remove(id)
@@ -133,11 +143,11 @@ func (c *Cron) RemoveTask(id cron.EntryID) {
 }
 
 // PrintTask 日志任务
-func (c *Cron) PrintTask(id cron.EntryID, content string) {
-	c.logTask(id, content)
+func (c *Cron) PrintTask(id cron.EntryID, content ...string) {
+	c.logTask(id, content...)
 }
 
-func (c *Cron) logTask(id cron.EntryID, content string) {
+func (c *Cron) logTask(id cron.EntryID, content ...string) {
 	if c.option.log {
 		for _, v := range c.list {
 			if v.id == id {
@@ -145,6 +155,15 @@ func (c *Cron) logTask(id cron.EntryID, content string) {
 			}
 		}
 	}
+}
+
+// PrintNameTask 日志任务
+func (c *Cron) PrintNameTask(id cron.EntryID, name string, content ...string) {
+	c.logNameTask(id, name, content...)
+}
+
+func (c *Cron) logNameTask(id cron.EntryID, name string, content ...string) {
+	log.Printf("%s [ID=%v]%s\n", name, id, content)
 }
 
 // ListTask 任务列表
