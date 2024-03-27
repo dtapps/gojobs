@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/redis/go-redis/v9"
-	"log"
+	"log/slog"
 )
 
 // Publish 发布
@@ -15,7 +15,7 @@ func (c *Client) Publish(ctx context.Context, channel string, message interface{
 	publish, err := c.redisConfig.client.Publish(ctx, channel, message).Result()
 	if err != nil {
 		if c.slog.status {
-			log.Println(fmt.Sprintf("发布失败：%s %s %v %s", channel, message, publish, err))
+			slog.Info(fmt.Sprintf("发布失败：%s %s %v %s", channel, message, publish, err))
 		}
 	}
 	return err

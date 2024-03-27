@@ -1,7 +1,6 @@
 package gojobs
 
 import (
-	"log"
 	"testing"
 )
 
@@ -15,7 +14,6 @@ func TestCron(t *testing.T) {
 		//fmt.Println("every 2s")
 	})
 	c.Start()
-	log.Println(c.List())
 	c.AddFunc("@every 10s", func() {
 		c.ListShow()
 	})

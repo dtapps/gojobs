@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go.dtapp.net/gotime"
-	"log"
+	"log/slog"
 	"time"
 )
 
@@ -40,7 +40,7 @@ func (c *Client) GormTaskLogDelete(ctx context.Context, hour int64) error {
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			log.Println(fmt.Sprintf("删除失败：%s", err))
+			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -56,7 +56,7 @@ func (c *Client) GormTaskLogInDelete(ctx context.Context, hour int64) error {
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			log.Println(fmt.Sprintf("删除失败：%s", err))
+			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -72,7 +72,7 @@ func (c *Client) GormTaskLogSuccessDelete(ctx context.Context, hour int64) error
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			log.Println(fmt.Sprintf("删除失败：%s", err))
+			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -88,7 +88,7 @@ func (c *Client) GormTaskLogErrorDelete(ctx context.Context, hour int64) error {
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			log.Println(fmt.Sprintf("删除失败：%s", err))
+			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -104,7 +104,7 @@ func (c *Client) GormTaskLogTimeoutDelete(ctx context.Context, hour int64) error
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			log.Println(fmt.Sprintf("删除失败：%s", err))
+			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -121,7 +121,7 @@ func (c *Client) GormTaskLogWaitDelete(ctx context.Context, hour int64) error {
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
 		if c.slog.status {
-			log.Println(fmt.Sprintf("删除失败：%s", err))
+			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
 		}
 	}
 	return err
@@ -141,10 +141,10 @@ func (c *Client) GormTaskLogRecord(ctx context.Context, task GormModelTask, runI
 		Create(&taskLog).Error
 	if err != nil {
 		if c.slog.status {
-			log.Println(fmt.Sprintf("记录失败：%s", err))
+			slog.ErrorContext(ctx, fmt.Sprintf("记录失败：%s", err))
 		}
 		if c.slog.status {
-			log.Println(fmt.Sprintf("记录数据：%+v", taskLog))
+			slog.ErrorContext(ctx, fmt.Sprintf("记录数据：%+v", taskLog))
 		}
 	}
 }

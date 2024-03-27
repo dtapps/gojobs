@@ -6,7 +6,7 @@ import (
 	"go.dtapp.net/goip"
 	"go.dtapp.net/gotime"
 	"go.dtapp.net/gotrace_id"
-	"log"
+	"log/slog"
 	"strings"
 )
 
@@ -78,7 +78,7 @@ func (c *Client) Run(ctx context.Context, task GormModelTask, taskResultCode int
 	runId := gotrace_id.GetTraceIdContext(ctx)
 	if runId == "" {
 		if c.slog.status {
-			log.Println("上下文没有跟踪编号")
+			slog.InfoContext(ctx, "上下文没有跟踪编号")
 		}
 		return
 	}
@@ -98,7 +98,7 @@ func (c *Client) Run(ctx context.Context, task GormModelTask, taskResultCode int
 			}).Error
 		if err != nil {
 			if c.slog.status {
-				log.Println(fmt.Sprintf("保存失败：%s", err))
+				slog.InfoContext(ctx, fmt.Sprintf("保存失败：%s", err))
 			}
 		}
 		return
@@ -116,7 +116,7 @@ func (c *Client) Run(ctx context.Context, task GormModelTask, taskResultCode int
 			}).Error
 		if err != nil {
 			if c.slog.status {
-				log.Println(fmt.Sprintf("保存失败：%s", err))
+				slog.InfoContext(ctx, fmt.Sprintf("保存失败：%s", err))
 			}
 		}
 	case CodeEnd:
@@ -133,7 +133,7 @@ func (c *Client) Run(ctx context.Context, task GormModelTask, taskResultCode int
 			}).Error
 		if err != nil {
 			if c.slog.status {
-				log.Println(fmt.Sprintf("保存失败：%s", err))
+				slog.InfoContext(ctx, fmt.Sprintf("保存失败：%s", err))
 			}
 		}
 	case CodeError:
@@ -150,7 +150,7 @@ func (c *Client) Run(ctx context.Context, task GormModelTask, taskResultCode int
 			}).Error
 		if err != nil {
 			if c.slog.status {
-				log.Println(fmt.Sprintf("保存失败：%s", err))
+				slog.InfoContext(ctx, fmt.Sprintf("保存失败：%s", err))
 			}
 		}
 	}
@@ -165,7 +165,7 @@ func (c *Client) Run(ctx context.Context, task GormModelTask, taskResultCode int
 				}).Error
 			if err != nil {
 				if c.slog.status {
-					log.Println(fmt.Sprintf("保存失败：%s", err))
+					slog.InfoContext(ctx, fmt.Sprintf("保存失败：%s", err))
 				}
 			}
 		}

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"go.dtapp.net/gotime"
-	"log"
+	"log/slog"
 	"time"
 )
 
@@ -18,7 +18,7 @@ func (c *Client) StartHandle(ctx context.Context, key any, overdue int64) error 
 	err = c.redisConfig.client.Set(ctx, fmt.Sprintf("%v", key), gotime.Current().Format(), time.Duration(overdue)*time.Second).Err()
 	if err != nil {
 		if c.slog.status {
-			log.Println(fmt.Sprintf("【%v】设置 %s", fmt.Sprintf("%v", key), err))
+			slog.Info(fmt.Sprintf("【%v】设置 %s", fmt.Sprintf("%v", key), err))
 		}
 	}
 
@@ -28,7 +28,7 @@ func (c *Client) EndHandle(ctx context.Context, key any) {
 	err := c.redisConfig.client.Del(ctx, fmt.Sprintf("%v", key)).Err()
 	if err != nil {
 		if c.slog.status {
-			log.Println(fmt.Sprintf("【%v】删除 %s", fmt.Sprintf("%v", key), err))
+			slog.Info(fmt.Sprintf("【%v】删除 %s", fmt.Sprintf("%v", key), err))
 		}
 	}
 }

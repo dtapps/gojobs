@@ -2,9 +2,10 @@ package gojobs
 
 import (
 	"context"
+	"fmt"
 	"github.com/robfig/cron/v3"
 	"go.dtapp.net/gotime"
-	"log"
+	"log/slog"
 )
 
 type taskList struct {
@@ -95,12 +96,12 @@ func (c *Cron) List() []cron.EntryID {
 func (c *Cron) ListShow() {
 	for _, v := range c.list {
 		taskInfo := c.inner.Entry(v.id)
-		log.Printf("[ID=%v][Schedule=%v][Prev=%v][Next=%v]",
+		slog.Info(fmt.Sprintf("[ID=%v][Schedule=%v][Prev=%v][Next=%v]",
 			taskInfo.ID,
 			taskInfo.Schedule,
 			taskInfo.Prev.Format(gotime.DateTimeZhFormat),
 			taskInfo.Next.Format(gotime.DateTimeZhFormat),
-		)
+		))
 	}
 }
 
@@ -151,7 +152,7 @@ func (c *Cron) logTask(id cron.EntryID, content ...string) {
 	if c.option.log {
 		for _, v := range c.list {
 			if v.id == id {
-				log.Printf("%s [ID=%v]%s\n", v.name, id, content)
+				slog.Info(fmt.Sprintf("%s [ID=%v]%s\n", v.name, id, content))
 			}
 		}
 	}
@@ -163,20 +164,20 @@ func (c *Cron) PrintNameTask(id cron.EntryID, name string, content ...string) {
 }
 
 func (c *Cron) logNameTask(id cron.EntryID, name string, content ...string) {
-	log.Printf("%s [ID=%v]%s\n", name, id, content)
+	slog.Info(fmt.Sprintf("%s [ID=%v]%s\n", name, id, content))
 }
 
 // ListTask 任务列表
 func (c *Cron) ListTask() {
 	for _, v := range c.list {
 		taskInfo := c.inner.Entry(v.id)
-		log.Printf("%s [ID=%v][Schedule=%v][Prev=%v][Next=%v]",
+		slog.Info(fmt.Sprintf("%s [ID=%v][Schedule=%v][Prev=%v][Next=%v]",
 			v.name,
 			taskInfo.ID,
 			taskInfo.Schedule,
 			taskInfo.Prev.Format(gotime.DateTimeZhFormat),
 			taskInfo.Next.Format(gotime.DateTimeZhFormat),
-		)
+		))
 	}
 }
 
