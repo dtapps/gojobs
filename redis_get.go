@@ -19,8 +19,8 @@ import (
 // err 错误信息
 func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *GormModelTask) (string, error) {
 	var (
-		currentIp       = ""    // 当前Ip
-		appointIpStatus = false // 指定Ip状态
+		currentIP       = ""    // 当前Ip
+		appointIPStatus = false // 指定Ip状态
 	)
 
 	if v.SpecifyIP != "" {
@@ -29,36 +29,36 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *GormM
 
 	// 赋值ip
 	if v.SpecifyIP != "" && v.SpecifyIP != SpecifyIpNull {
-		currentIp = v.SpecifyIP
-		appointIpStatus = true
+		currentIP = v.SpecifyIP
+		appointIPStatus = true
 	}
 
 	// 只有一个客户端在线
 	if len(workers) == 1 {
-		if appointIpStatus {
+		if appointIPStatus {
 			// 判断是否指定某ip执行
-			if gostring.Contains(workers[0], currentIp) {
+			if gostring.Contains(workers[0], currentIP) {
 				if c.slog.status {
-					slog.InfoContext(ctx, fmt.Sprintf("只有一个客户端在线，指定某ip执行：%v %v", workers[0], currentIp))
+					slog.InfoContext(ctx, fmt.Sprintf("只有一个客户端在线，指定某ip执行：%v %v", workers[0], currentIP))
 				}
 				return workers[0], nil
 			}
-			return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
+			return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIP))
 		}
 		return workers[0], nil
 	}
 
 	// 优先处理指定某ip执行
-	if appointIpStatus {
+	if appointIPStatus {
 		for wk, wv := range workers {
-			if gostring.Contains(wv, currentIp) {
+			if gostring.Contains(wv, currentIP) {
 				if c.slog.status {
-					slog.InfoContext(ctx, fmt.Sprintf("优先处理指定某ip执行：%v %v", workers[wk], currentIp))
+					slog.InfoContext(ctx, fmt.Sprintf("优先处理指定某ip执行：%v %v", workers[wk], currentIP))
 				}
 				return workers[wk], nil
 			}
 		}
-		return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIp))
+		return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIP))
 	} else {
 		// 随机返回一个
 		address := workers[c.random(0, len(workers))]
@@ -66,7 +66,7 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *GormM
 			return address, errors.New("获取执行的客户端异常")
 		}
 		if c.slog.status {
-			slog.InfoContext(ctx, fmt.Sprintf("随机返回一个：%v %v", address, currentIp))
+			slog.InfoContext(ctx, fmt.Sprintf("随机返回一个：%v %v", address, currentIP))
 		}
 		return address, nil
 	}

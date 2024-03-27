@@ -9,7 +9,7 @@ require (
 	go.dtapp.net/gorequest v1.0.48
 	go.dtapp.net/gostring v1.0.14
 	go.dtapp.net/gotime v1.0.8
-	go.dtapp.net/gotrace_id v1.0.8
+	go.dtapp.net/gotrace_id v1.0.12
 	gorm.io/gorm v1.25.8
 )
 

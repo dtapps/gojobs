@@ -6,10 +6,14 @@ import (
 )
 
 const (
-	CodeAbnormal = 0                              // 异常
-	CodeError    = http.StatusInternalServerError // 失败
-	CodeSuccess  = http.StatusOK                  // 成功
-	CodeEnd      = http.StatusCreated             // 结束
+	// CodeAbnormal 异常
+	CodeAbnormal = 0
+	// CodeError 失败
+	CodeError = http.StatusInternalServerError
+	// CodeSuccess 成功
+	CodeSuccess = http.StatusOK
+	// CodeEnd 结束
+	CodeEnd = http.StatusCreated
 )
 
 // 每隔n秒执行一次
