@@ -1,0 +1,11 @@
+.env
+.git
+.svn
+.idea
+.vscode
+*.log
+*.mmdb
+*.dat
+mod.sh
+/vendor/
+*_test.go
