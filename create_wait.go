@@ -2,10 +2,10 @@ package gojobs
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"go.dtapp.net/gostring"
 	"go.dtapp.net/gotime"
+	"go.opentelemetry.io/otel/codes"
 	"gorm.io/gorm"
 )
 
@@ -44,7 +44,10 @@ func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWai
 			NextRunTime:    gotime.Current().AfterSeconds(config.Frequency).Time,
 		}).Error
 	if err != nil {
-		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err.Error()))
+		err = fmt.Errorf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
+		return err
 	}
 	return nil
 }

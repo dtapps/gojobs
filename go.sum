@@ -50,10 +50,6 @@ github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd h1:TRLaZ9cD/w
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9Gz0M=
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
-github.com/oschwald/geoip2-golang v1.11.0 h1:hNENhCn1Uyzhf9PTmquXENiWS6AlxAEnBII6r8krA3w=
-github.com/oschwald/geoip2-golang v1.11.0/go.mod h1:P9zG+54KPEFOliZ29i7SeYZ/GM6tfEL+rgSn03hYuUo=
-github.com/oschwald/maxminddb-golang v1.13.0 h1:R8xBorY71s84yO06NgTmQvqvTvlS/bnYZrrWX1MElnU=
-github.com/oschwald/maxminddb-golang v1.13.0/go.mod h1:BU0z8BfFVhi1LQaonTwwGQlsHUEu9pWNdMfmq4ztm0o=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/redis/go-redis/v9 v9.5.3 h1:fOAp1/uJG+ZtcITgZOfYFmTKPE7n4Vclj1wZFgRciUU=
@@ -72,14 +68,12 @@ github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsT
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
-go.dtapp.net/goip v1.0.48 h1:BsTnM1uDOAiRqiy2x6fIwQGs4kCXvqXHs0vB15Lz0NA=
-go.dtapp.net/goip v1.0.48/go.mod h1:WTPo8MmvGPRlJVEtl4XOn1MsQosVsoEy4UkXL79z/Po=
 go.dtapp.net/gojson v1.0.4 h1:9en9iyOOLWoEIo2eKhqt3/Djh/3HhwsTpXxgI9efPRo=
 go.dtapp.net/gojson v1.0.4/go.mod h1:G9CMVzNSRkbNzIic/vJqHCOyKtw6BW2YM8Vyn64zfM0=
 go.dtapp.net/gorandom v1.0.3 h1:6RNDFMJfLlHFR98c2tbecaMzg4vEIHyEpduMBUdd0jc=
 go.dtapp.net/gorandom v1.0.3/go.mod h1:Qd6ywCSrk7sCkh9OdR0wygcbQBFt53WDIrx8rqGBvis=
-go.dtapp.net/gorequest v1.0.66 h1:bFwheCdlHZ/oHRTECCPHm0tcKPgM192VzdJH/m7Jj0k=
-go.dtapp.net/gorequest v1.0.66/go.mod h1:buYy18+d4jO3DbTl88BXyagilw5unU5FFDq5VfCehEg=
+go.dtapp.net/gorequest v1.0.67 h1:/zyAuS76BMV+Yj8gwN5mvMJ/hV+qKL1qaPAHqLY8MXA=
+go.dtapp.net/gorequest v1.0.67/go.mod h1:buYy18+d4jO3DbTl88BXyagilw5unU5FFDq5VfCehEg=
 go.dtapp.net/gostring v1.0.15 h1:MxvbgsBHSstIUdtwHf1FGtfh1bPbAlxxC+9NFVk396M=
 go.dtapp.net/gostring v1.0.15/go.mod h1:AJLixiPhpBZrSKQ7yW46a+42iEIrOlfkJJ+Hta/j8RE=
 go.dtapp.net/gotime v1.0.11 h1:VAmi1kFhkwJweIujeUOWf16wSmAZd4VyhyD25ku/J2Y=

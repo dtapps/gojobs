@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/redis/go-redis/v9"
-	"log/slog"
+	"go.opentelemetry.io/otel/codes"
 )
 
 // Publish 发布
@@ -14,9 +14,9 @@ import (
 func (c *Client) Publish(ctx context.Context, channel string, message interface{}) error {
 	publish, err := c.redisConfig.client.Publish(ctx, channel, message).Result()
 	if err != nil {
-		if c.slog.status {
-			slog.Info(fmt.Sprintf("发布失败：%s %s %v %s", channel, message, publish, err))
-		}
+		err = fmt.Errorf("发布失败：%s %s %v %s", channel, message, publish, err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return err
 }

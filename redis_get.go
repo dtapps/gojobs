@@ -2,10 +2,10 @@ package gojobs
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"go.dtapp.net/goip"
+	"go.dtapp.net/gorequest"
 	"go.dtapp.net/gostring"
+	"go.opentelemetry.io/otel/codes"
 	"log/slog"
 	"math/rand"
 	"time"
@@ -24,7 +24,7 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *GormM
 	)
 
 	if v.SpecifyIP != "" {
-		v.SpecifyIP = goip.IsIp(v.SpecifyIP)
+		v.SpecifyIP = gorequest.IpIs(v.SpecifyIP)
 	}
 
 	// 赋值ip
@@ -38,12 +38,13 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *GormM
 		if appointIPStatus {
 			// 判断是否指定某ip执行
 			if gostring.Contains(workers[0], currentIP) {
-				if c.slog.status {
-					slog.InfoContext(ctx, fmt.Sprintf("只有一个客户端在线，指定某ip执行：%v %v", workers[0], currentIP))
-				}
+				slog.InfoContext(ctx, fmt.Sprintf("只有一个客户端在线，指定某ip执行：%v %v", workers[0], currentIP))
 				return workers[0], nil
 			}
-			return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIP))
+			err := fmt.Errorf("需要执行的[%s]客户端不在线", currentIP)
+			TraceRecordError(ctx, err)
+			TraceSetStatus(ctx, codes.Error, err.Error())
+			return "", err
 		}
 		return workers[0], nil
 	}
@@ -52,22 +53,24 @@ func (c *Client) GetIssueAddress(ctx context.Context, workers []string, v *GormM
 	if appointIPStatus {
 		for wk, wv := range workers {
 			if gostring.Contains(wv, currentIP) {
-				if c.slog.status {
-					slog.InfoContext(ctx, fmt.Sprintf("优先处理指定某ip执行：%v %v", workers[wk], currentIP))
-				}
+				slog.InfoContext(ctx, fmt.Sprintf("优先处理指定某ip执行：%v %v", workers[wk], currentIP))
 				return workers[wk], nil
 			}
 		}
-		return "", errors.New(fmt.Sprintf("需要执行的[%s]客户端不在线", currentIP))
+		err := fmt.Errorf("需要执行的[%s]客户端不在线", currentIP)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
+		return "", err
 	} else {
 		// 随机返回一个
 		address := workers[c.random(0, len(workers))]
 		if address == "" {
-			return address, errors.New("获取执行的客户端异常")
+			err := fmt.Errorf("获取执行的客户端异常")
+			TraceRecordError(ctx, err)
+			TraceSetStatus(ctx, codes.Error, err.Error())
+			return address, err
 		}
-		if c.slog.status {
-			slog.InfoContext(ctx, fmt.Sprintf("随机返回一个：%v %v", address, currentIP))
-		}
+		slog.InfoContext(ctx, fmt.Sprintf("随机返回一个：%v %v", address, currentIP))
 		return address, nil
 	}
 }
@@ -78,9 +81,9 @@ func (c *Client) GetSubscribeClientList(ctx context.Context) (client []string, e
 	// 查询活跃的channel
 	client, err = c.redisConfig.client.PubSubChannels(ctx, c.redisConfig.cornKeyPrefix+"_*").Result()
 	if err != nil {
-		if c.slog.status {
-			slog.InfoContext(ctx, fmt.Sprintf("获取在线的客户端失败：%s，%v", c.redisConfig.cornKeyPrefix+"_*", err))
-		}
+		err = fmt.Errorf("获取在线的客户端失败：%s，%v", c.redisConfig.cornKeyPrefix+"_*", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 
 	return client, err

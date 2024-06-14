@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go.dtapp.net/gostring"
 	"go.dtapp.net/gotime"
+	"go.opentelemetry.io/otel/codes"
 	"gorm.io/gorm"
 )
 
@@ -44,7 +45,10 @@ func (c *Client) CreateInCustomId(ctx context.Context, config *ConfigCreateInCus
 			NextRunTime:    gotime.Current().AfterSeconds(config.Frequency).Time,
 		}).Error
 	if err != nil {
-		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err.Error()))
+		err = fmt.Errorf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
+		return err
 	}
 	return nil
 }
@@ -88,7 +92,10 @@ func (c *Client) CreateInCustomIdOnly(ctx context.Context, config *ConfigCreateI
 			NextRunTime:    gotime.Current().AfterSeconds(config.Frequency).Time,
 		}).Error
 	if err != nil {
-		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err.Error()))
+		err = fmt.Errorf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
+		return err
 	}
 	return nil
 }
@@ -130,7 +137,10 @@ func (c *Client) CreateInCustomIdMaxNumber(ctx context.Context, config *ConfigCr
 			NextRunTime:    gotime.Current().AfterSeconds(config.Frequency).Time,
 		}).Error
 	if err != nil {
-		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err.Error()))
+		err = fmt.Errorf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
+		return err
 	}
 	return nil
 }
@@ -153,7 +163,10 @@ type ConfigCreateInCustomIdMaxNumberOnly struct {
 func (c *Client) CreateInCustomIdMaxNumberOnly(ctx context.Context, config *ConfigCreateInCustomIdMaxNumberOnly) error {
 	query := c.TaskTypeTakeIn(ctx, config.Tx, config.CustomId, config.Type)
 	if query.ID != 0 {
-		return errors.New("任务已存在")
+		err := fmt.Errorf("任务[%s@%s]已存在", config.CustomId, config.Type)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
+		return err
 	}
 	if config.CurrentIp == "" {
 		config.CurrentIp = c.config.systemOutsideIP
@@ -176,7 +189,10 @@ func (c *Client) CreateInCustomIdMaxNumberOnly(ctx context.Context, config *Conf
 			NextRunTime:    gotime.Current().AfterSeconds(config.Frequency).Time,
 		}).Error
 	if err != nil {
-		return errors.New(fmt.Sprintf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err.Error()))
+		err = fmt.Errorf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
+		return err
 	}
 	return nil
 }

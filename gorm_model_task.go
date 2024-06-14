@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"go.dtapp.net/gotime"
+	"go.opentelemetry.io/otel/codes"
 	"gorm.io/gorm"
-	"log/slog"
 	"time"
 )
 
@@ -37,6 +37,10 @@ type GormModelTask struct {
 func (c *Client) gormAutoMigrateTask(ctx context.Context) error {
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		AutoMigrate(&GormModelTask{})
+	if err != nil {
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
+	}
 	return err
 }
 
@@ -46,9 +50,9 @@ func (c *Client) TaskTakeId(ctx context.Context, tx *gorm.DB, id uint) (result G
 		Where("id = ?", id).
 		Take(&result).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("编号查询任务：%v", err))
-		}
+		err = fmt.Errorf("编号查询任务：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return result
 }
@@ -59,9 +63,9 @@ func (c *Client) TaskTake(ctx context.Context, tx *gorm.DB, customId string) (re
 		Where("custom_id = ?", customId).
 		Take(&result).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("自定义编号查询任务：%v", err))
-		}
+		err = fmt.Errorf("自定义编号查询任务：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return result
 }
@@ -73,9 +77,9 @@ func (c *Client) taskTake(ctx context.Context, tx *gorm.DB, customId, status str
 		Where("status = ?", status).
 		Take(&result).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("自定义编号加状态查询任务：%v", err))
-		}
+		err = fmt.Errorf("自定义编号加状态查询任务：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return result
 }
@@ -112,9 +116,9 @@ func (c *Client) TaskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type s
 		Where("type = ?", Type).
 		Take(&result).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("查询单任务：%v", err))
-		}
+		err = fmt.Errorf("查询单任务：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return result
 }
@@ -126,9 +130,9 @@ func (c *Client) taskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type, 
 		Where("status = ?", status).
 		Take(&result).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("查询单任务：%v", err))
-		}
+		err = fmt.Errorf("查询单任务：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return result
 }
@@ -165,9 +169,9 @@ func (c *Client) TaskFindAll(ctx context.Context, tx *gorm.DB, frequency int64) 
 		Order("id asc").
 		Find(&results).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("查询多任务：%v", err))
-		}
+		err = fmt.Errorf("查询多任务：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return results
 }
@@ -180,9 +184,9 @@ func (c *Client) TaskFindAllType(ctx context.Context, tx *gorm.DB, Type string, 
 		Order("id asc").
 		Find(&results).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("查询多任务：%v", err))
-		}
+		err = fmt.Errorf("查询多任务：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return results
 }
@@ -195,9 +199,9 @@ func (c *Client) taskFindAll(ctx context.Context, tx *gorm.DB, frequency int64, 
 		Order("id asc").
 		Find(&results).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("查询多任务：%v", err))
-		}
+		err = fmt.Errorf("查询多任务：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return results
 }
@@ -211,9 +215,9 @@ func (c *Client) taskFindAllType(ctx context.Context, tx *gorm.DB, Type string, 
 			Order("id asc").
 			Find(&results).Error
 		if err != nil {
-			if c.slog.status {
-				slog.ErrorContext(ctx, fmt.Sprintf("查询多任务：%v", err))
-			}
+			err = fmt.Errorf("查询多任务：%v", err)
+			TraceRecordError(ctx, err)
+			TraceSetStatus(ctx, codes.Error, err.Error())
 		}
 		return results
 	}
@@ -224,9 +228,9 @@ func (c *Client) taskFindAllType(ctx context.Context, tx *gorm.DB, Type string, 
 		Order("id asc").
 		Find(&results).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("查询多任务：%v", err))
-		}
+		err = fmt.Errorf("查询多任务：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return results
 }
@@ -290,9 +294,9 @@ func (c *Client) StartTask(ctx context.Context, tx *gorm.DB, id uint) error {
 			StatusDesc: "启动任务",
 		}).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("任务启动失败：%v", err))
-		}
+		err = fmt.Errorf("任务启动失败：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return err
 }
@@ -309,9 +313,9 @@ func (c *Client) StartTaskCustom(ctx context.Context, tx *gorm.DB, customId stri
 			StatusDesc: "启动任务",
 		}).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("任务启动自定义失败：%v", err))
-		}
+		err = fmt.Errorf("任务启动自定义失败：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return err
 }
@@ -331,9 +335,9 @@ func (c *Client) UpdateFrequency(ctx context.Context, tx *gorm.DB, id uint, freq
 			NextRunTime: gotime.Current().AfterSeconds(frequency).Time,
 		}).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("更新任务频率失败：%v", err))
-		}
+		err = fmt.Errorf("更新任务频率失败：%v", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return err
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go.dtapp.net/gotime"
-	"log/slog"
+	"go.opentelemetry.io/otel/codes"
 	"time"
 )
 
@@ -27,6 +27,10 @@ func (c *Client) gormAutoMigrateTaskLog(ctx context.Context) error {
 	}
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
 		AutoMigrate(&GormModelTaskLog{})
+	if err != nil {
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
+	}
 	return err
 }
 
@@ -39,9 +43,9 @@ func (c *Client) GormTaskLogDelete(ctx context.Context, hour int64) error {
 		Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
-		}
+		err = fmt.Errorf("删除失败：%s", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return err
 }
@@ -55,9 +59,9 @@ func (c *Client) GormTaskLogInDelete(ctx context.Context, hour int64) error {
 		Where("task_result_status = ?", TASK_IN).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
-		}
+		err = fmt.Errorf("删除失败：%s", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return err
 }
@@ -71,9 +75,9 @@ func (c *Client) GormTaskLogSuccessDelete(ctx context.Context, hour int64) error
 		Where("task_result_status = ?", TASK_SUCCESS).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
-		}
+		err = fmt.Errorf("删除失败：%s", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return err
 }
@@ -87,9 +91,9 @@ func (c *Client) GormTaskLogErrorDelete(ctx context.Context, hour int64) error {
 		Where("task_result_status = ?", TASK_ERROR).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
-		}
+		err = fmt.Errorf("删除失败：%s", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return err
 }
@@ -103,9 +107,9 @@ func (c *Client) GormTaskLogTimeoutDelete(ctx context.Context, hour int64) error
 		Where("task_result_status = ?", TASK_TIMEOUT).Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
-		}
+		err = fmt.Errorf("删除失败：%s", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return err
 }
@@ -120,9 +124,9 @@ func (c *Client) GormTaskLogWaitDelete(ctx context.Context, hour int64) error {
 		Where("log_time < ?", gotime.Current().BeforeHour(hour).Format()).
 		Delete(&GormModelTaskLog{}).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("删除失败：%s", err))
-		}
+		err = fmt.Errorf("删除失败：%s", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 	return err
 }
@@ -140,11 +144,8 @@ func (c *Client) GormTaskLogRecord(ctx context.Context, task GormModelTask, runI
 	err := c.gormConfig.client.WithContext(ctx).Table(c.gormConfig.taskLogTableName).
 		Create(&taskLog).Error
 	if err != nil {
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("记录失败：%s", err))
-		}
-		if c.slog.status {
-			slog.ErrorContext(ctx, fmt.Sprintf("记录数据：%+v", taskLog))
-		}
+		err = fmt.Errorf("记录失败：%s", err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 }

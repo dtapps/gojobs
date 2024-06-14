@@ -2,24 +2,26 @@ package gojobs
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"go.dtapp.net/gotime"
-	"log/slog"
+	"go.opentelemetry.io/otel/codes"
 	"time"
 )
 
 func (c *Client) StartHandle(ctx context.Context, key any, overdue int64) error {
 	status, err := c.redisConfig.client.Get(ctx, fmt.Sprintf("%v", key)).Result()
 	if status != "" {
-		return errors.New(fmt.Sprintf("【%v】上一次还在执行中", fmt.Sprintf("%v", key)))
+		err = fmt.Errorf("【%v】上一次还在执行中", fmt.Sprintf("%v", key))
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
+		return err
 	}
 
 	err = c.redisConfig.client.Set(ctx, fmt.Sprintf("%v", key), gotime.Current().Format(), time.Duration(overdue)*time.Second).Err()
 	if err != nil {
-		if c.slog.status {
-			slog.Info(fmt.Sprintf("【%v】设置 %s", fmt.Sprintf("%v", key), err))
-		}
+		err = fmt.Errorf("【%v】设置 %s", fmt.Sprintf("%v", key), err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 
 	return nil
@@ -27,8 +29,8 @@ func (c *Client) StartHandle(ctx context.Context, key any, overdue int64) error 
 func (c *Client) EndHandle(ctx context.Context, key any) {
 	err := c.redisConfig.client.Del(ctx, fmt.Sprintf("%v", key)).Err()
 	if err != nil {
-		if c.slog.status {
-			slog.Info(fmt.Sprintf("【%v】删除 %s", fmt.Sprintf("%v", key), err))
-		}
+		err = fmt.Errorf("【%v】删除 %s", fmt.Sprintf("%v", key), err)
+		TraceRecordError(ctx, err)
+		TraceSetStatus(ctx, codes.Error, err.Error())
 	}
 }
