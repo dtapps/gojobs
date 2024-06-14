@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"go.dtapp.net/goip"
+	"go.dtapp.net/gorequest"
 	"go.dtapp.net/gotime"
-	"go.dtapp.net/gotrace_id"
 	"log/slog"
 	"strings"
 )
@@ -75,12 +75,15 @@ func (c *Client) Filter(ctx context.Context, isMandatoryIp bool, specifyIp strin
 // Run 运行
 func (c *Client) Run(ctx context.Context, task GormModelTask, taskResultCode int, taskResultDesc string) {
 
-	runId := gotrace_id.GetTraceIdContext(ctx)
+	runId := c.TraceGetTraceID()
 	if runId == "" {
-		if c.slog.status {
-			slog.InfoContext(ctx, "上下文没有跟踪编号")
+		runId = gorequest.GetRequestIDContext(ctx)
+		if runId == "" {
+			if c.slog.status {
+				slog.InfoContext(ctx, "上下文没有跟踪编号")
+			}
+			return
 		}
-		return
 	}
 
 	if c.gormConfig.taskLogStatus {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/redis/go-redis/v9"
+	"go.opentelemetry.io/otel/trace"
 	"gorm.io/gorm"
 )
 
@@ -29,11 +30,12 @@ type Client struct {
 	slog struct {
 		status bool // 状态
 	}
+	trace bool       // OpenTelemetry链路追踪
+	span  trace.Span // OpenTelemetry链路追踪
 }
 
 // NewClient 创建实例
 func NewClient(ctx context.Context, currentIP string) (*Client, error) {
-
 	c := &Client{}
 
 	if currentIP == "" || currentIP == "0.0.0.0" {
@@ -43,5 +45,6 @@ func NewClient(ctx context.Context, currentIP string) (*Client, error) {
 	// 配置信息
 	c.setConfig(ctx, currentIP)
 
+	c.trace = true
 	return c, nil
 }
