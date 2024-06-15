@@ -8,6 +8,11 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+// NewTraceStartSpan 开始OpenTelemetry链路追踪状态
+func NewTraceStartSpan(ctx context.Context, spanName string) (context.Context, trace.Span) {
+	return gorequest.TraceNewSpan(ctx, "go.dtapp.net/gojobs", "", spanName, Version, trace.SpanKindClient)
+}
+
 // TraceStartSpan 开始OpenTelemetry链路追踪状态
 func TraceStartSpan(ctx context.Context, spanName string) (context.Context, trace.Span) {
 	return gorequest.TraceNewSpan(ctx, "go.dtapp.net/gojobs", "gojobs.", spanName, Version, trace.SpanKindClient)
