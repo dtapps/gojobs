@@ -83,6 +83,10 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyN
 					//th.listSpan.RecordError( err, trace.WithStackTrace(true))
 					th.listSpan.SetStatus(codes.Error, err.Error())
 
+					if th.logIsDebug {
+						slog.DebugContext(th.listCtx, "查询redis的key不存在，根据设置，无法继续运行", slog.String("key", GetRedisKeyName(th.taskType)), slog.String("err", isRunResult.Err().Error()))
+					}
+
 					// 停止OpenTelemetry链路追踪
 					th.listSpan.End()
 					th.newSpan.End()
@@ -93,6 +97,10 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyN
 				//th.listSpan.RecordError( err, trace.WithStackTrace(true))
 				th.listSpan.SetStatus(codes.Error, err.Error())
 
+				if th.logIsDebug {
+					slog.DebugContext(th.listCtx, "QueryTaskList 查询redis的key异常，无法继续运行", slog.String("err", isRunResult.Err().Error()))
+				}
+
 				// 停止OpenTelemetry链路追踪
 				th.listSpan.End()
 				th.newSpan.End()
@@ -102,6 +110,10 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyN
 				err := fmt.Errorf("查询redis的key内容为空，根据配置，无法继续运行: %s", isRunResult.Val())
 				//th.listSpan.RecordError(err, trace.WithStackTrace(true))
 				th.listSpan.SetStatus(codes.Error, err.Error())
+
+				if th.logIsDebug {
+					slog.DebugContext(th.listCtx, "QueryTaskList 查询redis的key内容为空，根据配置，无法继续运行", slog.String("val", isRunResult.Val()))
+				}
 
 				// 停止OpenTelemetry链路追踪
 				th.listSpan.End()
@@ -129,7 +141,7 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyN
 	// 没有任务需要执行
 	if len(th.taskList) <= 0 {
 		if th.logIsDebug {
-			slog.ErrorContext(th.listCtx, "QueryTaskList 没有任务需要执行", slog.Int("taskList", len(th.taskList)))
+			slog.InfoContext(th.listCtx, "QueryTaskList 没有任务需要执行")
 		}
 
 		if th.traceIsFilter {
@@ -225,7 +237,7 @@ func (th *TaskHelper) FilterTaskList(isMandatoryIp bool, specifyIp string) (isCo
 	// 没有任务需要执行
 	if len(th.taskList) <= 0 {
 		if th.logIsDebug {
-			slog.ErrorContext(th.filterCtx, "FilterTaskList 没有任务需要执行")
+			slog.InfoContext(th.filterCtx, "FilterTaskList 没有任务需要执行")
 		}
 
 		if th.traceIsFilter {
@@ -283,13 +295,13 @@ func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx con
 }
 
 type RunSingleTaskResponse struct {
-	RunID   string
-	RunCode int
-	RunDesc string
+	RunID   string // 运行编号
+	RunCode int    // 运行状态
+	RunDesc string // 运行描述
 
-	TraceID   string
-	SpanID    string
-	RequestID string
+	TraceID   string // 追踪编号
+	SpanID    string // 跨度编号
+	RequestID string // 请求编号
 }
 
 // RunSingleTask 运行单个任务
@@ -339,6 +351,10 @@ func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(c
 			if result.RunID == "" {
 				th.runSingleSpan.RecordError(fmt.Errorf("上下文没有运行编号"), trace.WithStackTrace(true))
 				th.runSingleSpan.SetStatus(codes.Error, "上下文没有运行编号")
+
+				if th.logIsDebug {
+					slog.ErrorContext(th.listCtx, "RunSingleTask 上下文没有运行编号")
+				}
 
 				// 停止OpenTelemetry链路追踪
 				th.runSingleSpan.End()
