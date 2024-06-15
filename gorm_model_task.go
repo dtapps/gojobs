@@ -2,6 +2,7 @@ package gojobs
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"go.dtapp.net/gotime"
 	"go.opentelemetry.io/otel/codes"
@@ -49,6 +50,9 @@ func (c *Client) TaskTakeId(ctx context.Context, tx *gorm.DB, id uint) (result G
 	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Where("id = ?", id).
 		Take(&result).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return result
+	}
 	if err != nil {
 		err = fmt.Errorf("编号查询任务：%v", err)
 		TraceRecordError(ctx, err)
@@ -62,6 +66,9 @@ func (c *Client) TaskTake(ctx context.Context, tx *gorm.DB, customId string) (re
 	err := tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Where("custom_id = ?", customId).
 		Take(&result).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return result
+	}
 	if err != nil {
 		err = fmt.Errorf("自定义编号查询任务：%v", err)
 		TraceRecordError(ctx, err)
@@ -76,6 +83,9 @@ func (c *Client) taskTake(ctx context.Context, tx *gorm.DB, customId, status str
 		Where("custom_id = ?", customId).
 		Where("status = ?", status).
 		Take(&result).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return result
+	}
 	if err != nil {
 		err = fmt.Errorf("自定义编号加状态查询任务：%v", err)
 		TraceRecordError(ctx, err)
@@ -115,6 +125,9 @@ func (c *Client) TaskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type s
 		Where("custom_id = ?", customId).
 		Where("type = ?", Type).
 		Take(&result).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return result
+	}
 	if err != nil {
 		err = fmt.Errorf("查询单任务：%v", err)
 		TraceRecordError(ctx, err)
@@ -129,6 +142,9 @@ func (c *Client) taskTypeTake(ctx context.Context, tx *gorm.DB, customId, Type, 
 		Where("custom_id = ?", customId).Where("type = ?", Type).
 		Where("status = ?", status).
 		Take(&result).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return result
+	}
 	if err != nil {
 		err = fmt.Errorf("查询单任务：%v", err)
 		TraceRecordError(ctx, err)
