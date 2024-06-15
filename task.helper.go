@@ -50,7 +50,7 @@ func NewTaskHelper(ctx context.Context, taskType string, logIsDebug bool, traceI
 	}
 
 	// 启动OpenTelemetry链路追踪
-	th.newCtx, th.newSpan = TraceStartSpan(ctx, "NewTaskHelper")
+	th.newCtx, th.newSpan = NewTraceStartSpan(ctx, "NewTaskHelper")
 
 	TraceSetAttributes(th.newCtx, attribute.String("task.new.type", th.taskType))
 	TraceSetAttributes(th.newCtx, attribute.Bool("task.new.is_debug", th.logIsDebug))
