@@ -66,7 +66,7 @@ func NewTaskHelper(ctx context.Context, taskType string, logIsDebug bool, traceI
 // listCallback 任务回调函数 返回 任务列表
 // newTaskLists 新的任务列表
 // isContinue 是否继续
-func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, taskType string) (isUse bool, result redis.StringCmd), listCallback func(ctx context.Context, taskType string) []GormModelTask) (isContinue bool) {
+func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyName string) (isUse bool, result redis.StringCmd), listCallback func(ctx context.Context, taskType string) []GormModelTask) (isContinue bool) {
 
 	// 启动OpenTelemetry链路追踪
 	th.listCtx, th.listSpan = NewTraceStartSpan(th.newCtx, "QueryTaskList "+th.taskType)
@@ -74,7 +74,7 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, task
 	if isRunCallback != nil {
 
 		// 执行任务列表回调函数
-		isRunUse, isRunResult := isRunCallback(th.listCtx, th.taskType)
+		isRunUse, isRunResult := isRunCallback(th.listCtx, GetRedisKeyName(th.taskType))
 		if isRunUse {
 			if isRunResult.Err() != nil {
 				if errors.Is(isRunResult.Err(), redis.Nil) {
