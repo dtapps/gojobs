@@ -16,8 +16,7 @@ import (
 )
 
 type TaskHelper struct {
-	logIsDebug    bool // [日志]日志是否启动
-	traceIsFilter bool // [过滤]链路追踪是否过滤
+	cfg *taskHelperConfig // 配置
 
 	taskType string          // [任务]类型
 	taskList []GormModelTask // [任务]列表
@@ -40,23 +39,27 @@ type TaskHelper struct {
 // taskType 任务类型
 // logIsDebug 日志是否启动
 // traceIsFilter 链路追踪是否过滤
-func NewTaskHelper(ctx context.Context, taskType string, logIsDebug bool, traceIsFilter bool) (*TaskHelper, error) {
+func NewTaskHelper(ctx context.Context, taskType string, opts ...TaskHelperOption) (*TaskHelper, error) {
 	th := &TaskHelper{
-		logIsDebug:    logIsDebug,
-		taskType:      taskType,
-		traceIsFilter: traceIsFilter,
+		taskType: taskType,
 	}
 
 	if th.taskType == "" {
 		return th, fmt.Errorf("请检查任务类型参数")
 	}
 
+	// 配置
+	th.cfg = newTaskHelperConfig(opts)
+
 	// 启动OpenTelemetry链路追踪
 	th.newCtx, th.newSpan = NewTraceStartSpan(ctx, th.taskType)
 
 	th.newSpan.SetAttributes(attribute.String("task.new.type", th.taskType))
-	th.newSpan.SetAttributes(attribute.Bool("task.new.is_debug", th.logIsDebug))
-	th.newSpan.SetAttributes(attribute.Bool("task.new.is_filter", th.traceIsFilter))
+
+	th.newSpan.SetAttributes(attribute.Bool("task.cfg.is_debug", th.cfg.logIsDebug))
+	th.newSpan.SetAttributes(attribute.Bool("task.cfg.is_filter", th.cfg.traceIsFilter))
+	th.newSpan.SetAttributes(attribute.String("task.cfg.filter_name", th.cfg.traceIsFilterKeyName))
+	th.newSpan.SetAttributes(attribute.String("task.cfg.filter_value", th.cfg.traceIsFilterKeyValue))
 
 	return th, nil
 }
@@ -83,8 +86,13 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyN
 					//th.listSpan.RecordError( err, trace.WithStackTrace(true))
 					th.listSpan.SetStatus(codes.Error, err.Error())
 
-					if th.logIsDebug {
+					if th.cfg.logIsDebug {
 						slog.DebugContext(th.listCtx, "查询redis的key不存在，根据设置，无法继续运行", slog.String("key", GetRedisKeyName(th.taskType)), slog.String("err", isRunResult.Err().Error()))
+					}
+
+					if th.cfg.traceIsFilter {
+						th.listSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
+						th.newSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 					}
 
 					// 停止OpenTelemetry链路追踪
@@ -97,7 +105,7 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyN
 				//th.listSpan.RecordError( err, trace.WithStackTrace(true))
 				th.listSpan.SetStatus(codes.Error, err.Error())
 
-				if th.logIsDebug {
+				if th.cfg.logIsDebug {
 					slog.DebugContext(th.listCtx, "QueryTaskList 查询redis的key异常，无法继续运行", slog.String("err", isRunResult.Err().Error()))
 				}
 
@@ -111,8 +119,13 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyN
 				//th.listSpan.RecordError(err, trace.WithStackTrace(true))
 				th.listSpan.SetStatus(codes.Error, err.Error())
 
-				if th.logIsDebug {
+				if th.cfg.logIsDebug {
 					slog.DebugContext(th.listCtx, "QueryTaskList 查询redis的key内容为空，根据配置，无法继续运行", slog.String("val", isRunResult.Val()))
+				}
+
+				if th.cfg.traceIsFilter {
+					th.listSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
+					th.newSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 				}
 
 				// 停止OpenTelemetry链路追踪
@@ -140,13 +153,13 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyN
 
 	// 没有任务需要执行
 	if len(th.taskList) <= 0 {
-		if th.logIsDebug {
+		if th.cfg.logIsDebug {
 			slog.InfoContext(th.listCtx, "QueryTaskList 没有任务需要执行")
 		}
 
-		if th.traceIsFilter {
-			th.listSpan.SetAttributes(attribute.String("is_filter", "true"))
-			th.newSpan.SetAttributes(attribute.String("is_filter", "true"))
+		if th.cfg.traceIsFilter {
+			th.listSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
+			th.newSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 		}
 
 		// 停止OpenTelemetry链路追踪
@@ -170,7 +183,7 @@ func (th *TaskHelper) FilterTaskList(isMandatoryIp bool, specifyIp string) (isCo
 	// 启动OpenTelemetry链路追踪
 	th.filterCtx, th.filterSpan = NewTraceStartSpan(th.listCtx, "FilterTaskList")
 
-	if th.logIsDebug {
+	if th.cfg.logIsDebug {
 		slog.DebugContext(th.filterCtx, "FilterTaskList 过滤任务列表", slog.Bool("isMandatoryIp", isMandatoryIp), slog.String("specifyIp", specifyIp))
 	}
 
@@ -236,14 +249,14 @@ func (th *TaskHelper) FilterTaskList(isMandatoryIp bool, specifyIp string) (isCo
 
 	// 没有任务需要执行
 	if len(th.taskList) <= 0 {
-		if th.logIsDebug {
+		if th.cfg.logIsDebug {
 			slog.InfoContext(th.filterCtx, "FilterTaskList 没有任务需要执行")
 		}
 
-		if th.traceIsFilter {
-			th.filterSpan.SetAttributes(attribute.String("is_filter", "true"))
-			th.listSpan.SetAttributes(attribute.String("is_filter", "true"))
-			th.newSpan.SetAttributes(attribute.String("is_filter", "true"))
+		if th.cfg.traceIsFilter {
+			th.filterSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
+			th.listSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
+			th.newSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 		}
 
 		// 停止OpenTelemetry链路追踪
@@ -273,7 +286,7 @@ func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx con
 	th.runMultipleStatus = true
 	th.runMultipleCtx, th.runMultipleSpan = NewTraceStartSpan(th.filterCtx, "RunMultipleTask")
 
-	if th.logIsDebug {
+	if th.cfg.logIsDebug {
 		slog.DebugContext(th.runMultipleCtx, "RunMultipleTask 运行多个任务", slog.Int64("wait", wait))
 	}
 
@@ -317,7 +330,7 @@ func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(c
 		th.runSingleCtx, th.runSingleSpan = NewTraceStartSpan(th.filterCtx, "RunSingleTask "+th.taskType+" "+task.CustomID)
 	}
 
-	if th.logIsDebug {
+	if th.cfg.logIsDebug {
 		slog.DebugContext(th.runSingleCtx, "RunSingleTask 运行单个任务", slog.String("task", gojson.JsonEncodeNoError(task)))
 	}
 
@@ -352,7 +365,7 @@ func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(c
 				th.runSingleSpan.RecordError(fmt.Errorf("上下文没有运行编号"), trace.WithStackTrace(true))
 				th.runSingleSpan.SetStatus(codes.Error, "上下文没有运行编号")
 
-				if th.logIsDebug {
+				if th.cfg.logIsDebug {
 					slog.ErrorContext(th.listCtx, "RunSingleTask 上下文没有运行编号")
 				}
 
