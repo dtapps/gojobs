@@ -211,9 +211,6 @@ func (th *TaskHelper) RunTask(task GormModelTask, executionCallback func(ctx con
 
 				// 停止OpenTelemetry链路追踪
 				TraceEndSpan(th.runSpan)
-				TraceEndSpan(th.filterSpan)
-				TraceEndSpan(th.listSpan)
-				TraceEndSpan(th.newSpan)
 				return
 			}
 		}
@@ -241,6 +238,11 @@ func (th *TaskHelper) RunTask(task GormModelTask, executionCallback func(ctx con
 
 	// 停止OpenTelemetry链路追踪
 	TraceEndSpan(th.runSpan)
+	return
+}
+
+// EndRunTaskList 结束运行任务列表并停止OpenTelemetry链路追踪
+func (th *TaskHelper) EndRunTaskList() {
 	TraceEndSpan(th.filterSpan)
 	TraceEndSpan(th.listSpan)
 	TraceEndSpan(th.newSpan)
