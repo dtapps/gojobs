@@ -2,7 +2,9 @@ package gojobs
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/redis/go-redis/v9"
 	"go.dtapp.net/gojson"
 	"go.dtapp.net/gorequest"
 	"go.opentelemetry.io/otel/attribute"
@@ -50,7 +52,7 @@ func NewTaskHelper(ctx context.Context, taskType string, logIsDebug bool, traceI
 	}
 
 	// 启动OpenTelemetry链路追踪
-	th.newCtx, th.newSpan = NewTraceStartSpan(ctx, "NewTaskHelper")
+	th.newCtx, th.newSpan = NewTraceStartSpan(ctx, th.taskType)
 
 	TraceSetAttributes(th.newCtx, attribute.String("task.new.type", th.taskType))
 	TraceSetAttributes(th.newCtx, attribute.Bool("task.new.is_debug", th.logIsDebug))
@@ -60,18 +62,63 @@ func NewTaskHelper(ctx context.Context, taskType string, logIsDebug bool, traceI
 }
 
 // QueryTaskList 通过回调函数获取任务列表
-// callback 回调函数 返回 任务列表
+// isRunCallback 任务列表回调函数 返回 是否使用 任务列表
+// listCallback 任务回调函数 返回 任务列表
 // newTaskLists 新的任务列表
 // isContinue 是否继续
-func (th *TaskHelper) QueryTaskList(callback func(ctx context.Context, taskType string) (taskLists []GormModelTask)) (isContinue bool) {
+func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, taskType string) (isUse bool, result redis.StringCmd), listCallback func(ctx context.Context, taskType string) []GormModelTask) (isContinue bool) {
 
 	// 启动OpenTelemetry链路追踪
 	th.listCtx, th.listSpan = NewTraceStartSpan(th.newCtx, "QueryTaskList "+th.taskType)
 
-	if callback != nil {
+	if isRunCallback != nil {
 
 		// 执行任务列表回调函数
-		taskLists := callback(th.listCtx, th.taskType)
+		isRunUse, isRunResult := isRunCallback(th.listCtx, th.taskType)
+		if isRunUse {
+			if isRunResult.Err() != nil {
+				if errors.Is(isRunResult.Err(), redis.Nil) {
+
+					err := fmt.Errorf("查询redis的key不存在，根据设置，无法继续运行：%s", isRunResult.Err().Error())
+					TraceRecordError(th.listCtx, err, trace.WithStackTrace(true))
+					TraceSetStatus(th.listCtx, codes.Error, err.Error())
+
+					// 停止OpenTelemetry链路追踪
+					TraceEndSpan(th.listSpan)
+					TraceEndSpan(th.newSpan)
+
+					return
+				}
+
+				err := fmt.Errorf("查询redis的key异常，无法继续运行：%s", isRunResult.Err().Error())
+				TraceRecordError(th.listCtx, err, trace.WithStackTrace(true))
+				TraceSetStatus(th.listCtx, codes.Error, err.Error())
+
+				// 停止OpenTelemetry链路追踪
+				TraceEndSpan(th.listSpan)
+				TraceEndSpan(th.newSpan)
+
+				return
+			}
+			if isRunResult.Val() == "" {
+
+				err := fmt.Errorf("查询redis的key内容为空，根据配置，无法继续运行")
+				TraceRecordError(th.listCtx, err, trace.WithStackTrace(true))
+				TraceSetStatus(th.listCtx, codes.Error, err.Error())
+
+				// 停止OpenTelemetry链路追踪
+				TraceEndSpan(th.listSpan)
+				TraceEndSpan(th.newSpan)
+
+				return
+			}
+		}
+	}
+
+	if listCallback != nil {
+
+		// 执行任务列表回调函数
+		taskLists := listCallback(th.listCtx, th.taskType)
 		if taskLists == nil {
 			if th.traceIsFilter {
 				TraceSetAttributes(th.newCtx, attribute.String("is_filter", "true"))
@@ -91,6 +138,7 @@ func (th *TaskHelper) QueryTaskList(callback func(ctx context.Context, taskType 
 
 	// 没有任务需要执行
 	if len(th.taskList) <= 0 {
+
 		if th.logIsDebug {
 			slog.ErrorContext(th.listCtx, "QueryTaskList 没有任务需要执行", slog.Int("taskLists", len(th.taskList)))
 		}
@@ -98,9 +146,11 @@ func (th *TaskHelper) QueryTaskList(callback func(ctx context.Context, taskType 
 			TraceSetAttributes(th.newCtx, attribute.String("is_filter", "true"))
 			TraceSetAttributes(th.listCtx, attribute.String("is_filter", "true"))
 		}
+
 		// 停止OpenTelemetry链路追踪
 		TraceEndSpan(th.listSpan)
 		TraceEndSpan(th.newSpan)
+
 		return
 	}
 
@@ -212,9 +262,9 @@ func (th *TaskHelper) GetTaskList() []GormModelTask {
 }
 
 // RunMultipleTask 运行多个任务
-// executionCallback 执行任务回调函数 返回 状态和描述
-// updateCallback 更新回调函数
-func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, runID string, runCode int, runDesc string)) {
+// executionCallback 执行任务回调函数 返回 runCode=状态 runDesc=描述
+// updateCallback 执行更新回调函数
+func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, result RunSingleTaskResponse)) {
 
 	// 启动OpenTelemetry链路追踪
 	th.runMultipleStatus = true
@@ -241,11 +291,21 @@ func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx con
 	return
 }
 
+type RunSingleTaskResponse struct {
+	RunID   string
+	RunCode int
+	RunDesc string
+
+	TraceID   string
+	SpanID    string
+	RequestID string
+}
+
 // RunSingleTask 运行单个任务
 // task 任务
-// executionCallback 执行任务回调函数 返回 状态和描述
-// updateCallback 更新回调函数
-func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, runID string, runCode int, runDesc string)) {
+// executionCallback 执行任务回调函数 返回 runCode=状态 runDesc=描述
+// updateCallback 执行更新回调函数
+func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, result RunSingleTaskResponse)) {
 
 	// 启动OpenTelemetry链路追踪
 	if th.runMultipleStatus {
@@ -260,25 +320,32 @@ func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(c
 
 	if executionCallback != nil {
 
+		// 需要返回的结构
+		result := RunSingleTaskResponse{
+			TraceID:   TraceGetTraceID(th.runSingleCtx),
+			SpanID:    TraceGetSpanID(th.runSingleCtx),
+			RequestID: gorequest.GetRequestIDContext(th.runSingleCtx),
+		}
+
 		// 执行任务回调函数
-		runCode, runDesc := executionCallback(th.runSingleCtx, task)
-		if runCode == CodeAbnormal {
-			TraceSetStatus(th.runSingleCtx, codes.Error, runDesc)
+		result.RunCode, result.RunDesc = executionCallback(th.runSingleCtx, task)
+		if result.RunCode == CodeAbnormal {
+			TraceSetStatus(th.runSingleCtx, codes.Error, result.RunDesc)
 		}
-		if runCode == CodeSuccess {
-			TraceSetStatus(th.runSingleCtx, codes.Ok, runDesc)
+		if result.RunCode == CodeSuccess {
+			TraceSetStatus(th.runSingleCtx, codes.Ok, result.RunDesc)
 		}
-		if runCode == CodeError {
-			TraceRecordError(th.runSingleCtx, fmt.Errorf(runDesc))
-			TraceSetStatus(th.runSingleCtx, codes.Error, runDesc)
+		if result.RunCode == CodeError {
+			TraceRecordError(th.runSingleCtx, fmt.Errorf(result.RunDesc), trace.WithStackTrace(true))
+			TraceSetStatus(th.runSingleCtx, codes.Error, result.RunDesc)
 		}
 
 		// 运行编号
-		runID := TraceGetTraceID(th.runSingleCtx)
-		if runID == "" {
-			runID = gorequest.GetRequestIDContext(th.runSingleCtx)
-			if runID == "" {
-				TraceRecordError(th.runSingleCtx, fmt.Errorf("上下文没有运行编号"))
+		result.RunID = result.TraceID
+		if result.RunID == "" {
+			result.RunID = result.RequestID
+			if result.RunID == "" {
+				TraceRecordError(th.runSingleCtx, fmt.Errorf("上下文没有运行编号"), trace.WithStackTrace(true))
 				TraceSetStatus(th.runSingleCtx, codes.Error, "上下文没有运行编号")
 
 				// 停止OpenTelemetry链路追踪
@@ -297,13 +364,13 @@ func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(c
 		TraceSetAttributes(th.runSingleCtx, attribute.Int64("task.info.custom_sequence", task.CustomSequence))
 		TraceSetAttributes(th.runSingleCtx, attribute.String("task.info.type", task.Type))
 		TraceSetAttributes(th.runSingleCtx, attribute.String("task.info.type_name", task.TypeName))
-		TraceSetAttributes(th.runSingleCtx, attribute.String("task.run.id", runID))
-		TraceSetAttributes(th.runSingleCtx, attribute.Int("task.run.code", runCode))
-		TraceSetAttributes(th.runSingleCtx, attribute.String("task.run.desc", runDesc))
+		TraceSetAttributes(th.runSingleCtx, attribute.String("task.run.id", result.RunID))
+		TraceSetAttributes(th.runSingleCtx, attribute.Int("task.run.code", result.RunCode))
+		TraceSetAttributes(th.runSingleCtx, attribute.String("task.run.desc", result.RunDesc))
 
 		// 执行更新回调函数
 		if updateCallback != nil {
-			updateCallback(th.runSingleCtx, task, runID, runCode, runDesc)
+			updateCallback(th.runSingleCtx, task, result)
 		}
 
 	}
