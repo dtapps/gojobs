@@ -214,7 +214,7 @@ func (th *TaskHelper) GetTaskList() []GormModelTask {
 // RunMultipleTask 运行多个任务
 // executionCallback 执行任务回调函数 返回 状态和描述
 // updateCallback 更新回调函数
-func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, runCode int, runDesc string)) {
+func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, runID string, runCode int, runDesc string)) {
 
 	// 启动OpenTelemetry链路追踪
 	th.runMultipleStatus = true
@@ -245,7 +245,7 @@ func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx con
 // task 任务
 // executionCallback 执行任务回调函数 返回 状态和描述
 // updateCallback 更新回调函数
-func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, runCode int, runDesc string)) {
+func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, runID string, runCode int, runDesc string)) {
 
 	// 启动OpenTelemetry链路追踪
 	if th.runMultipleStatus {
@@ -303,7 +303,7 @@ func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(c
 
 		// 执行更新回调函数
 		if updateCallback != nil {
-			updateCallback(th.runSingleCtx, task, runCode, runDesc)
+			updateCallback(th.runSingleCtx, task, runID, runCode, runDesc)
 		}
 
 	}
