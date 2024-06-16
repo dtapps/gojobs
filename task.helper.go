@@ -284,7 +284,7 @@ func (th *TaskHelper) GetTaskList() []GormModelTask {
 // RunMultipleTask 运行多个任务
 // executionCallback 执行任务回调函数 返回 runCode=状态 runDesc=描述
 // updateCallback 执行更新回调函数
-func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, result RunSingleTaskResponse)) {
+func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, result TaskHelperRunSingleTaskResponse)) {
 
 	// 启动OpenTelemetry链路追踪
 	th.runMultipleStatus = true
@@ -311,7 +311,7 @@ func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx con
 	return
 }
 
-type RunSingleTaskResponse struct {
+type TaskHelperRunSingleTaskResponse struct {
 	RunID   string // 运行编号
 	RunCode int    // 运行状态
 	RunDesc string // 运行描述
@@ -325,7 +325,7 @@ type RunSingleTaskResponse struct {
 // task 任务
 // executionCallback 执行任务回调函数 返回 runCode=状态 runDesc=描述
 // updateCallback 执行更新回调函数
-func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, result RunSingleTaskResponse)) {
+func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, result TaskHelperRunSingleTaskResponse)) {
 
 	// 启动OpenTelemetry链路追踪
 	if th.runMultipleStatus {
@@ -342,7 +342,7 @@ func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(c
 	if executionCallback != nil {
 
 		// 需要返回的结构
-		result := RunSingleTaskResponse{
+		result := TaskHelperRunSingleTaskResponse{
 			TraceID:   th.runSingleSpan.SpanContext().TraceID().String(),
 			SpanID:    th.runSingleSpan.SpanContext().SpanID().String(),
 			RequestID: gorequest.GetRequestIDContext(th.runSingleCtx),
