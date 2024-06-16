@@ -56,10 +56,10 @@ func NewTaskHelper(ctx context.Context, taskType string, opts ...TaskHelperOptio
 
 	th.newSpan.SetAttributes(attribute.String("task.new.type", th.taskType))
 
-	th.newSpan.SetAttributes(attribute.Bool("task.cfg.is_debug", th.cfg.logIsDebug))
-	th.newSpan.SetAttributes(attribute.Bool("task.cfg.is_filter", th.cfg.traceIsFilter))
-	th.newSpan.SetAttributes(attribute.String("task.cfg.filter_name", th.cfg.traceIsFilterKeyName))
-	th.newSpan.SetAttributes(attribute.String("task.cfg.filter_value", th.cfg.traceIsFilterKeyValue))
+	th.newSpan.SetAttributes(attribute.Bool("task.cfg.logIsDebug", th.cfg.logIsDebug))
+	th.newSpan.SetAttributes(attribute.Bool("task.cfg.traceIsFilter", th.cfg.traceIsFilter))
+	th.newSpan.SetAttributes(attribute.String("task.cfg.traceIsFilterKeyName", th.cfg.traceIsFilterKeyName))
+	th.newSpan.SetAttributes(attribute.String("task.cfg.traceIsFilterKeyValue", th.cfg.traceIsFilterKeyValue))
 
 	return th, nil
 }
@@ -276,11 +276,6 @@ func (th *TaskHelper) FilterTaskList(isMandatoryIp bool, specifyIp string) (isCo
 	return true
 }
 
-// GetTaskList 获取任务列表
-func (th *TaskHelper) GetTaskList() []GormModelTask {
-	return th.taskList
-}
-
 // RunMultipleTask 运行多个任务
 // executionCallback 执行任务回调函数 返回 runCode=状态 runDesc=描述
 // updateCallback 执行更新回调函数
@@ -297,7 +292,7 @@ func (th *TaskHelper) RunMultipleTask(wait int64, executionCallback func(ctx con
 	for _, vTask := range th.taskList {
 
 		// 运行单个任务
-		th.RunSingleTask(vTask, executionCallback, updateCallback)
+		th.runSingleTask(vTask, executionCallback, updateCallback)
 
 		// 等待 wait 秒
 		if wait > 0 {
@@ -321,18 +316,14 @@ type TaskHelperRunSingleTaskResponse struct {
 	RequestID string // 请求编号
 }
 
-// RunSingleTask 运行单个任务
+// 运行单个任务
 // task 任务
 // executionCallback 执行任务回调函数 返回 runCode=状态 runDesc=描述
 // updateCallback 执行更新回调函数
-func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, result TaskHelperRunSingleTaskResponse)) {
+func (th *TaskHelper) runSingleTask(task GormModelTask, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, result TaskHelperRunSingleTaskResponse)) {
 
 	// 启动OpenTelemetry链路追踪
-	if th.runMultipleStatus {
-		th.runSingleCtx, th.runSingleSpan = NewTraceStartSpan(th.runMultipleCtx, "RunSingleTask "+task.CustomID)
-	} else {
-		th.runSingleCtx, th.runSingleSpan = NewTraceStartSpan(th.filterCtx, "RunSingleTask "+task.CustomID)
-	}
+	th.runSingleCtx, th.runSingleSpan = NewTraceStartSpan(th.runMultipleCtx, "runSingleTask "+task.CustomID)
 
 	if th.cfg.logIsDebug {
 		slog.DebugContext(th.runSingleCtx, "RunSingleTask 运行单个任务", slog.String("task", gojson.JsonEncodeNoError(task)))
