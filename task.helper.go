@@ -276,6 +276,11 @@ func (th *TaskHelper) FilterTaskList(isMandatoryIp bool, specifyIp string) (isCo
 	return true
 }
 
+// GetTaskList 获取任务列表
+func (th *TaskHelper) GetTaskList() []GormModelTask {
+	return th.taskList
+}
+
 // RunMultipleTask 运行多个任务
 // executionCallback 执行任务回调函数 返回 runCode=状态 runDesc=描述
 // updateCallback 执行更新回调函数

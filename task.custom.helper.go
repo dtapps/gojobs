@@ -14,7 +14,7 @@ import (
 )
 
 type TaskCustomHelper struct {
-	cfg *taskCustomHelperConfig // 配置
+	cfg *taskHelperConfig // 配置
 
 	taskType string                     // [任务]类型
 	taskList []TaskCustomHelperTaskList // [任务]列表
@@ -35,7 +35,7 @@ type TaskCustomHelper struct {
 // taskType 任务类型
 // logIsDebug 日志是否启动
 // traceIsFilter 链路追踪是否过滤
-func NewTaskCustomHelper(ctx context.Context, taskType string, opts ...TaskCustomHelperOption) (*TaskCustomHelper, error) {
+func NewTaskCustomHelper(ctx context.Context, taskType string, opts ...TaskHelperOption) (*TaskCustomHelper, error) {
 	th := &TaskCustomHelper{
 		taskType: taskType,
 	}
@@ -45,7 +45,7 @@ func NewTaskCustomHelper(ctx context.Context, taskType string, opts ...TaskCusto
 	}
 
 	// 配置
-	th.cfg = newTaskCustomHelperConfig(opts)
+	th.cfg = newTaskHelperConfig(opts)
 
 	// 启动OpenTelemetry链路追踪
 	th.newCtx, th.newSpan = NewTraceStartSpan(ctx, th.taskType)
@@ -161,6 +161,11 @@ func (th *TaskCustomHelper) QueryTaskList(isRunCallback func(ctx context.Context
 	th.listSpan.SetAttributes(attribute.Int("task.list.count", len(th.taskList)))
 
 	return true
+}
+
+// GetTaskList 获取任务列表
+func (th *TaskCustomHelper) GetTaskList() []TaskCustomHelperTaskList {
+	return th.taskList
 }
 
 // RunMultipleTask 运行多个任务
