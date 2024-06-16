@@ -35,13 +35,15 @@ func (c *Client) ConfigGormClientFun(ctx context.Context, client *gorm.DB, taskT
 		}
 	}
 
-	err := c.gormAutoMigrateTask(ctx)
-	if err != nil {
-		return err
-	}
-	err = c.gormAutoMigrateTaskLog(ctx)
+	return nil
 
-	return err
+	//err := c.gormAutoMigrateTask(ctx)
+	//if err != nil {
+	//	return err
+	//}
+	//err = c.gormAutoMigrateTaskLog(ctx)
+	//
+	//return err
 }
 
 // ConfigRedisClientFun REDIS配置

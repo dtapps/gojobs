@@ -90,6 +90,7 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyN
 						slog.DebugContext(th.listCtx, "查询redis的key不存在，根据设置，无法继续运行", slog.String("key", GetRedisKeyName(th.taskType)), slog.String("err", isRunResult.Err().Error()))
 					}
 
+					// 过滤
 					if th.cfg.traceIsFilter {
 						th.listSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 						th.newSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
@@ -123,6 +124,7 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyN
 					slog.DebugContext(th.listCtx, "QueryTaskList 查询redis的key内容为空，根据配置，无法继续运行", slog.String("val", isRunResult.Val()))
 				}
 
+				// 过滤
 				if th.cfg.traceIsFilter {
 					th.listSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 					th.newSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
@@ -157,6 +159,7 @@ func (th *TaskHelper) QueryTaskList(isRunCallback func(ctx context.Context, keyN
 			slog.InfoContext(th.listCtx, "QueryTaskList 没有任务需要执行")
 		}
 
+		// 过滤
 		if th.cfg.traceIsFilter {
 			th.listSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 			th.newSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
@@ -253,6 +256,7 @@ func (th *TaskHelper) FilterTaskList(isMandatoryIp bool, specifyIp string) (isCo
 			slog.InfoContext(th.filterCtx, "FilterTaskList 没有任务需要执行")
 		}
 
+		// 过滤
 		if th.cfg.traceIsFilter {
 			th.filterSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 			th.listSpan.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
@@ -327,7 +331,7 @@ func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(c
 	if th.runMultipleStatus {
 		th.runSingleCtx, th.runSingleSpan = NewTraceStartSpan(th.runMultipleCtx, "RunSingleTask "+task.CustomID)
 	} else {
-		th.runSingleCtx, th.runSingleSpan = NewTraceStartSpan(th.filterCtx, "RunSingleTask "+th.taskType+" "+task.CustomID)
+		th.runSingleCtx, th.runSingleSpan = NewTraceStartSpan(th.filterCtx, "RunSingleTask "+task.CustomID)
 	}
 
 	if th.cfg.logIsDebug {
@@ -384,7 +388,6 @@ func (th *TaskHelper) RunSingleTask(task GormModelTask, executionCallback func(c
 		th.runSingleSpan.SetAttributes(attribute.String("task.info.custom_id", task.CustomID))
 		th.runSingleSpan.SetAttributes(attribute.Int64("task.info.custom_sequence", task.CustomSequence))
 		th.runSingleSpan.SetAttributes(attribute.String("task.info.type", task.Type))
-		th.runSingleSpan.SetAttributes(attribute.String("task.info.type_name", task.TypeName))
 		th.runSingleSpan.SetAttributes(attribute.String("task.run.id", result.RunID))
 		th.runSingleSpan.SetAttributes(attribute.Int("task.run.code", result.RunCode))
 		th.runSingleSpan.SetAttributes(attribute.String("task.run.desc", result.RunDesc))
