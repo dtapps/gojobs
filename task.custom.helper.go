@@ -163,8 +163,11 @@ func (th *TaskCustomHelper) QueryTaskList(isRunCallback func(ctx context.Context
 	return true
 }
 
-// GetTaskList 获取任务列表
+// GetTaskList 请在QueryTaskList之后获取任务列表
 func (th *TaskCustomHelper) GetTaskList() []TaskCustomHelperTaskList {
+	if len(th.taskList) <= 0 {
+		th.EndRunTaskList()
+	}
 	return th.taskList
 }
 

@@ -276,8 +276,11 @@ func (th *TaskHelper) FilterTaskList(isMandatoryIp bool, specifyIp string) (isCo
 	return true
 }
 
-// GetTaskList 获取任务列表
+// GetTaskList 请在FilterTaskList之后获取任务列表
 func (th *TaskHelper) GetTaskList() []GormModelTask {
+	if len(th.taskList) <= 0 {
+		th.EndRunTaskList()
+	}
 	return th.taskList
 }
 
