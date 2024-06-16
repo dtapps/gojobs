@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"go.dtapp.net/gojson"
+	"go.dtapp.net/gorequest"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -39,6 +40,9 @@ func NewTaskCustomHelper(rootCtx context.Context, taskType string, opts ...TaskH
 	// 启动OpenTelemetry链路追踪
 	th.Ctx, th.Span = NewTraceStartSpan(rootCtx, th.taskType)
 
+	th.Span.SetAttributes(attribute.String("task.help.helper", "custom"))
+	th.Span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(th.Ctx)))
+
 	th.Span.SetAttributes(attribute.String("task.new.type", th.taskType))
 
 	th.Span.SetAttributes(attribute.Bool("task.cfg.logIsDebug", th.cfg.logIsDebug))
@@ -59,6 +63,9 @@ func (th *TaskCustomHelper) QueryTaskList(rootCtx context.Context, isRunCallback
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(rootCtx, "QueryTaskList")
 	defer span.End()
+
+	span.SetAttributes(attribute.String("task.help.helper", "custom"))
+	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
 
 	// 任务列表回调函数
 	if isRunCallback != nil {
@@ -127,6 +134,7 @@ func (th *TaskCustomHelper) QueryTaskList(rootCtx context.Context, isRunCallback
 	}
 
 	// OpenTelemetry链路追踪
+	span.SetAttributes(attribute.String("task.list.list", gojson.JsonEncodeNoError(th.taskList)))
 	span.SetAttributes(attribute.Int("task.list.count", len(th.taskList)))
 
 	return true
@@ -144,6 +152,13 @@ func (th *TaskCustomHelper) RunMultipleTask(rootCtx context.Context, wait int64,
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(rootCtx, "RunMultipleTask")
 	defer span.End()
+
+	span.SetAttributes(attribute.String("task.help.helper", "custom"))
+	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
+
+	span.SetAttributes(attribute.Int64("task.multiple.wait", wait))
+	span.SetAttributes(attribute.String("task.multiple.list", gojson.JsonEncodeNoError(th.taskList)))
+	span.SetAttributes(attribute.Int("task.multiple.count", len(th.taskList)))
 
 	if th.cfg.logIsDebug {
 		slog.DebugContext(ctx, "RunMultipleTask 运行多个任务", slog.Int64("wait", wait))
@@ -172,6 +187,11 @@ func (th *TaskCustomHelper) RunSingleTask(rootCtx context.Context, task TaskCust
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(rootCtx, "RunSingleTask "+task.CustomID)
 	defer span.End()
+
+	span.SetAttributes(attribute.String("task.help.helper", "custom"))
+	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
+
+	span.SetAttributes(attribute.String("task.single.info", gojson.JsonEncodeNoError(task)))
 
 	if th.cfg.logIsDebug {
 		slog.DebugContext(ctx, "RunSingleTask 运行单个任务", slog.String("task", gojson.JsonEncodeNoError(task)))

@@ -38,8 +38,15 @@ func NewTaskHelper(rootCtx context.Context, taskType string, opts ...TaskHelperO
 	// 配置
 	th.cfg = newTaskHelperConfig(opts)
 
+	if gorequest.GetRequestIDContext(rootCtx) == "" {
+		rootCtx = gorequest.SetRequestIDContext(rootCtx)
+	}
+
 	// 启动OpenTelemetry链路追踪
 	th.Ctx, th.Span = NewTraceStartSpan(rootCtx, th.taskType)
+
+	th.Span.SetAttributes(attribute.String("task.help.helper", "db"))
+	th.Span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(th.Ctx)))
 
 	th.Span.SetAttributes(attribute.String("task.new.type", th.taskType))
 
@@ -141,6 +148,7 @@ func (th *TaskHelper) QueryTaskList(rootCtx context.Context, isRunCallback func(
 	}
 
 	// OpenTelemetry链路追踪
+	span.SetAttributes(attribute.String("task.list.list", gojson.JsonEncodeNoError(th.taskList)))
 	span.SetAttributes(attribute.Int("task.list.count", len(th.taskList)))
 
 	return true
@@ -155,6 +163,9 @@ func (th *TaskHelper) FilterTaskList(rootCtx context.Context, isMandatoryIp bool
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(rootCtx, "FilterTaskList")
 	defer span.End()
+
+	span.SetAttributes(attribute.String("task.help.helper", "db"))
+	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
 
 	if th.cfg.logIsDebug {
 		slog.DebugContext(ctx, "FilterTaskList 过滤任务列表", slog.Bool("isMandatoryIp", isMandatoryIp), slog.String("specifyIp", specifyIp))
@@ -235,6 +246,7 @@ func (th *TaskHelper) FilterTaskList(rootCtx context.Context, isMandatoryIp bool
 	}
 
 	// OpenTelemetry链路追踪
+	span.SetAttributes(attribute.String("task.filter.list", gojson.JsonEncodeNoError(th.taskList)))
 	span.SetAttributes(attribute.Int("task.filter.count", len(th.taskList)))
 
 	return true
@@ -253,6 +265,13 @@ func (th *TaskHelper) RunMultipleTask(rootCtx context.Context, wait int64, execu
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(rootCtx, "RunMultipleTask")
 	defer span.End()
+
+	span.SetAttributes(attribute.String("task.help.helper", "db"))
+	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
+
+	span.SetAttributes(attribute.Int64("task.multiple.wait", wait))
+	span.SetAttributes(attribute.String("task.multiple.list", gojson.JsonEncodeNoError(th.taskList)))
+	span.SetAttributes(attribute.Int("task.multiple.count", len(th.taskList)))
 
 	if th.cfg.logIsDebug {
 		slog.DebugContext(ctx, "RunMultipleTask 运行多个任务", slog.Int64("wait", wait))
@@ -290,6 +309,11 @@ func (th *TaskHelper) RunSingleTask(rootCtx context.Context, task GormModelTask,
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(rootCtx, "RunSingleTask "+task.CustomID)
 	defer span.End()
+
+	span.SetAttributes(attribute.String("task.help.helper", "db"))
+	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
+
+	span.SetAttributes(attribute.String("task.single.info", gojson.JsonEncodeNoError(task)))
 
 	if th.cfg.logIsDebug {
 		slog.DebugContext(ctx, "RunSingleTask 运行单个任务", slog.String("task", gojson.JsonEncodeNoError(task)))
