@@ -37,6 +37,10 @@ func NewTaskCustomHelper(rootCtx context.Context, taskType string, opts ...TaskH
 	// 配置
 	th.cfg = newTaskHelperConfig(opts)
 
+	if gorequest.GetRequestIDContext(rootCtx) == "" {
+		rootCtx = gorequest.SetRequestIDContext(rootCtx)
+	}
+
 	// 启动OpenTelemetry链路追踪
 	th.Ctx, th.Span = NewTraceStartSpan(rootCtx, th.taskType)
 
