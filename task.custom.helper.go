@@ -17,8 +17,8 @@ import (
 type TaskCustomHelper struct {
 	cfg *taskHelperConfig // 配置
 
-	taskType string                     // [任务]类型
-	taskList []TaskCustomHelperTaskList // [任务]列表
+	taskType string                      // [任务]类型
+	taskList []*TaskCustomHelperTaskList // [任务]列表
 
 	Ctx  context.Context // [启动]上下文
 	Span trace.Span      // [启动]链路追踪
@@ -63,11 +63,10 @@ func NewTaskCustomHelper(rootCtx context.Context, taskType string, opts ...TaskH
 // listCallback 任务回调函数 返回 任务列表
 // newTaskLists 新的任务列表
 // isContinue 是否继续
-func (th *TaskCustomHelper) QueryTaskList(rootCtx context.Context, isRunCallback func(ctx context.Context, keyName string) (isUse bool, result *redis.StringCmd), listCallback func(ctx context.Context, taskType string) []TaskCustomHelperTaskList) (isContinue bool) {
+func (th *TaskCustomHelper) QueryTaskList(rootCtx context.Context, isRunCallback func(ctx context.Context, keyName string) (isUse bool, result *redis.StringCmd), listCallback func(ctx context.Context, taskType string) []*TaskCustomHelperTaskList) (isContinue bool) {
 
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(rootCtx, "QueryTaskList")
-	defer span.End()
 
 	span.SetAttributes(attribute.String("task.help.helper", "custom"))
 	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
@@ -91,6 +90,8 @@ func (th *TaskCustomHelper) QueryTaskList(rootCtx context.Context, isRunCallback
 					if th.cfg.traceIsFilter {
 						span.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 					}
+
+					span.End() // 结束OpenTelemetry链路追踪
 					return
 				}
 
@@ -100,6 +101,8 @@ func (th *TaskCustomHelper) QueryTaskList(rootCtx context.Context, isRunCallback
 				if th.cfg.logIsDebug {
 					slog.DebugContext(ctx, fmt.Sprintf("执行任务列表回调函数返回错误，无法继续运行: %v", isRunResult.Err().Error()))
 				}
+
+				span.End() // 结束OpenTelemetry链路追踪
 				return
 			}
 			if isRunResult.Val() == "" {
@@ -114,14 +117,15 @@ func (th *TaskCustomHelper) QueryTaskList(rootCtx context.Context, isRunCallback
 				if th.cfg.traceIsFilter {
 					span.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 				}
+
+				span.End() // 结束OpenTelemetry链路追踪
 				return
 			}
 		}
 	}
 
-	// 任务列表回调函数
+	// 执行任务列表回调函数
 	if listCallback != nil {
-		// 执行
 		th.taskList = listCallback(ctx, th.taskType)
 	}
 
@@ -135,6 +139,8 @@ func (th *TaskCustomHelper) QueryTaskList(rootCtx context.Context, isRunCallback
 		if th.cfg.traceIsFilter {
 			span.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 		}
+
+		span.End() // 结束OpenTelemetry链路追踪
 		return
 	}
 
@@ -142,11 +148,12 @@ func (th *TaskCustomHelper) QueryTaskList(rootCtx context.Context, isRunCallback
 	span.SetAttributes(attribute.String("task.list.list", gojson.JsonEncodeNoError(th.taskList)))
 	span.SetAttributes(attribute.Int("task.list.count", len(th.taskList)))
 
+	span.End() // 结束OpenTelemetry链路追踪
 	return true
 }
 
 // GetTaskList 请在QueryTaskList之后获取任务列表
-func (th *TaskCustomHelper) GetTaskList() []TaskCustomHelperTaskList {
+func (th *TaskCustomHelper) GetTaskList() []*TaskCustomHelperTaskList {
 	return th.taskList
 }
 
@@ -156,11 +163,10 @@ func (th *TaskCustomHelper) GetTaskList() []TaskCustomHelperTaskList {
 // executionCallback 执行任务回调函数
 // startCallback 开始任务回调函数
 // endCallback 结束任务回调函数
-func (th *TaskCustomHelper) RunMultipleTask(rootCtx context.Context, wait int64, executionCallback func(ctx context.Context, task TaskCustomHelperTaskList) (err error), startCallback func(ctx context.Context, taskType string) (err error), endCallback func(ctx context.Context, taskType string)) {
+func (th *TaskCustomHelper) RunMultipleTask(rootCtx context.Context, wait int64, executionCallback func(ctx context.Context, task *TaskCustomHelperTaskList) (err error), startCallback func(ctx context.Context, taskType string) (err error), endCallback func(ctx context.Context, taskType string)) {
 
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(rootCtx, "RunMultipleTask")
-	defer span.End()
 
 	span.SetAttributes(attribute.String("task.help.helper", "custom"))
 	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
@@ -173,9 +179,8 @@ func (th *TaskCustomHelper) RunMultipleTask(rootCtx context.Context, wait int64,
 		slog.DebugContext(ctx, "RunMultipleTask 运行多个任务", slog.Int64("wait", wait))
 	}
 
+	// 执行开始任务回调函数
 	if startCallback != nil && endCallback != nil {
-
-		// 开始任务回调函数
 		err := startCallback(ctx, th.taskType)
 		if err != nil {
 			err = fmt.Errorf("开始任务回调函数返回错误，无法继续运行: %s", err)
@@ -189,10 +194,10 @@ func (th *TaskCustomHelper) RunMultipleTask(rootCtx context.Context, wait int64,
 			if th.cfg.traceIsFilter {
 				span.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 			}
+
+			span.End() // 结束OpenTelemetry链路追踪
 			return
 		}
-		defer endCallback(ctx, th.taskType)
-
 	}
 
 	for _, vTask := range th.taskList {
@@ -207,6 +212,12 @@ func (th *TaskCustomHelper) RunMultipleTask(rootCtx context.Context, wait int64,
 
 	}
 
+	// 执行结束任务回调函数
+	if startCallback != nil && endCallback != nil {
+		endCallback(ctx, th.taskType)
+	}
+
+	span.End() // 结束OpenTelemetry链路追踪
 	return
 }
 
@@ -214,11 +225,10 @@ func (th *TaskCustomHelper) RunMultipleTask(rootCtx context.Context, wait int64,
 // rootCtx 链路追踪的上下文
 // task 任务
 // executionCallback 执行任务回调函数
-func (th *TaskCustomHelper) RunSingleTask(rootCtx context.Context, task TaskCustomHelperTaskList, executionCallback func(ctx context.Context, task TaskCustomHelperTaskList) (err error)) {
+func (th *TaskCustomHelper) RunSingleTask(rootCtx context.Context, task *TaskCustomHelperTaskList, executionCallback func(ctx context.Context, task *TaskCustomHelperTaskList) (err error)) {
 
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(rootCtx, "RunSingleTask "+task.CustomID)
-	defer span.End()
 
 	span.SetAttributes(attribute.String("task.help.helper", "custom"))
 	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
@@ -246,6 +256,8 @@ func (th *TaskCustomHelper) RunSingleTask(rootCtx context.Context, task TaskCust
 		span.SetAttributes(attribute.String("task.info.custom_id", task.CustomID))
 
 	}
+
+	span.End() // 结束OpenTelemetry链路追踪
 	return
 }
 
