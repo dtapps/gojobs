@@ -6,11 +6,11 @@ import (
 )
 
 type TaskLockOperation struct {
-	client *Client       // 实例
-	task   GormModelTask // 任务
+	client *Client        // 实例
+	task   *GormModelTask // 任务
 }
 
-func (c *Client) NewLock(task GormModelTask) (*TaskLockOperation, error) {
+func (c *Client) NewLock(task *GormModelTask) (*TaskLockOperation, error) {
 	if task.ID == 0 {
 		return nil, errors.New("任务数据不正常")
 	}
