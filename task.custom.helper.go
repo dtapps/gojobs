@@ -25,7 +25,7 @@ type TaskCustomHelper struct {
 }
 
 // NewTaskCustomHelper 任务帮助
-// ctx 链路追踪的上下文
+// rootCtx 链路追踪的上下文
 // taskType 任务类型
 // logIsDebug 日志是否启动
 // traceIsFilter 链路追踪是否过滤
@@ -58,6 +58,7 @@ func NewTaskCustomHelper(rootCtx context.Context, taskType string, opts ...TaskH
 }
 
 // QueryTaskList 通过回调函数获取任务列表
+// rootCtx 链路追踪的上下文
 // isRunCallback 任务列表回调函数 返回 是否使用 任务列表
 // listCallback 任务回调函数 返回 任务列表
 // newTaskLists 新的任务列表
@@ -79,11 +80,11 @@ func (th *TaskCustomHelper) QueryTaskList(rootCtx context.Context, isRunCallback
 		if isRunUse {
 			if isRunResult.Err() != nil {
 				if errors.Is(isRunResult.Err(), redis.Nil) {
-					err := fmt.Errorf("查询redis的key不存在，根据设置，无法继续运行: %v", isRunResult.Err().Error())
+					err := fmt.Errorf("执行任务列表回调函数返回不存在，无法继续运行: %v@%v", GetRedisKeyName(th.taskType), isRunResult.Err().Error())
 					span.SetStatus(codes.Error, err.Error())
 
 					if th.cfg.logIsDebug {
-						slog.DebugContext(ctx, "查询redis的key不存在，根据设置，无法继续运行", slog.String("key", GetRedisKeyName(th.taskType)), slog.String("err", isRunResult.Err().Error()))
+						slog.DebugContext(ctx, fmt.Sprintf("执行任务列表回调函数返回不存在，无法继续运行: %v@%v", GetRedisKeyName(th.taskType), isRunResult.Err().Error()))
 					}
 
 					// 过滤
@@ -93,20 +94,20 @@ func (th *TaskCustomHelper) QueryTaskList(rootCtx context.Context, isRunCallback
 					return
 				}
 
-				err := fmt.Errorf("查询redis的key异常，无法继续运行: %v", isRunResult.Err().Error())
+				err := fmt.Errorf("执行任务列表回调函数返回错误，无法继续运行: %v", isRunResult.Err().Error())
 				span.SetStatus(codes.Error, err.Error())
 
 				if th.cfg.logIsDebug {
-					slog.DebugContext(ctx, "QueryTaskList 查询redis的key异常，无法继续运行", slog.String("err", isRunResult.Err().Error()))
+					slog.DebugContext(ctx, fmt.Sprintf("执行任务列表回调函数返回错误，无法继续运行: %v", isRunResult.Err().Error()))
 				}
 				return
 			}
 			if isRunResult.Val() == "" {
-				err := fmt.Errorf("查询redis的key内容为空，根据配置，无法继续运行: %s", isRunResult.Val())
+				err := fmt.Errorf("执行任务列表回调函数返回空，无法继续运行: %s", isRunResult.Val())
 				span.SetStatus(codes.Error, err.Error())
 
 				if th.cfg.logIsDebug {
-					slog.DebugContext(ctx, "QueryTaskList 查询redis的key内容为空，根据配置，无法继续运行", slog.String("val", isRunResult.Val()))
+					slog.DebugContext(ctx, fmt.Sprintf("执行任务列表回调函数返回空，无法继续运行: %s", isRunResult.Val()))
 				}
 
 				// 过滤
@@ -150,8 +151,12 @@ func (th *TaskCustomHelper) GetTaskList() []TaskCustomHelperTaskList {
 }
 
 // RunMultipleTask 运行多个任务
+// rootCtx 链路追踪的上下文
+// wait 等待时间（秒）
 // executionCallback 执行任务回调函数
-func (th *TaskCustomHelper) RunMultipleTask(rootCtx context.Context, wait int64, executionCallback func(ctx context.Context, task TaskCustomHelperTaskList) (err error)) {
+// startCallback 开始任务回调函数
+// endCallback 结束任务回调函数
+func (th *TaskCustomHelper) RunMultipleTask(rootCtx context.Context, wait int64, executionCallback func(ctx context.Context, task TaskCustomHelperTaskList) (err error), startCallback func(ctx context.Context, taskType string) (err error), endCallback func(ctx context.Context, taskType string)) {
 
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(rootCtx, "RunMultipleTask")
@@ -166,6 +171,28 @@ func (th *TaskCustomHelper) RunMultipleTask(rootCtx context.Context, wait int64,
 
 	if th.cfg.logIsDebug {
 		slog.DebugContext(ctx, "RunMultipleTask 运行多个任务", slog.Int64("wait", wait))
+	}
+
+	if startCallback != nil && endCallback != nil {
+
+		// 开始任务回调函数
+		err := startCallback(ctx, th.taskType)
+		if err != nil {
+			err = fmt.Errorf("开始任务回调函数返回错误，无法继续运行: %s", err)
+			span.SetStatus(codes.Error, err.Error())
+
+			if th.cfg.logIsDebug {
+				slog.DebugContext(ctx, fmt.Sprintf("开始任务回调函数返回错误，无法继续运行: %s", err))
+			}
+
+			// 过滤
+			if th.cfg.traceIsFilter {
+				span.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
+			}
+			return
+		}
+		defer endCallback(ctx, th.taskType)
+
 	}
 
 	for _, vTask := range th.taskList {
@@ -184,6 +211,7 @@ func (th *TaskCustomHelper) RunMultipleTask(rootCtx context.Context, wait int64,
 }
 
 // RunSingleTask 运行单个任务
+// rootCtx 链路追踪的上下文
 // task 任务
 // executionCallback 执行任务回调函数
 func (th *TaskCustomHelper) RunSingleTask(rootCtx context.Context, task TaskCustomHelperTaskList, executionCallback func(ctx context.Context, task TaskCustomHelperTaskList) (err error)) {

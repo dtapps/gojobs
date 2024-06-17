@@ -6,7 +6,7 @@ require (
 	github.com/redis/go-redis/v9 v9.5.3
 	github.com/robfig/cron/v3 v3.0.1
 	go.dtapp.net/gojson v1.0.4
-	go.dtapp.net/gorequest v1.0.68
+	go.dtapp.net/gorequest v1.0.70
 	go.dtapp.net/gostring v1.0.15
 	go.dtapp.net/gotime v1.0.11
 	go.opentelemetry.io/otel v1.27.0

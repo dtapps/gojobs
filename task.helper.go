@@ -59,6 +59,7 @@ func NewTaskHelper(rootCtx context.Context, taskType string, opts ...TaskHelperO
 }
 
 // QueryTaskList 通过回调函数获取任务列表
+// rootCtx 链路追踪的上下文
 // isRunCallback 任务列表回调函数 返回 是否使用 任务列表
 // listCallback 任务回调函数 返回 任务列表
 // newTaskLists 新的任务列表
@@ -77,12 +78,12 @@ func (th *TaskHelper) QueryTaskList(rootCtx context.Context, isRunCallback func(
 		if isRunUse {
 			if isRunResult.Err() != nil {
 				if errors.Is(isRunResult.Err(), redis.Nil) {
-					err := fmt.Errorf("查询redis的key不存在，根据设置，无法继续运行: %v", isRunResult.Err().Error())
+					err := fmt.Errorf("执行任务列表回调函数返回不存在，无法继续运行: %v@%v", GetRedisKeyName(th.taskType), isRunResult.Err().Error())
 					//th.listSpan.RecordError( err, trace.WithStackTrace(true))
 					span.SetStatus(codes.Error, err.Error())
 
 					if th.cfg.logIsDebug {
-						slog.DebugContext(ctx, "查询redis的key不存在，根据设置，无法继续运行", slog.String("key", GetRedisKeyName(th.taskType)), slog.String("err", isRunResult.Err().Error()))
+						slog.DebugContext(ctx, fmt.Sprintf("执行任务列表回调函数返回不存在，无法继续运行: %v@%v", GetRedisKeyName(th.taskType), isRunResult.Err().Error()))
 					}
 
 					// 过滤
@@ -92,30 +93,28 @@ func (th *TaskHelper) QueryTaskList(rootCtx context.Context, isRunCallback func(
 					return
 				}
 
-				err := fmt.Errorf("查询redis的key异常，无法继续运行: %v", isRunResult.Err().Error())
+				err := fmt.Errorf("执行任务列表回调函数返回错误，无法继续运行: %v", isRunResult.Err().Error())
 				//th.listSpan.RecordError( err, trace.WithStackTrace(true))
 				span.SetStatus(codes.Error, err.Error())
 
 				if th.cfg.logIsDebug {
-					slog.DebugContext(ctx, "QueryTaskList 查询redis的key异常，无法继续运行", slog.String("err", isRunResult.Err().Error()))
+					slog.DebugContext(ctx, fmt.Sprintf("执行任务列表回调函数返回错误，无法继续运行: %v", isRunResult.Err().Error()))
 				}
-
 				return
 			}
 			if isRunResult.Val() == "" {
-				err := fmt.Errorf("查询redis的key内容为空，根据配置，无法继续运行: %s", isRunResult.Val())
+				err := fmt.Errorf("执行任务列表回调函数返回空，无法继续运行: %s", isRunResult.Val())
 				//th.listSpan.RecordError(err, trace.WithStackTrace(true))
 				span.SetStatus(codes.Error, err.Error())
 
 				if th.cfg.logIsDebug {
-					slog.DebugContext(ctx, "QueryTaskList 查询redis的key内容为空，根据配置，无法继续运行", slog.String("val", isRunResult.Val()))
+					slog.DebugContext(ctx, fmt.Sprintf("执行任务列表回调函数返回空，无法继续运行: %s", isRunResult.Val()))
 				}
 
 				// 过滤
 				if th.cfg.traceIsFilter {
 					span.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 				}
-
 				return
 			}
 		}
@@ -155,6 +154,7 @@ func (th *TaskHelper) QueryTaskList(rootCtx context.Context, isRunCallback func(
 }
 
 // FilterTaskList 过滤任务列表
+// rootCtx 链路追踪的上下文
 // isMandatoryIp 强制当前ip
 // specifyIp 指定Ip
 // isContinue 是否继续
@@ -241,7 +241,6 @@ func (th *TaskHelper) FilterTaskList(rootCtx context.Context, isMandatoryIp bool
 		if th.cfg.traceIsFilter {
 			span.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
 		}
-
 		return
 	}
 
@@ -253,14 +252,18 @@ func (th *TaskHelper) FilterTaskList(rootCtx context.Context, isMandatoryIp bool
 }
 
 // GetTaskList 请在FilterTaskList之后获取任务列表
-func (th *TaskHelper) GetTaskList(rootCtx context.Context) []GormModelTask {
+func (th *TaskHelper) GetTaskList() []GormModelTask {
 	return th.taskList
 }
 
 // RunMultipleTask 运行多个任务
+// rootCtx 链路追踪的上下文
+// wait 等待时间（秒）
 // executionCallback 执行任务回调函数 返回 runCode=状态 runDesc=描述
 // updateCallback 执行更新回调函数
-func (th *TaskHelper) RunMultipleTask(rootCtx context.Context, wait int64, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, result TaskHelperRunSingleTaskResponse)) {
+// startCallback 开始任务回调函数
+// endCallback 结束任务回调函数
+func (th *TaskHelper) RunMultipleTask(rootCtx context.Context, wait int64, executionCallback func(ctx context.Context, task GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task GormModelTask, result TaskHelperRunSingleTaskResponse), startCallback func(ctx context.Context, taskType string) (err error), endCallback func(ctx context.Context, taskType string)) {
 
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(rootCtx, "RunMultipleTask")
@@ -275,6 +278,28 @@ func (th *TaskHelper) RunMultipleTask(rootCtx context.Context, wait int64, execu
 
 	if th.cfg.logIsDebug {
 		slog.DebugContext(ctx, "RunMultipleTask 运行多个任务", slog.Int64("wait", wait))
+	}
+
+	if startCallback != nil && endCallback != nil {
+
+		// 开始任务回调函数
+		err := startCallback(ctx, th.taskType)
+		if err != nil {
+			err = fmt.Errorf("开始任务回调函数返回错误，无法继续运行: %s", err)
+			span.SetStatus(codes.Error, err.Error())
+
+			if th.cfg.logIsDebug {
+				slog.DebugContext(ctx, fmt.Sprintf("开始任务回调函数返回错误，无法继续运行: %s", err))
+			}
+
+			// 过滤
+			if th.cfg.traceIsFilter {
+				span.SetAttributes(attribute.String(th.cfg.traceIsFilterKeyName, th.cfg.traceIsFilterKeyValue))
+			}
+			return
+		}
+		defer endCallback(ctx, th.taskType)
+
 	}
 
 	for _, vTask := range th.taskList {
@@ -301,6 +326,7 @@ type TaskHelperRunSingleTaskResponse struct {
 }
 
 // RunSingleTask 运行单个任务
+// rootCtx 链路追踪的上下文
 // task 任务
 // executionCallback 执行任务回调函数 返回 runCode=状态 runDesc=描述
 // updateCallback 执行更新回调函数
