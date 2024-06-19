@@ -424,6 +424,8 @@ func (th *TaskHelper) RunSingleTask(rootCtx context.Context, task *GormModelTask
 
 // EndRunTaskList 结束运行任务列表并停止OpenTelemetry链路追踪
 func (th *TaskHelper) EndRunTaskList() {
-	th.Span.End() // 结束OpenTelemetry链路追踪
+	if th.Span != nil {
+		th.Span.End()
+	}
 	return
 }

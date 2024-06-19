@@ -263,6 +263,8 @@ func (th *TaskCustomHelper) RunSingleTask(rootCtx context.Context, task *TaskCus
 
 // EndRunTaskList 结束运行任务列表并停止OpenTelemetry链路追踪
 func (th *TaskCustomHelper) EndRunTaskList() {
-	th.Span.End()
+	if th.Span != nil {
+		th.Span.End()
+	}
 	return
 }
