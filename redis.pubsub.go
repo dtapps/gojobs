@@ -36,50 +36,12 @@ func (c *PubSubClient) PSubscribe(ctx context.Context, channel ...string) *redis
 	return c.client.PSubscribe(ctx, channel...)
 }
 
-// CustomRunSingleTask 运行单个任务
-// ctx 链路追踪的上下文
-// message 任务json编码
-// executionCallback 执行任务回调函数 返回 runCode=状态 runDesc=描述
-// updateCallback 执行更新回调函数
-func (c *PubSubClient) CustomRunSingleTask(ctx context.Context, message string, executionCallback func(ctx context.Context, task *TaskCustomHelperTaskList) (err error)) {
-
-	// 解析任务
-	var task TaskCustomHelperTaskList
-	err := gojson.Unmarshal([]byte(message), &task)
-	if err != nil {
-		return
-	}
-
-	// 启动OpenTelemetry链路追踪
-	ctx, span := NewTraceStartSpan(ctx, "CustomRunSingleTask "+task.TaskName+" "+task.CustomID)
-
-	span.SetAttributes(attribute.String("task.help.helper", "custom"))
-	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
-
-	span.SetAttributes(attribute.String("task.single.info", gojson.JsonEncodeNoError(task)))
-
-	// 任务回调函数
-	if executionCallback != nil {
-
-		// 执行
-		err = executionCallback(ctx, &task)
-		if err != nil {
-			span.RecordError(err, trace.WithStackTrace(true))
-			span.SetStatus(codes.Error, err.Error())
-		}
-
-	}
-
-	span.End() // 结束OpenTelemetry链路追踪
-	return
-}
-
 // DbRunSingleTask 运行单个任务
 // ctx 链路追踪的上下文
 // message 任务json编码
 // executionCallback 执行任务回调函数 返回 runCode=状态 runDesc=描述
 // updateCallback 执行更新回调函数
-func (c *PubSubClient) DbRunSingleTask(ctx context.Context, message string, executionCallback func(ctx context.Context, task *GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task *GormModelTask, result *TaskHelperRunSingleTaskResponse)) {
+func (c *PubSubClient) DbRunSingleTask(ctx context.Context, message string, executionCallback func(ctx context.Context, task *GormModelTask) (runCode int, runDesc string), updateCallback func(ctx context.Context, task *GormModelTask, result *TaskHelperRunSingleTaskResponse) (err error)) {
 
 	// 解析任务
 	var task GormModelTask
@@ -89,7 +51,7 @@ func (c *PubSubClient) DbRunSingleTask(ctx context.Context, message string, exec
 	}
 
 	// 启动OpenTelemetry链路追踪
-	ctx, span := NewTraceStartSpan(ctx, "DbRunSingleTask "+task.Type+" "+task.CustomID)
+	ctx, span := NewTraceStartSpan(ctx, task.Type+" "+task.CustomID)
 
 	span.SetAttributes(attribute.String("task.help.helper", "db"))
 	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
@@ -139,7 +101,14 @@ func (c *PubSubClient) DbRunSingleTask(ctx context.Context, message string, exec
 
 		// 执行更新回调函数
 		if updateCallback != nil {
-			updateCallback(ctx, &task, &result)
+			err = updateCallback(ctx, &task, &result)
+			if err != nil {
+				span.RecordError(err, trace.WithStackTrace(true))
+				span.SetStatus(codes.Error, err.Error())
+
+				span.End() // 结束OpenTelemetry链路追踪
+				return
+			}
 		}
 
 	}
