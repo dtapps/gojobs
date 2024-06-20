@@ -21,11 +21,11 @@ func (c *PubSubClient) Publish(ctx context.Context, channel string, message inte
 }
 
 // Subscribe 订阅
-func (c *PubSubClient) Subscribe(ctx context.Context, channel string) *redis.PubSub {
-	return c.client.Subscribe(ctx, channel)
+func (c *PubSubClient) Subscribe(ctx context.Context, channel ...string) *redis.PubSub {
+	return c.client.Subscribe(ctx, channel...)
 }
 
 // PSubscribe 订阅，支持通配符匹配(ch_user_*)
-func (c *PubSubClient) PSubscribe(ctx context.Context, channel string) *redis.PubSub {
-	return c.client.PSubscribe(ctx, channel)
+func (c *PubSubClient) PSubscribe(ctx context.Context, channel ...string) *redis.PubSub {
+	return c.client.PSubscribe(ctx, channel...)
 }
