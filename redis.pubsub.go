@@ -53,10 +53,7 @@ func (c *PubSubClient) DbRunSingleTask(ctx context.Context, message string, exec
 	// 启动OpenTelemetry链路追踪
 	ctx, span := NewTraceStartSpan(ctx, task.Type+" "+task.CustomID)
 
-	span.SetAttributes(attribute.String("task.help.helper", "db"))
-	span.SetAttributes(attribute.String("task.help.request_id", gorequest.GetRequestIDContext(ctx)))
-
-	span.SetAttributes(attribute.String("task.single.info", gojson.JsonEncodeNoError(task)))
+	span.SetAttributes(attribute.String("task.run.info", gojson.JsonEncodeNoError(task)))
 
 	// 任务回调函数
 	if executionCallback != nil {
