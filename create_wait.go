@@ -14,18 +14,19 @@ type ConfigCreateWaitCustomId struct {
 	Tx             *gorm.DB // 驱动
 	Params         string   // 参数
 	Frequency      int64    // 频率(秒单位)
-	CustomId       string   // 自定义编号
+	Spec           string   // cron表达式
+	CustomID       string   // 自定义编号
 	CustomSequence int64    // 自定义顺序
 	Type           string   // 类型
 	TypeName       string   // 类型名称
-	SpecifyIp      string   // 指定外网IP
-	CurrentIp      string   // 当前外网IP
+	SpecifyIP      string   // 指定IP
+	CurrentIP      string   // 当前IP
 }
 
 // CreateWaitCustomId 创建正在运行任务
 func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWaitCustomId) error {
-	if config.CurrentIp == "" {
-		config.CurrentIp = c.config.systemOutsideIP
+	if config.CurrentIP == "" {
+		config.CurrentIP = c.config.systemOutsideIP
 	}
 	err := config.Tx.WithContext(ctx).Table(c.gormConfig.taskTableName).
 		Create(&GormModelTask{
@@ -33,18 +34,19 @@ func (c *Client) CreateWaitCustomId(ctx context.Context, config *ConfigCreateWai
 			Params:         config.Params,
 			StatusDesc:     "首次添加等待任务",
 			Frequency:      config.Frequency,
+			Spec:           config.Spec,
 			RunID:          gostring.GetUuId(),
-			CustomID:       config.CustomId,
+			CustomID:       config.CustomID,
 			CustomSequence: config.CustomSequence,
 			Type:           config.Type,
 			TypeName:       config.TypeName,
-			CreatedIP:      config.CurrentIp,
-			SpecifyIP:      config.SpecifyIp,
-			UpdatedIP:      config.CurrentIp,
+			CreatedIP:      config.CurrentIP,
+			SpecifyIP:      config.SpecifyIP,
+			UpdatedIP:      config.CurrentIP,
 			NextRunTime:    gotime.Current().AfterSeconds(config.Frequency).Time,
 		}).Error
 	if err != nil {
-		err = fmt.Errorf("创建[%s@%s]任务失败：%s", config.CustomId, config.Type, err)
+		err = fmt.Errorf("创建[%s@%s]任务失败：%s", config.CustomID, config.Type, err)
 		TraceRecordError(ctx, err)
 		TraceSetStatus(ctx, codes.Error, err.Error())
 		return err

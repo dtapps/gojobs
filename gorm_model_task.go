@@ -17,6 +17,7 @@ type GormModelTask struct {
 	Params         string         `gorm:"comment:参数" json:"params"`                               // 参数
 	StatusDesc     string         `gorm:"comment:状态描述" json:"status_desc"`                        // 状态描述
 	Frequency      int64          `gorm:"index;comment:频率(秒单位)" json:"frequency"`                 // 频率(秒单位)
+	Spec           string         `gorm:"index;comment:cron表达式" json:"spec"`                      // cron表达式
 	Number         int64          `gorm:"comment:当前次数" json:"number"`                             // 当前次数
 	MaxNumber      int64          `gorm:"comment:最大次数" json:"max_number"`                         // 最大次数
 	RunID          string         `gorm:"comment:执行编号" json:"run_id"`                             // 执行编号
